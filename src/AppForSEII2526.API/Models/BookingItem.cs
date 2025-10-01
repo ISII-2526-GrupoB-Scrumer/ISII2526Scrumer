@@ -3,10 +3,9 @@ using System;
 public class BookingItem
 {
     // Propiedades
-    public int Id { get; set; }
-    public string Description { get; set; }
-    public decimal Price { get; set; }
-    public int Quantity { get; set; }
+    public int BookingId { get; set; }
+    public string Comment { get; set; }
+    public int MantId { get; set; }
 
     // Constructor por defecto
     public BookingItem()
@@ -14,12 +13,11 @@ public class BookingItem
     }
 
     // Constructor con parámetros
-    public BookingItem(int id, string description, decimal price, int quantity)
+    public BookingItem(int bookingId, string comment, int mantID)
     {
-        Id = id;
-        Description = description;
-        Price = price;
-        Quantity = quantity;
+        BookingId = bookingId;
+        Comment = comment;
+        MantID = mantID;
     }
 
     // Método Equals
