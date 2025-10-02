@@ -5,7 +5,6 @@ public class Rental
     public string DeliveryCarDealer { get; set; }
     public DateTime EndDate { get; set; }
     public int Id { get; set; }
-    public string PaymentMethod { get; set; }
     public DateTime RentingDate { get; set; }
     public DateTime StartDate { get; set; }
     public decimal TotalPrice { get; set; }
@@ -15,12 +14,11 @@ public class Rental
 
     public Rental() { }
 
-    public Rental(string deliveryCarDealer, DateTime endDate, int id, string paymentMethod, DateTime rentingDate, DateTime startDate, decimal totalPrice)
+    public Rental(string deliveryCarDealer, DateTime endDate, int id, DateTime rentingDate, DateTime startDate, decimal totalPrice)
     {
         DeliveryCarDealer = deliveryCarDealer;
         EndDate = endDate;
         Id = id;
-        PaymentMethod = paymentMethod;
         RentingDate = rentingDate;
         StartDate = startDate;
         TotalPrice = totalPrice;
