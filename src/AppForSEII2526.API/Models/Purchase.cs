@@ -11,26 +11,6 @@ namespace AppForSEII2526.API.Models
         public int Id { get; set; }
 
         /// <summary>
-        /// Concesionario de entrega
-        /// </summary>
-        public string DeliveryCarDealer { get; set; } = string.Empty;
-
-        /// <summary>
-        /// Nombre del cliente
-        /// </summary>
-        public string Name { get; set; } = string.Empty;
-
-        /// <summary>
-        /// Apellidos del cliente
-        /// </summary>
-        public string Surname { get; set; } = string.Empty;
-
-        /// <summary>
-        /// Método de pago utilizado
-        /// </summary>
-        public string PaymentMethod { get; set; } = string.Empty;
-
-        /// <summary>
         /// Fecha de la compra
         /// </summary>
         public DateTime PurchasingDate { get; set; }
