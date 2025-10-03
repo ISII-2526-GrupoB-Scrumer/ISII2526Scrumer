@@ -5,6 +5,8 @@ public class Model
     public string Id { get; set; }
     public string Name { get; set; }
 
+    public IList<Car> Cars { get; set; }
+
     public Model()
     {
     }

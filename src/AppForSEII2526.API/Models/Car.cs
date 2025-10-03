@@ -18,6 +18,8 @@ public class Car
     public decimal RentingPrice { get; set; }
     public int RimSize { get; set; }
 
+    public Model Model { get; set; }
+
     public Car()
     {
     }
