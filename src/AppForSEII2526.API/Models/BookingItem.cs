@@ -17,7 +17,7 @@ public class BookingItem
     {
         BookingId = bookingId;
         Comment = comment;
-        MantID = mantID;
+        MantId = mantID;
     }
 
     // Método Equals
@@ -25,14 +25,14 @@ public class BookingItem
     {
         if (obj is BookingItem other)
         {
-            return Id == other.Id;
+            return this.BookingId == other.BookingId;
         }
         return false;
     }
 
-    // Método GetHashCode
     public override int GetHashCode()
     {
-        return Id.GetHashCode();
+        return BookingId.GetHashCode();
     }
 }
+
