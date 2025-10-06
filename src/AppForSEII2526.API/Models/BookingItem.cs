@@ -7,6 +7,10 @@ public class BookingItem
     public string Comment { get; set; }
     public int MantId { get; set; }
 
+    //Relaciones
+    public Booking Booking { get; set; }
+    public Maintenance Maintenance { get; set; }
+
     // Constructor por defecto
     public BookingItem()
     {
