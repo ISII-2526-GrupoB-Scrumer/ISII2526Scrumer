@@ -8,7 +8,7 @@ public class RentalItem
 
 
     //Métodos
-    punlic RentalItem() { }
+    public RentalItem() { }
 
     public RentalItem(int carId, int quantity, int rentalId)
     {
