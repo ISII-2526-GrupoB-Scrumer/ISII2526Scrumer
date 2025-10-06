@@ -19,6 +19,7 @@ public class Car
     public int RimSize { get; set; }
 
     public Model Model { get; set; }
+    public IList<ReviewItem> ReviewItems { get; set; }
 
     public Car()
     {
