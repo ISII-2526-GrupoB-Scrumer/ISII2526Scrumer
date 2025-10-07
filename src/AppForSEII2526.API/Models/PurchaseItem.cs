@@ -20,6 +20,10 @@ namespace AppForSEII2526.API.Models
         /// </summary>
         public int Quantity { get; set; }
 
+        public Purchase Purchase { get; set; }
+
+        public Car Car { get; set; }
+
         public PurchaseItem()
         {
         }
