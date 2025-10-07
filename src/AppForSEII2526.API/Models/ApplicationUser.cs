@@ -25,6 +25,8 @@ public class ApplicationUser : IdentityUser {
 
 
 
+    public IList<Purchase> Purchases { get; set; }
+
     //Metodos
 
     public ApplicationUser() { }

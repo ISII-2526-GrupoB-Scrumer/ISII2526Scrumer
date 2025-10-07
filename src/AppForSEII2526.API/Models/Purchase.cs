@@ -10,6 +10,8 @@ namespace AppForSEII2526.API.Models
         /// </summary>
         public int Id { get; set; }
 
+
+
         /// <summary>
         /// Fecha de la compra
         /// </summary>
@@ -24,6 +26,8 @@ namespace AppForSEII2526.API.Models
         /// Lista de items comprados
         /// </summary>
         public List<PurchaseItem> PurchaseItems { get; set; } = new List<PurchaseItem>();
+
+        public Car Car { get; set; }
 
         public Purchase()
         {
