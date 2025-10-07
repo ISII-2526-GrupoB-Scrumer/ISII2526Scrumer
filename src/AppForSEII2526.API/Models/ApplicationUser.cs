@@ -7,12 +7,17 @@ public class ApplicationUser : IdentityUser {
 
 
     //Atributos clase Booking
+    [Required]
     public string ClientAddress { get; set; }
+    [Required,Phone]
     public string ClientPhoneNumber { get; set; }
+    [Required]
     public string PaymentMethod { get; set; }
 
     //Atributos clase Retal
+    [Required,StringLength(100)]
     public string Name { get; set; }
+    [Required,StringLength(100)]
     public string Surname { get; set; }
 
     //Atrubitos clase Review

@@ -3,9 +3,17 @@ using System;
 public class Maintenance
 {
     // Propiedades
+
+    [Key]
     public int Id { get; set; }
+
+    [Required,StringLength(100)]
     public string Name { get; set; }
+
+    [Range(1,365)]
     public int NumberOfDays { get; set; }
+
+    [Precision(10,2)]
     public decimal Price { get; set; }
 
     // Relaciones

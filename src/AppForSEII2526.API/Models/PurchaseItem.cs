@@ -8,20 +8,28 @@ namespace AppForSEII2526.API.Models
         /// <summary>
         /// ID del coche asociado
         /// </summary>
+
+        [Required]
         public int CarId { get; set; }
 
         /// <summary>
         /// ID de la compra asociada
         /// </summary>
+
+        [Required]
         public int PurchaseId { get; set; }
 
         /// <summary>
         /// Cantidad de coches en esta línea de compra
         /// </summary>
+
+        [Range(1,int.MaxValue)]
         public int Quantity { get; set; }
 
+        [ForeignKey("PurcheseId")]
         public Purchase Purchase { get; set; }
 
+        [ForeignKey("CarId")]
         public Car Car { get; set; }
 
         public PurchaseItem()

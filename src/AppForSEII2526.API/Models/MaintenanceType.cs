@@ -3,10 +3,14 @@ using System;
 public class MaintenanceType
 {
     // Propiedades
+    [Key]
     public int id { get; set; }
+
+    [Required,StringLength(50)]
     public string Type { get; set; }
 
     //Relaciones
+    [ForeignKey("MaintenanceId")]
     public Maintenance Maintenance { get; set; }
 
 

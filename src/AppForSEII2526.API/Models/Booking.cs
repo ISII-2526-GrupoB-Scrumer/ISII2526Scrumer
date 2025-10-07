@@ -3,11 +3,16 @@ using System;
 public class Booking
 {
     // Propiedades
+    [Required]
     public DateTime Date { get; set; }
+
+    [Key]
     public int Id { get; set; }
 
     //Relaciones
     public IList<BookingItem> Items { get; set; }
+
+    [ForeignKey("ClientId")]
     public ApplicationUser Client { get; set; }
 
     // Constructor por defecto

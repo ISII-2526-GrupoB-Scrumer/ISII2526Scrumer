@@ -2,13 +2,21 @@ public class RentalItem
 {
 
     //Atributos
+    [Required]
     public int CarId { get; set; }
+
+    [Range(1,int.MaxValue)]
     public int Quantity { get; set; }
+
+    [Required]
     public int RentalId { get; set; }
 
 
     //Relaciones
+    [ForeignKey("CarId")]
     public Car Car { get; set; }
+
+    [ForeignKey("RentalId")]
     public Rental Rental { get; set; }
     //Métodos
     public RentalItem() { }
