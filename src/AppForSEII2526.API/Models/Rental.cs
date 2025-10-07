@@ -9,6 +9,10 @@ public class Rental
     public DateTime StartDate { get; set; }
     public decimal TotalPrice { get; set; }
 
+    //Relaciones
+    public IList<RentalItem> RentalItems { get; set; }
+    public ApplicationUser Client { get; set; }
+
 
     //Metodos
 
