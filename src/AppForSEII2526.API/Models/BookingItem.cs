@@ -10,7 +10,7 @@ public class BookingItem
     [StringLength(200)]
     public string Comment { get; set; }
 
-    [Required]
+    [Required,Key]
     public int MantId { get; set; }
 
     //Relaciones

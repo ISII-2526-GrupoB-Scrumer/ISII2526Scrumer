@@ -8,7 +8,7 @@ public class RentalItem
     [Range(1,int.MaxValue)]
     public int Quantity { get; set; }
 
-    [Required]
+    [Required,Key]
     public int RentalId { get; set; }
 
 

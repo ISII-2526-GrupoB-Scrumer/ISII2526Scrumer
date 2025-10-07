@@ -11,7 +11,7 @@ public class ReviewItem
     [Range(1,5)]
     public int Rating { get; set; }
 
-    [Required]
+    [Required,Key]
     public int ReviewId { get; set; }
 
 
