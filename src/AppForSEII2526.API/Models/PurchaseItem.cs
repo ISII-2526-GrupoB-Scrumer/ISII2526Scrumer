@@ -9,7 +9,7 @@ namespace AppForSEII2526.API.Models
         /// ID del coche asociado
         /// </summary>
 
-        [Required]
+        [Required,Key]
         public int CarId { get; set; }
 
         /// <summary>
