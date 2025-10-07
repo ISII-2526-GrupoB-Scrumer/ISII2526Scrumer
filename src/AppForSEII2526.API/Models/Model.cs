@@ -2,7 +2,11 @@ using System;
 
 public class Model
 {
+
+    [Key,StringLength(50)]
     public string Id { get; set; }
+
+    [Required,StringLength(100)]
     public string Name { get; set; }
 
     public IList<Car> Cars { get; set; }

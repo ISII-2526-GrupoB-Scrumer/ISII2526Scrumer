@@ -2,11 +2,22 @@ public class Rental
 {
 
     //Atributos
+    [Required,StringLength(100)]
     public string DeliveryCarDealer { get; set; }
+
+    [Required]
     public DateTime EndDate { get; set; }
+
+    [Key]
     public int Id { get; set; }
+
+    [Required]
     public DateTime RentingDate { get; set; }
+
+    [Required]
     public DateTime StartDate { get; set; }
+
+    [Required,Precision(10,2)]
     public decimal TotalPrice { get; set; }
 
     //Relaciones

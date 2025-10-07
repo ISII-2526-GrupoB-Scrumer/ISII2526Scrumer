@@ -4,17 +4,38 @@ public class Car
 {
 
     //Atributos
+    [Required,StringLength(50)]
     public string CarClass { get; set; }
+
+    [Required, StringLength(30)]
     public string Color { get; set; }
+
+    [StringLength(200)]
     public string Description { get; set; }
+
+    [Required, StringLength(20)]
     public string EngDisplacement { get; set; }
+
+    [Required, StringLength(20)]
     public string FuelType { get; set; }
+    [Key]
     public int Id { get; set; }
     public string MaintenanceTypes { get; set; }
+
+    [Required,StringLength(50)]
     public string Manufacturer { get; set; }
+
+    [Precision(10, 2)]
     public decimal PurchasingPrice { get; set; }
+
+    [Range(0, int.MaxValue)]
     public int QuantityForPurchasing { get; set; }
+
+    [Range(0, int.MaxValue)]
     public int QuantityForRenting { get; set; }
+
+    [Precision(10, 2)]
+
     public decimal RentingPrice { get; set; }
     public int RimSize { get; set; }
 

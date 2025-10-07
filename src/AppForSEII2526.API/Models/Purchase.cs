@@ -8,6 +8,8 @@ namespace AppForSEII2526.API.Models
         /// <summary>
         /// Identificador único de la compra
         /// </summary>
+
+        [Key]
         public int Id { get; set; }
 
 
@@ -15,11 +17,15 @@ namespace AppForSEII2526.API.Models
         /// <summary>
         /// Fecha de la compra
         /// </summary>
+
+        [Required]
         public DateTime PurchasingDate { get; set; }
 
         /// <summary>
         /// Precio total de la compra
         /// </summary>
+
+        [Precision(10,2)]
         public decimal PurchasingPrice { get; set; }
 
         /// <summary>
@@ -27,7 +33,8 @@ namespace AppForSEII2526.API.Models
         /// </summary>
         public List<PurchaseItem> PurchaseItems { get; set; } = new List<PurchaseItem>();
 
-        public Car Car { get; set; }
+        [ForeignKey("ClientId")]
+        public ApplicationUser Client { get; set; }
 
         public Purchase()
         {
