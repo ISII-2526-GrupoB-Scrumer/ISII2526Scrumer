@@ -7,8 +7,12 @@ public class RentalItem
     public int RentalId { get; set; }
 
 
+    //Relaciones
+    public Car Car { get; set; }
+    public Rental Rental { get; set; }
     //Métodos
     public RentalItem() { }
+
 
     public RentalItem(int carId, int quantity, int rentalId)
     {
