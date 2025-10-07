@@ -24,6 +24,8 @@ public class ApplicationUser : IdentityUser {
     public string DeliveryCarDealer { get; set; }
 
 
+    //Relaciones
+    public IList<Booking> Bookings { get; set; }
 
     //Metodos
 

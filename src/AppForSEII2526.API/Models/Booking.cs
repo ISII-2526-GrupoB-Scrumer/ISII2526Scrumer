@@ -6,6 +6,10 @@ public class Booking
     public DateTime Date { get; set; }
     public int Id { get; set; }
 
+    //Relaciones
+    public IList<BookingItem> Items { get; set; }
+    public ApplicationUser Client { get; set; }
+
     // Constructor por defecto
     public Booking()
     {
