@@ -1,0 +1,85 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Model">
+    <Position X="9" Y="4.5" Width="1.5" />
+    <AssociationLine Name="Cars" Type="Car" FixedFromPoint="true">
+      <Path>
+        <Point X="10.5" Y="4.938" />
+        <Point X="12" Y="4.938" />
+      </Path>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>AAACAAACAAAAAAAAgAAAAAQAAAAAAIAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\Model.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Property Name="Cars" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="Car">
+    <Position X="12" Y="1.25" Width="1.5" />
+    <AssociationLine Name="Model" Type="Model" FixedToPoint="true">
+      <Path>
+        <Point X="12" Y="5.562" />
+        <Point X="10.5" Y="5.562" />
+      </Path>
+    </AssociationLine>
+    <AssociationLine Name="ReviewItems" Type="ReviewItem" FixedToPoint="true">
+      <Path>
+        <Point X="12" Y="3.375" />
+        <Point X="8" Y="3.375" />
+      </Path>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>AAgiCAgIAABgACABgAACAACAAAAAAIAAEAgAgBAAAAQ=</HashCode>
+      <FileName>Models\Car.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Model" />
+    </ShowAsAssociation>
+    <ShowAsCollectionAssociation>
+      <Property Name="ReviewItems" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="ReviewItem">
+    <Position X="6.5" Y="2.75" Width="1.5" />
+    <AssociationLine Name="Car" Type="Car" FixedFromPoint="true">
+      <Path>
+        <Point X="8" Y="4.062" />
+        <Point X="12" Y="4.062" />
+      </Path>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAQgAAAAgAAAAACAAAAAAIEAEACAAAAAAAA=</HashCode>
+      <FileName>Models\ReviewItem.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Car" />
+      <Property Name="Review" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="Review">
+    <Position X="3.5" Y="2.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAACAAAAAAAAgAAAAAAAAAAAAIQAAAAAAAAAAAQ=</HashCode>
+      <FileName>Models\Review.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Client" />
+    </ShowAsAssociation>
+    <ShowAsCollectionAssociation>
+      <Property Name="Cars" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="AppForSEII2526.API.Models.ApplicationUser">
+    <Position X="0.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AgABAEAAACAAAAAAgAAAgAQABAIAAIAAAQAAAAAAQAA=</HashCode>
+      <FileName>Models\ApplicationUser.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Property Name="Reviews" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

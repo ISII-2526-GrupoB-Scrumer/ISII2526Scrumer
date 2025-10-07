@@ -7,6 +7,10 @@ public class ReviewItem
     public int Rating { get; set; }
     public int ReviewId { get; set; }
 
+
+    public Car Car { get; set; }
+    public Review Review { get; set; }
+
     public ReviewItem()
     {
     }

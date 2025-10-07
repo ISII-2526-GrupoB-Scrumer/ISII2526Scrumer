@@ -6,6 +6,10 @@ public class MaintenanceType
     public int id { get; set; }
     public string Type { get; set; }
 
+    //Relaciones
+    public Maintenance Maintenance { get; set; }
+
+
     // Constructor por defecto
     public MaintenanceType()
     {
