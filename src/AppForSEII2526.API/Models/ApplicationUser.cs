@@ -27,6 +27,7 @@ public class ApplicationUser : IdentityUser {
     //Relaciones
     public IList<Review> Reviews { get; set; }
     
+    public IList<Booking> Bookings { get; set; }
 
     //Metodos
 

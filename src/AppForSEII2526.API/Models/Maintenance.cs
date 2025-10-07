@@ -8,6 +8,10 @@ public class Maintenance
     public int NumberOfDays { get; set; }
     public decimal Price { get; set; }
 
+    // Relaciones
+    public IList<BookingItem> Bookings { get; set; }
+    public IList<MaintenanceType> MaintenanceTypes { get; set; }
+
     // Constructor por defecto
     public Maintenance()
     {
