@@ -1,3 +1,5 @@
+
+[PrimaryKey(nameof(RentalId), nameof(CarId))]
 public class RentalItem
 {
 
