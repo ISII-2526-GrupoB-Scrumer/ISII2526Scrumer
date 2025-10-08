@@ -18,6 +18,7 @@ namespace AppForSEII2526.API.Models
         /// Fecha de la compra
         /// </summary>
 
+        [DataType(System.ComponentModel.DataAnnotations.DataType.Date)]
         [Required]
         public DateTime PurchasingDate { get; set; }
 
@@ -25,6 +26,7 @@ namespace AppForSEII2526.API.Models
         /// Precio total de la compra
         /// </summary>
 
+        [DataType(System.ComponentModel.DataAnnotations.DataType.Currency)]
         [Precision(10,2)]
         public decimal PurchasingPrice { get; set; }
 

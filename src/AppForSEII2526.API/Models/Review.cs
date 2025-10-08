@@ -3,6 +3,7 @@ using System;
 public class Review
 {
     [Required]
+    [DataType(System.ComponentModel.DataAnnotations.DataType.Date)]
     public DateTime Created { get; set; }
 
     [Key]
