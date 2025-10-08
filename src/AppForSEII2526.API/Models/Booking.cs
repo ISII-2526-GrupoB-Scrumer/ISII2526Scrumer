@@ -4,6 +4,7 @@ public class Booking
 {
     // Propiedades
     [Required]
+    [DataType(System.ComponentModel.DataAnnotations.DataType.Date)]
     public DateTime Date { get; set; }
 
     [Key]

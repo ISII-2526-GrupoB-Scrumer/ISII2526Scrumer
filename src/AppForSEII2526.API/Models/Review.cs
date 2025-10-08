@@ -3,6 +3,7 @@ using System;
 public class Review
 {
     [Required]
+    [DataType(System.ComponentModel.DataAnnotations.DataType.Date)]
     public DateTime Created { get; set; }
 
     [Key]
@@ -10,7 +11,7 @@ public class Review
 
     public IList<ReviewItem> Cars { get; set; }
 
-    [ForeignKey("ClientId")]
+    
     public ApplicationUser Client { get; set; }
 
     public Review()

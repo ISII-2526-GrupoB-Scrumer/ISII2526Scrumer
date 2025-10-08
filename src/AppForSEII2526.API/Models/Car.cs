@@ -25,6 +25,7 @@ public class Car
     [Required,StringLength(50)]
     public string Manufacturer { get; set; }
 
+    [DataType(System.ComponentModel.DataAnnotations.DataType.Currency)]
     [Precision(10, 2)]
     public decimal PurchasingPrice { get; set; }
 
@@ -35,12 +36,13 @@ public class Car
     public int QuantityForRenting { get; set; }
 
     [Precision(10, 2)]
-
+    [DataType(System.ComponentModel.DataAnnotations.DataType.Currency)]
     public decimal RentingPrice { get; set; }
     public int RimSize { get; set; }
 
 
     //Relaciones
+    [ForeignKey("ModelId")]
     public Model Model { get; set; }
     public IList<PurchaseItem> PurchaseItems { get; set; }
     public IList<RentalItem> RentalItems { get; set; }

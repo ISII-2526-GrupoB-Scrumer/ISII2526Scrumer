@@ -26,10 +26,10 @@ namespace AppForSEII2526.API.Models
         [Range(1,int.MaxValue)]
         public int Quantity { get; set; }
 
-        [ForeignKey("PurcheseId")]
+        [ForeignKey(nameof(PurchaseId))]
         public Purchase Purchase { get; set; }
 
-        [ForeignKey("CarId")]
+        [ForeignKey(nameof(CarId))]
         public Car Car { get; set; }
 
         public PurchaseItem()

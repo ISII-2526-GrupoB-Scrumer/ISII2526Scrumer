@@ -10,7 +10,7 @@ public class MaintenanceType
     public string Type { get; set; }
 
     //Relaciones
-    [ForeignKey("MaintenanceId")]
+    
     public Maintenance Maintenance { get; set; }
 
 

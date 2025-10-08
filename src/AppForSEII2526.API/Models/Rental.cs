@@ -6,18 +6,22 @@ public class Rental
     public string DeliveryCarDealer { get; set; }
 
     [Required]
+    [DataType(System.ComponentModel.DataAnnotations.DataType.Date)]
     public DateTime EndDate { get; set; }
 
     [Key]
     public int Id { get; set; }
 
     [Required]
+    [DataType(System.ComponentModel.DataAnnotations.DataType.Date)]
     public DateTime RentingDate { get; set; }
 
     [Required]
+    [DataType(System.ComponentModel.DataAnnotations.DataType.Date)]
     public DateTime StartDate { get; set; }
 
     [Required,Precision(10,2)]
+    [DataType(System.ComponentModel.DataAnnotations.DataType.Currency)]
     public decimal TotalPrice { get; set; }
 
     //Relaciones

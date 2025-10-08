@@ -13,6 +13,7 @@ public class Maintenance
     [Range(1,365)]
     public int NumberOfDays { get; set; }
 
+    [DataType(System.ComponentModel.DataAnnotations.DataType.Currency)]   
     [Precision(10,2)]
     public decimal Price { get; set; }
 
