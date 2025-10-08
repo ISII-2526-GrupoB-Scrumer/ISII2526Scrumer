@@ -35,7 +35,7 @@ namespace AppForSEII2526.API.Models
         /// </summary>
         public List<PurchaseItem> PurchaseItems { get; set; } = new List<PurchaseItem>();
 
-        [ForeignKey("ClientId")]
+        
         public ApplicationUser Client { get; set; }
 
         public Purchase()
