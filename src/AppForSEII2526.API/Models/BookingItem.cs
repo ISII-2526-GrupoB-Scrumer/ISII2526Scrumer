@@ -1,5 +1,7 @@
 using System;
 
+
+[PrimaryKey(nameof(BookingId), nameof(MantId))]
 public class BookingItem
 {
     // Propiedades

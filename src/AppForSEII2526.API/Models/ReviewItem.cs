@@ -1,5 +1,6 @@
 using System;
 
+[PrimaryKey(nameof(ReviewId), nameof(CarId))]
 public class ReviewItem
 {
     [Required]

@@ -3,6 +3,8 @@ namespace AppForSEII2526.API.Models
     /// <summary>
     /// Representa un ítem de compra en el sistema
     /// </summary>
+    /// 
+    [PrimaryKey(nameof(PurchaseId), nameof(CarId))]
     public class PurchaseItem
     {
         /// <summary>
