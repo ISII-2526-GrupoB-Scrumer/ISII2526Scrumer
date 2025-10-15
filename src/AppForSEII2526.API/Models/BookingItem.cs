@@ -1,7 +1,7 @@
 using System;
 
 
-[PrimaryKey(nameof(BookingId), nameof(MantId))]
+[PrimaryKey(nameof(BookingId), nameof(MaintenanceID))]
 public class BookingItem
 {
     // Propiedades
@@ -13,7 +13,7 @@ public class BookingItem
     public string Comment { get; set; }
 
     [Required,Key]
-    public int MantId { get; set; }
+    public int MaintenanceID { get; set; }
 
     //Relaciones
     [ForeignKey("BookingId")]
@@ -28,11 +28,11 @@ public class BookingItem
     }
 
     // Constructor con parámetros
-    public BookingItem(int bookingId, string comment, int mantID)
+    public BookingItem(int bookingId, string comment, int maintenanceID)
     {
         BookingId = bookingId;
         Comment = comment;
-        MantId = mantID;
+        MaintenanceID = maintenanceID;
     }
 
     // Método Equals

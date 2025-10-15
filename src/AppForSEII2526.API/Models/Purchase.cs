@@ -30,6 +30,12 @@ namespace AppForSEII2526.API.Models
         [Precision(10,2)]
         public decimal PurchasingPrice { get; set; }
 
+        public string DriverType { get; set; }
+
+        public string DeliveryCarDealer { get; set; }
+        public string PaymentMethod { get; set; }
+
+        public string Country { get; set; }
         /// <summary>
         /// Lista de items comprados
         /// </summary>
