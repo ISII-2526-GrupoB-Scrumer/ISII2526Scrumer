@@ -61,7 +61,7 @@
   <Class Name="Review">
     <Position X="3.5" Y="2.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAACAAACAAAAAAAAgAAAAAAAAAAAAIQAAAAAAAAAAAQ=</HashCode>
+      <HashCode>AAACAAACACAAAAAAgAAAAAAAAAIAAIQAAAAAAAAAAAQ=</HashCode>
       <FileName>Models\Review.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
@@ -74,7 +74,7 @@
   <Class Name="AppForSEII2526.API.Models.ApplicationUser">
     <Position X="0.5" Y="1.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AgABAEAAACAAAAAAgAAAgAQABAIAAIAAAQAAAAAAQAA=</HashCode>
+      <HashCode>AgwAAEAAAAAgAAAAgAAAAAQABAAAAIAAAAAAAAAAQAA=</HashCode>
       <FileName>Models\ApplicationUser.cs</FileName>
     </TypeIdentifier>
     <ShowAsCollectionAssociation>
