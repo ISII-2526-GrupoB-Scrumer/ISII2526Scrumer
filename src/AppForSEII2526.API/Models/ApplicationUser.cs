@@ -12,21 +12,19 @@ public class ApplicationUser : IdentityUser {
     [Required,Phone]
     public string ClientPhoneNumber { get; set; }
     [Required]
-    public string PaymentMethod { get; set; }
+    
 
     //Atributos clase Retal
-    [Required,StringLength(100)]
     public string Name { get; set; }
     [Required,StringLength(100)]
     public string Surname { get; set; }
 
     //Atrubitos clase Review
-    public string Country { get; set; }
+    
     public string UserName { get; set; }
-    public string DriverType { get; set; }
+    
 
     //Atributos clase Purchase
-    public string DeliveryCarDealer { get; set; }
 
 
     //Relaciones
@@ -46,13 +44,11 @@ public class ApplicationUser : IdentityUser {
     {
         ClientAddress = clientAddress;
         ClientPhoneNumber = clientPhoneNumber;
-        PaymentMethod = paymentMethod;
         Name = name;
         Surname = surname;
-        Country = country;
         UserName = userName;
-        DriverType = driverType;
-        DeliveryCarDealer = deliveryCarDealer;
+        
+        
     }
 
     public override bool Equals(object? obj)

@@ -10,6 +10,10 @@ public class Booking
     [Key]
     public int Id { get; set; }
 
+    [Required, StringLength(100)]
+    public string PaymentMethod { get; set; }
+    
+
     //Relaciones
     public IList<BookingItem> Items { get; set; }
 
@@ -22,10 +26,11 @@ public class Booking
     }
 
     // Constructor con parámetros
-    public Booking(int id, DateTime date)
+    public Booking(int id, DateTime date,string paymentMethod)
     {
         Id = id;
         Date = date;
+        PaymentMethod = paymentMethod;
     }
 
     // Método Equals

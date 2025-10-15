@@ -1,7 +1,7 @@
 using System;
 
 
-[PrimaryKey(nameof(BookingId), nameof(MantId))]
+[PrimaryKey(nameof(BookingId), nameof(MaintenanceId))]
 public class BookingItem
 {
     // Propiedades
@@ -13,7 +13,7 @@ public class BookingItem
     public string Comment { get; set; }
 
     [Required,Key]
-    public int MantId { get; set; }
+    public int MaintenanceId { get; set; }
 
     //Relaciones
     [ForeignKey("BookingId")]
@@ -32,7 +32,7 @@ public class BookingItem
     {
         BookingId = bookingId;
         Comment = comment;
-        MantId = mantID;
+        MaintenanceId = mantID;
     }
 
     // Método Equals
