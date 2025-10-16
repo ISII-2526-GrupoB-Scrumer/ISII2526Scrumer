@@ -11,22 +11,18 @@ public class ApplicationUser : IdentityUser {
     public string ClientAddress { get; set; }
     [Required,Phone]
     public string? ClientPhoneNumber { get; set; }
-    
-    
 
-    //Atributos clase Retal
+    //Atributos clase Rental
     [Required,StringLength(100)]
     public string Name { get; set; }
     [Required,StringLength(100)]
     public string Surname { get; set; }
 
     //Atrubitos clase Review
-   
     public string UserName { get; set; }
-    
 
-   
 
+    //Atributos clase Purchase
 
     //Relaciones
     public IList<Rental> Rentals { get; set; }
