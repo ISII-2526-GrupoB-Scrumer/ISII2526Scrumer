@@ -7,10 +7,11 @@ public class ReviewItem
     public int CarId { get; set; }
 
     [StringLength(500)]
-    public string Description { get; set; }
+    public string? Description { get; set; }
 
-    [Range(1,5)]
+    [Range(0, 5, ErrorMessage = "La reseña debe estar entre 0 y 5.")]
     public int Rating { get; set; }
+
 
     [Required,Key]
     public int ReviewId { get; set; }

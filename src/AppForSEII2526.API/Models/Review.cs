@@ -8,6 +8,10 @@ public class Review
 
     [Key]
     public int Id { get; set; }
+    
+    //Correciones
+    public string Country { get; set; }
+    public string DriverType { get; set; }
 
     public IList<ReviewItem> Cars { get; set; }
 
