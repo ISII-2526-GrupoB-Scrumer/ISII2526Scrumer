@@ -1,7 +1,7 @@
 using System;
 
 
-[PrimaryKey(nameof(BookingId), nameof(MaintenanceId))]
+[PrimaryKey(nameof(BookingId), nameof(MaintenanceID))]
 public class BookingItem
 {
     // Propiedades
@@ -13,7 +13,7 @@ public class BookingItem
     public string Comment { get; set; }
 
     [Required,Key]
-    public int MaintenanceId { get; set; }
+    public int MaintenanceID { get; set; }
 
     //Relaciones
     [ForeignKey("BookingId")]
@@ -27,15 +27,15 @@ public class BookingItem
     {
     }
 
-    // Constructor con par·metros
-    public BookingItem(int bookingId, string comment, int mantID)
+    // Constructor con par√°metros
+    public BookingItem(int bookingId, string comment, int maintenanceID)
     {
         BookingId = bookingId;
         Comment = comment;
-        MaintenanceId = mantID;
+        MaintenanceID = maintenanceID;
     }
 
-    // MÈtodo Equals
+    // M√©todo Equals
     public override bool Equals(object obj)
     {
         if (obj is BookingItem other)
