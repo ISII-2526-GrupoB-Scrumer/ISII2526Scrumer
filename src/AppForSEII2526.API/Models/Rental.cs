@@ -24,6 +24,9 @@ public class Rental
     [DataType(System.ComponentModel.DataAnnotations.DataType.Currency)]
     public decimal TotalPrice { get; set; }
 
+    [Required]
+    public string PaymentMethod { get; set; }
+
     //Relaciones
     public IList<RentalItem> RentalItems { get; set; }
     public ApplicationUser Client { get; set; }

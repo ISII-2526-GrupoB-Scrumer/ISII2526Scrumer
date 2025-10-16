@@ -11,7 +11,7 @@
     </ShowAsCollectionAssociation>
   </Class>
   <Class Name="Car">
-    <Position X="15.75" Y="1.75" Width="1.5" />
+    <Position X="15.75" Y="1.75" Width="2.25" />
     <TypeIdentifier>
       <HashCode>AAgiCAgIAABgACABgAACAACAAAAAAIAAEAgAgBAAAAQ=</HashCode>
       <FileName>Models\Car.cs</FileName>
@@ -35,9 +35,9 @@
     </ShowAsAssociation>
   </Class>
   <Class Name="Rental">
-    <Position X="5.75" Y="2.25" Width="1.5" />
+    <Position X="5.25" Y="2.25" Width="2" />
     <TypeIdentifier>
-      <HashCode>AAACCAAAAAAAAAAAgAAAgAAgAAAAQIAAAAAAAEAAAAU=</HashCode>
+      <HashCode>AAADCAAAAAAAAAAAgAAAgAAgAAAAQIAAAAAAAEAAAAU=</HashCode>
       <FileName>Models\Rental.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
@@ -48,9 +48,9 @@
     </ShowAsCollectionAssociation>
   </Class>
   <Class Name="AppForSEII2526.API.Models.ApplicationUser">
-    <Position X="1.75" Y="2.25" Width="1.5" />
+    <Position X="1" Y="2.25" Width="2.25" />
     <TypeIdentifier>
-      <HashCode>AggBAAAAACAAAAAAgAAAgAQABAIAAIAAAQAAAAAAQAA=</HashCode>
+      <HashCode>AgwAAEAAAAAgAAAAgAAAAAQABAAAAIAAAQAAAAAAQAA=</HashCode>
       <FileName>Models\ApplicationUser.cs</FileName>
     </TypeIdentifier>
     <ShowAsCollectionAssociation>

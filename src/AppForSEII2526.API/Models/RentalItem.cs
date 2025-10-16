@@ -20,6 +20,8 @@ public class RentalItem
 
     [ForeignKey("RentalId")]
     public Rental Rental { get; set; }
+
+
     //Métodos
     public RentalItem() { }
 
