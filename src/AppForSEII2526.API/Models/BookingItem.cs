@@ -27,7 +27,7 @@ public class BookingItem
     {
     }
 
-    // Constructor con par·metros
+    // Constructor con par√°metros
     public BookingItem(int bookingId, string comment, int maintenanceID)
     {
         BookingId = bookingId;
@@ -35,7 +35,7 @@ public class BookingItem
         MaintenanceID = maintenanceID;
     }
 
-    // MÈtodo Equals
+    // M√©todo Equals
     public override bool Equals(object obj)
     {
         if (obj is BookingItem other)
