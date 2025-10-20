@@ -43,9 +43,10 @@ namespace AppForSEII2526.API.Controllers
         [HttpGet]
         [Route("[action]")]
         [ProducesResponseType(typeof(IList<CarforRental>), (int)HttpStatusCode.OK)]
-        public async Task<ActionResult> GetCoches_FILTRO_MODELO_DTO(string? modelo) { 
-            
-            
+        public async Task<ActionResult> GetCoches_FILTRO_MODELO_DTO(string? modelo)
+        {
+
+
             IList<CarforRental> coches = await _context.Car
                 .Where(c => c.Model.Name.Contains(modelo) || (modelo == null))
                 .Select(c => new CarforRental(c.Id, c.Model.Name, c.FuelType, c.Manufacturer, c.RentingPrice, c.Color))
@@ -98,6 +99,49 @@ namespace AppForSEII2526.API.Controllers
                 return StatusCode(500, "Ocurrió un error al filtrar los coches.");
             }
         }
+
+
+        [HttpGet]
+        [Route("[action]")]
+        [ProducesResponseType(typeof(IList<CarforReview>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult> GetCoches_Filtrados_Fabricante_Gasoil(string? fabricante, string? tipoGasoil)
+        {
+            try
+            {
+                // 🔹 1.1 El sistema ofrece la posibilidad de filtrar por fabricante y tipo de gasoil
+                var query = _context.Car.AsQueryable();
+
+                // 🔹 1.2 El cliente selecciona los filtros que le interesan
+                if (!string.IsNullOrWhiteSpace(fabricante))
+                    query = query.Where(c => c.Manufacturer.Contains(fabricante));
+
+                if (!string.IsNullOrWhiteSpace(tipoGasoil))
+                    query = query.Where(c => c.FuelType.Contains(tipoGasoil));
+
+                // 🔹 1.3 El sistema muestra los coches disponibles que cumplen los filtros
+                var cochesFiltrados = await query
+                    .Select(c => new CarforReview(
+                        c.Id,
+                        c.Model.Name,
+                        c.CarClass,
+                        c.Manufacturer,
+                        c.FuelType,
+                        c.Color))
+                    .ToListAsync();
+
+                if (!cochesFiltrados.Any())
+                    return NotFound("No se encontraron coches que coincidan con los filtros seleccionados.");
+
+                return Ok(cochesFiltrados);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al filtrar coches por fabricante y tipo de gasoil.");
+                return StatusCode(500, "Ocurrió un error al obtener los coches para reseñar.");
+            }
+        }
+
 
     }
 }
