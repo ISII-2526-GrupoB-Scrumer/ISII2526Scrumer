@@ -172,12 +172,23 @@ namespace AppForSEII2526.API.Controllers
             }
         }
 
+        [HttpGet]
+        [Route("[action]")]
+        [ProducesResponseType(typeof(IList<CarforReview>), (int)HttpStatusCode.OK)]
+        public async Task<ActionResult> GetCoches_Datos_REVIEW()
+        {
+            var coches = await _context.Car
+                .Select(c => new CarforReview(c.Id, c.Model.Name, c.CarClass, c.Manufacturer, c.FuelType, c.Color))
+                .ToListAsync();
+            return Ok(coches);
+        }
+
 
         [HttpGet]
         [Route("[action]")]
         [ProducesResponseType(typeof(IList<CarforReview>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult> GetCoches_Filtrados_Fabricante_Gasoil(string? fabricante, string? tipoGasoil)
+        public async Task<ActionResult> GetCoches_Filtrados_Fabricante_Gasoil_REVIEW(string? fabricante, string? tipoGasoil)
         {
             try
             {

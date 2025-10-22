@@ -31,7 +31,7 @@ namespace AppForSEII2526.API.Controllers
             try
             {
                 // 🔹 Paso 2.1: El sistema ofrece la posibilidad de filtrar por nombre y tipo
-                var query = _context.Maintenance
+                var query =  _context.Maintenance
                     .Include(m => m.MaintenanceTypes)
                     .AsQueryable();
 
@@ -45,9 +45,8 @@ namespace AppForSEII2526.API.Controllers
                 // 🔹 Paso 2.3: El sistema muestra los mantenimientos que cumplen los filtros
                 var mantenimientosFiltrados = await query
                     .Select(m => new CarforMaintenance(
-                        m.Id,
                         m.Name,
-                        m.MaintenanceTypes.FirstOrDefault()!.Type,
+                        m.MaintenanceTypes.FirstOrDefault() != null ? m.MaintenanceTypes.FirstOrDefault()!.Type : "Sin tipo",
                         m.Price,
                         m.NumberOfDays))
                     .ToListAsync();
