@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Linq;
 
 namespace AppForSEII2526.API.Controllers
 {
@@ -62,5 +63,20 @@ namespace AppForSEII2526.API.Controllers
                 return StatusCode(500, "Ocurrió un error al obtener los mantenimientos filtrados.");
             }
         }
+        [HttpGet]
+        [Route("[action]")]
+        [ProducesResponseType(typeof(IList<CarforMaintenance>), (int)HttpStatusCode.OK)]
+        public async Task<ActionResult> GetCoches_Datos_Mantenimiento()
+        {
+            var query = _context.Maintenance
+                .Include(m => m.MaintenanceTypes)
+                .AsQueryable();
+
+            var mantinimientos = await query
+                .Select(m => new CarforMaintenance(m.Name, m.MaintenanceTypes, m.Price, m.NumberOfDays))
+                .ToListAsync();
+            return Ok(mantinimientos);
+        }
+
     }
 }
