@@ -32,7 +32,7 @@ namespace AppForSEII2526.API.Controllers
         [HttpGet]
         [Route("[action]")]
         [ProducesResponseType(typeof(IList<CarforRental>), (int)HttpStatusCode.OK)]
-        public async Task<ActionResult> GetCoches_Datos()
+        public async Task<ActionResult> GetCoches_Datos_RENTAL()
         {
             var coches = await _context.Car
                 .Select(c => new CarforRental(c.Id, c.Model.Name, c.FuelType, c.Manufacturer, c.RentingPrice, c.Color))
@@ -62,7 +62,7 @@ namespace AppForSEII2526.API.Controllers
         [Route("[action]")]
         [ProducesResponseType(typeof(IList<CarforRental>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult> GetCoches_Filtrados_Modelo_Precio(string? modelo, decimal? precio)
+        public async Task<ActionResult> GetCoches_Filtrados_Modelo_Precio_RENTAL(string? modelo, decimal? precio)
         {
             try
             {
