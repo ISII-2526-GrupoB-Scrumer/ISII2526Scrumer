@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using System.Net;
 
 namespace AppForSEII2526.API.Controllers
 {
@@ -27,27 +29,27 @@ namespace AppForSEII2526.API.Controllers
         [Route("[action]")]
         [ProducesResponseType(typeof(IList<CarforMaintenance>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult> GetMantenimientos_Filtrados_Nombre_Tipo(string? nombre, string? tipo)
+        public async Task<ActionResult> GetMantenimientos_Filtrados_Nombre_Tipo_Mantenimiento(string? nombre, string? tipo)
         {
             try
             {
-                // 🔹 Paso 2.1: El sistema ofrece la posibilidad de filtrar por nombre y tipo
-                var query =  _context.Maintenance
+                var query = _context.Maintenance
                     .Include(m => m.MaintenanceTypes)
                     .AsQueryable();
 
-                // 🔹 Paso 2.2: El cliente selecciona los filtros que le interesan
                 if (!string.IsNullOrWhiteSpace(nombre))
                     query = query.Where(m => m.Name.Contains(nombre));
 
                 if (!string.IsNullOrWhiteSpace(tipo))
                     query = query.Where(m => m.MaintenanceTypes.Any(t => t.Type.Contains(tipo)));
 
-                // 🔹 Paso 2.3: El sistema muestra los mantenimientos que cumplen los filtros
                 var mantenimientosFiltrados = await query
                     .Select(m => new CarforMaintenance(
+                        
                         m.Name,
-                        m.MaintenanceTypes.FirstOrDefault() != null ? m.MaintenanceTypes.FirstOrDefault()!.Type : "Sin tipo",
+                        m.MaintenanceTypes.FirstOrDefault() != null
+                            ? m.MaintenanceTypes.FirstOrDefault()!.Type
+                            : "Sin tipo",
                         m.Price,
                         m.NumberOfDays))
                     .ToListAsync();
@@ -63,6 +65,10 @@ namespace AppForSEII2526.API.Controllers
                 return StatusCode(500, "Ocurrió un error al obtener los mantenimientos filtrados.");
             }
         }
+
+        // ===============================================================
+        // Método adicional: mostrar todos los mantenimientos disponibles
+        // ===============================================================
         [HttpGet]
         [Route("[action]")]
         [ProducesResponseType(typeof(IList<CarforMaintenance>), (int)HttpStatusCode.OK)]
@@ -72,11 +78,18 @@ namespace AppForSEII2526.API.Controllers
                 .Include(m => m.MaintenanceTypes)
                 .AsQueryable();
 
-            var mantinimientos = await query
-                .Select(m => new CarforMaintenance(m.Name, m.MaintenanceTypes, m.Price, m.NumberOfDays))
+            var mantenimientos = await query
+                .Select(m => new CarforMaintenance(
+                    
+                    m.Name,
+                    m.MaintenanceTypes.FirstOrDefault() != null
+                        ? m.MaintenanceTypes.FirstOrDefault()!.Type
+                        : "Sin tipo",
+                    m.Price,
+                    m.NumberOfDays))
                 .ToListAsync();
-            return Ok(mantinimientos);
-        }
 
+            return Ok(mantenimientos);
+        }
     }
 }

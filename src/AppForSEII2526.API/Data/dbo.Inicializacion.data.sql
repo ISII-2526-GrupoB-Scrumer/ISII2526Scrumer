@@ -21,3 +21,23 @@ INSERT INTO [dbo].[Car] ([Id], [CarClass], [Color], [Description], [EngDisplacem
 INSERT INTO [dbo].[Car] ([Id], [CarClass], [Color], [Description], [EngDisplacement], [FuelType], [MaintenanceTypes], [Manufacturer], [PurchasingPrice], [QuantityForPurchasing], [QuantityForRenting], [RentingPrice], [RimSize], [ModelId]) VALUES (14, N'SUV', N'Blanco', N'Hyundai Tucson Hybrid', N'1.6', N'Hibrido', N'Estandar', N'Hyundai', CAST(31000.00 AS Decimal(10, 2)), 4, 2, CAST(95.00 AS Decimal(10, 2)), 17, N'9')
 INSERT INTO [dbo].[Car] ([Id], [CarClass], [Color], [Description], [EngDisplacement], [FuelType], [MaintenanceTypes], [Manufacturer], [PurchasingPrice], [QuantityForPurchasing], [QuantityForRenting], [RentingPrice], [RimSize], [ModelId]) VALUES (15, N'Electrico', N'Plata', N'Nissan Leaf e+', N'-', N'Electrico', N'Bajo', N'Nissan', CAST(37000.00 AS Decimal(10, 2)), 5, 3, CAST(105.00 AS Decimal(10, 2)), 16, N'10')
 SET IDENTITY_INSERT [dbo].[Car] OFF
+
+
+SET IDENTITY_INSERT [dbo].[Maintenance] ON
+INSERT INTO [dbo].[Maintenance] ([Id], [Name], [NumberOfDays], [Price]) VALUES (1, N'Cambio aceite', 1, CAST(100.00 AS Decimal(10, 2)))
+INSERT INTO [dbo].[Maintenance] ([Id], [Name], [NumberOfDays], [Price]) VALUES (2, N'Revision frenos', 2, CAST(150.00 AS Decimal(10, 2)))
+INSERT INTO [dbo].[Maintenance] ([Id], [Name], [NumberOfDays], [Price]) VALUES (3, N'Sustitucion bateria', 1, CAST(120.00 AS Decimal(10, 2)))
+INSERT INTO [dbo].[Maintenance] ([Id], [Name], [NumberOfDays], [Price]) VALUES (4, N'Alineacion ruedas', 1, CAST(80.00 AS Decimal(10, 2)))
+INSERT INTO [dbo].[Maintenance] ([Id], [Name], [NumberOfDays], [Price]) VALUES (5, N'Cambio filtros', 1, CAST(90.00 AS Decimal(10, 2)))
+INSERT INTO [dbo].[Maintenance] ([Id], [Name], [NumberOfDays], [Price]) VALUES (6, N'Revision completa', 3, CAST(250.00 AS Decimal(10, 2)))
+SET IDENTITY_INSERT [dbo].[Maintenance] OFF
+
+SET IDENTITY_INSERT [dbo].[MaintenanceType] ON
+INSERT INTO [dbo].[MaintenanceType] ([id], [Type], [MaintenanceId]) VALUES (2, N'Motor', 1)
+INSERT INTO [dbo].[MaintenanceType] ([id], [Type], [MaintenanceId]) VALUES (3, N'Frenos', 2)
+INSERT INTO [dbo].[MaintenanceType] ([id], [Type], [MaintenanceId]) VALUES (4, N'Electricidad', 3)
+INSERT INTO [dbo].[MaintenanceType] ([id], [Type], [MaintenanceId]) VALUES (5, N'Ruedas', 4)
+INSERT INTO [dbo].[MaintenanceType] ([id], [Type], [MaintenanceId]) VALUES (6, N'Filtros', 5)
+INSERT INTO [dbo].[MaintenanceType] ([id], [Type], [MaintenanceId]) VALUES (7, N'General', 6)
+SET IDENTITY_INSERT [dbo].[MaintenanceType] OFF
+

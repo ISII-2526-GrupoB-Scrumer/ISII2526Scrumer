@@ -6,8 +6,9 @@
     public int NumberOfDays { get; set; } 
 
 
-    public CarforMaintenance(string name, string type, decimal price, int numberofdays)
+    public CarforMaintenance( string name, string type, decimal price, int numberofdays)
     {
+        
         Name = name;
         Type = type;
         Price = price;
