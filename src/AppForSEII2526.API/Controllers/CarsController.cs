@@ -100,55 +100,24 @@ namespace AppForSEII2526.API.Controllers
             }
         }
 
-
-        [HttpGet]
-        [Route("[action]")]
-        [ProducesResponseType(typeof(IList<CarforPurchase>), (int)HttpStatusCode.OK)]
-        public async Task<ActionResult> GetCoches_Datos_Compra()
-        {
-            var coches = await _context.Car
-                .Select(c => new CarforPurchase(c.Id, c.Model.Name, c.FuelType, c.Manufacturer, c.PurchasingPrice, c.Color))
-                .ToListAsync();
-            return Ok(coches);
-        }
-
-        [HttpGet]
-        [Route("[action]")]
-        [ProducesResponseType(typeof(IList<CarforPurchase>), (int)HttpStatusCode.OK)]
-        public async Task<ActionResult> GetCoches_FILTRO_MODELO_DTO_Compra(string? modelo)
-        {
-
-
-            IList<CarforPurchase> coches = await _context.Car
-                .Where(c => c.Model.Name.Contains(modelo) || (modelo == null))
-                .Select(c => new CarforPurchase(c.Id, c.Model.Name, c.FuelType, c.Manufacturer, c.PurchasingPrice, c.Color))
-                .ToListAsync();
-
-            return Ok(coches);
-        }
-
-
-
-
         [HttpGet]
         [Route("[action]")]
         [ProducesResponseType(typeof(IList<CarforPurchase>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult> GetCoches_Filtrados_Modelo_Precio_Compra(string? modelo, decimal? precio)
+        public async Task<ActionResult> GetCoches_Filtrados_Modelo_Color_Compra(string? modelo, string? color)
         {
             try
             {
-
-
                 var query = _context.Car.AsQueryable();
 
+
                 if (!string.IsNullOrWhiteSpace(modelo))
+
                     query = query.Where(c => c.Model.Name.Contains(modelo));
 
 
-                if (precio.HasValue)
-                    query = query.Where(c => c.PurchasingPrice <= precio.Value);
-
+                if (!string.IsNullOrWhiteSpace(color))
+                    query = query.Where(c => c.Color.Contains(color));
 
                 var cochesFiltrados = await query
                     .Select(c => new CarforPurchase(
@@ -167,10 +136,26 @@ namespace AppForSEII2526.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error al aplicar filtros de modelo y precio en los coches.");
+
+                _logger.LogError(ex, "Error al aplicar filtros de modelo y color en los coches.");
                 return StatusCode(500, "Ocurrió un error al filtrar los coches.");
             }
         }
+
+
+
+        [HttpGet]
+        [Route("[action]")]
+        [ProducesResponseType(typeof(IList<CarforPurchase>), (int)HttpStatusCode.OK)]
+        public async Task<ActionResult> GetCoches_Datos_Compra()
+        {
+            var coches = await _context.Car
+                .Select(c => new CarforPurchase(c.Id, c.Model.Name, c.FuelType, c.Manufacturer, c.PurchasingPrice, c.Color))
+                .ToListAsync();
+            return Ok(coches);
+        }
+
+
 
         [HttpGet]
         [Route("[action]")]
