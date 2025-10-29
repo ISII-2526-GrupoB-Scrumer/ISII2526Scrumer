@@ -22,6 +22,8 @@ namespace AppForSEII2526
             _logger = logger;
         }
 
+
+        //PASO 7
         [HttpGet]
         [Route("[action]")]
         [ProducesResponseType(typeof(RentalDetailDTO), (int)HttpStatusCode.OK)]
@@ -65,94 +67,106 @@ namespace AppForSEII2526
             return Ok(rental);
         }
 
+
+        //PASO 5
         [HttpPost]
         [Route("[action]")]
         [ProducesResponseType(typeof(RentalDetailDTO), (int)HttpStatusCode.Created)]
         [ProducesResponseType(typeof(ValidationProblemDetails), (int)HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.Conflict)]
-        public async Task<ActionResult> CreateRental(RentalCreateDTO rentalForCreate)
+        public async Task<ActionResult> CreateRental([FromBody] RentalCreateDTO rentalForCreate)
         {
-            // --- VALIDACIONES DEL CASO DE USO ---
+            // ===== VALIDACIONES BÁSICAS =====
             if (rentalForCreate.StartDate <= DateTime.Today)
-                ModelState.AddModelError("StartDate", "Error: La fecha de inicio debe ser posterior a hoy.");
+                ModelState.AddModelError("StartDate", "La fecha de inicio debe ser posterior a hoy.");
 
             if (rentalForCreate.StartDate >= rentalForCreate.EndDate)
-                ModelState.AddModelError("StartDate&EndDate", "Error: La fecha de fin debe ser posterior a la de inicio.");
+                ModelState.AddModelError("StartDate&EndDate", "La fecha de fin debe ser posterior a la de inicio.");
 
-            if (rentalForCreate.RentalItems.Count == 0)
-                ModelState.AddModelError("RentalItems", "Error: Debe incluir al menos un coche en el alquiler.");
+            if (rentalForCreate.RentalItems == null || rentalForCreate.RentalItems.Count == 0)
+                ModelState.AddModelError("RentalItems", "Debes incluir al menos un coche para alquilar.");
 
-            var user = _context.Users.FirstOrDefault(u => u.Id == rentalForCreate.ClientId);
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => u.Id == rentalForCreate.ClientId);
+
             if (user == null)
-                ModelState.AddModelError("ClientId", "Error: El cliente no está registrado.");
+                ModelState.AddModelError("Client", "El usuario especificado no existe.");
 
             if (ModelState.ErrorCount > 0)
                 return BadRequest(new ValidationProblemDetails(ModelState));
 
-            // --- COMPROBACIÓN DE DISPONIBILIDAD DE LOS COCHES ---
-            var carIds = rentalForCreate.RentalItems.Select(ri => ri.CarId).ToList();
 
-            var cars = _context.Car
+            // ===== COMPROBAR DISPONIBILIDAD =====
+            var carIds = rentalForCreate.RentalItems.Select(i => i.CarId).Distinct().ToList();
+
+            var cars = await _context.Car
                 .Include(c => c.Model)
+                .Include(c => c.RentalItems)
+                    .ThenInclude(ri => ri.Rental)
                 .Where(c => carIds.Contains(c.Id))
                 .Select(c => new
                 {
-                    c.Id,
-                    c.Model.Name,
-                    c.QuantityForRenting,
-                    c.RentingPrice,
-                    NumberOfRentedItems = _context.RentalItem
-                        .Include(ri => ri.Rental)
-                        .Count(ri => ri.CarId == c.Id &&
-                                     ri.Rental.StartDate <= rentalForCreate.EndDate &&
-                                     ri.Rental.EndDate >= rentalForCreate.StartDate)
+                    Car = c,
+                    RentedQty = c.RentalItems
+                        .Where(ri => ri.Rental.StartDate <= rentalForCreate.EndDate
+                                     && ri.Rental.EndDate >= rentalForCreate.StartDate)
+                        .Sum(ri => ri.Quantity)
                 })
-                .ToList();
-
-            // --- CREACIÓN DEL RENTAL ---
-            var rental = new Rental
-            {
-                Client = user,
-                DeliveryCarDealer = rentalForCreate.DeliveryCarDealer,
-                PaymentMethod = rentalForCreate.PaymentMethod,
-                StartDate = rentalForCreate.StartDate,
-                EndDate = rentalForCreate.EndDate,
-                TotalPrice = 0,
-                RentalItems = new List<RentalItem>()
-            };
-
-            var numDays = (rentalForCreate.EndDate - rentalForCreate.StartDate).TotalDays;
+                .ToListAsync();
 
             foreach (var item in rentalForCreate.RentalItems)
             {
-                var car = cars.FirstOrDefault(c => c.Id == item.CarId);
-                if (car == null || car.NumberOfRentedItems >= car.QuantityForRenting)
+                var entry = cars.FirstOrDefault(x => x.Car.Id == item.CarId);
+                if (entry == null)
                 {
-                    ModelState.AddModelError("RentalItems", $"Error: El coche con ID {item.CarId} no está disponible entre {rentalForCreate.StartDate.ToShortDateString()} y {rentalForCreate.EndDate.ToShortDateString()}.");
+                    ModelState.AddModelError("RentalItems", $"El coche con Id={item.CarId} no existe.");
+                    continue;
                 }
-                else
-                {
-                    rental.RentalItems.Add(new RentalItem
-                    {
-                        CarId = car.Id,
-                        Rental = rental,
-                        Quantity = item.Quantity
-                    });
-                    item.RentingPrice = car.RentingPrice;
-                }
-            }
 
-            rental.TotalPrice = rental.RentalItems.Sum(ri =>
-            {
-                var car = cars.FirstOrDefault(c => c.Id == ri.CarId);
-                return (car?.RentingPrice ?? 0) * (decimal)numDays;
-            });
+                var disponible = entry.Car.QuantityForRenting - entry.RentedQty;
+                if (item.Quantity <= 0)
+                    ModelState.AddModelError("RentalItems", $"La cantidad para {entry.Car.Model.Name} debe ser mayor que 0.");
+                else if (disponible < item.Quantity)
+                    ModelState.AddModelError("RentalItems", $"No hay disponibilidad suficiente de {entry.Car.Model.Name}.");
+            }
 
             if (ModelState.ErrorCount > 0)
                 return BadRequest(new ValidationProblemDetails(ModelState));
 
-            // --- GUARDAR EN BASE DE DATOS ---
-            _context.Add(rental);
+
+            // ===== CALCULAR PRECIO TOTAL =====
+            var numDays = (rentalForCreate.EndDate - rentalForCreate.StartDate).TotalDays;
+            if (numDays < 1) numDays = 1;
+
+            decimal total = 0m;
+            var rentalItems = new List<RentalItem>();
+
+            foreach (var item in rentalForCreate.RentalItems)
+            {
+                var car = cars.First(c => c.Car.Id == item.CarId).Car;
+                total += car.RentingPrice * item.Quantity * (decimal)numDays;
+
+                rentalItems.Add(new RentalItem
+                {
+                    Car = car,
+                    Quantity = item.Quantity
+                });
+            }
+
+            // ===== CREAR EL OBJETO RENTAL =====
+            var rental = new Rental
+            {
+                Client = user, // ← aquí usamos el ApplicationUser directamente
+                DeliveryCarDealer = rentalForCreate.DeliveryCarDealer,
+                StartDate = rentalForCreate.StartDate,
+                EndDate = rentalForCreate.EndDate,
+                RentingDate = DateTime.Now,
+                TotalPrice = total,
+                PaymentMethod = rentalForCreate.PaymentMethod,
+                RentalItems = rentalItems
+            };
+
+            _context.Rental.Add(rental);
 
             try
             {
@@ -160,25 +174,32 @@ namespace AppForSEII2526
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex.Message);
-                ModelState.AddModelError("Rental", "Error al guardar el alquiler. Inténtelo más tarde.");
-                return Conflict("Error: " + ex.Message);
+                _logger.LogError(ex, "Error al guardar el alquiler.");
+                return Conflict("Error al guardar el alquiler. Inténtalo de nuevo más tarde.");
             }
 
-            // --- DEVOLVER DETALLE DEL RENTAL ---
-            var rentalDetail = new RentalDetailDTO(
+            // ===== CONSTRUIR DTO DE RESPUESTA =====
+            var rentalItemsDTO = rentalItems.Select(ri =>
+            {
+                var car = cars.First(c => c.Car.Id == ri.Car.Id).Car;
+                return new RentalItemDTO(car.Id, car.Model.Name, car.RentingPrice, ri.Quantity);
+            }).ToList();
+
+            var detailDTO = new RentalDetailDTO(
                 rental.Id,
                 rental.StartDate,
                 rental.EndDate,
                 rental.PaymentMethod,
                 rental.DeliveryCarDealer,
-                rental.Client.UserName,
+                user.Id, 
                 rental.TotalPrice,
-                rentalForCreate.RentalItems
+                rentalItemsDTO
             );
 
-            return CreatedAtAction(nameof(GetRental), new { id = rental.Id }, rentalDetail);
+            return CreatedAtAction(nameof(GetRental), new { id = rental.Id }, detailDTO);
         }
+
+
 
 
     }

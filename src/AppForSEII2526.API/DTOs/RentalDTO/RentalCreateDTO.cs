@@ -10,7 +10,12 @@
         public string ClientId { get; set; } = string.Empty;
         public decimal TotalPrice { get; set; }
 
-        public List<RentalItemDTO> RentalItems { get; set; } = new();
+        public List<RentalItemDTO> RentalItems { get; set; }
+
+        public RentalCreateDTO()
+        {
+            RentalItems = new List<RentalItemDTO>();
+        }
 
     }
 }
