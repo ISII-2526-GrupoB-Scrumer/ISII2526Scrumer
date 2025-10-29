@@ -9,6 +9,9 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<Car> Car { get; set; } 
     public DbSet<Maintenance> Maintenance { get; set; }
 
+    public DbSet<Rental> Rental { get; set; }
+    public DbSet<RentalItem> RentalItem { get; set; }
+
 
 
 }
