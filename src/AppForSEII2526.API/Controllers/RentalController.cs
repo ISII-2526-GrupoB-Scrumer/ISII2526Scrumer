@@ -13,10 +13,10 @@ namespace AppForSEII2526
     {
 
         private readonly ApplicationDbContext _context;
-        private readonly ILogger<CarsController> _logger;
+        private readonly ILogger<RentalController> _logger;
 
 
-        public RentalController(ApplicationDbContext context, ILogger<CarsController> logger)
+        public RentalController(ApplicationDbContext context, ILogger<RentalController> logger)
         {
             _context = context;
             _logger = logger;

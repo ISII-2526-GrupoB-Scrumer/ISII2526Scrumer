@@ -10,10 +10,10 @@ namespace AppForSEII2526.API.Controllers
     {
 
         private readonly ApplicationDbContext _context;
-        private readonly ILogger<CarsController> _logger;
+        private readonly ILogger<MaintenanceController> _logger;
 
 
-        public MaintenanceController(ApplicationDbContext context, ILogger<CarsController> logger)
+        public MaintenanceController(ApplicationDbContext context, ILogger<MaintenanceController> logger)
         {
             _context = context;
             _logger = logger;
