@@ -1,0 +1,206 @@
+﻿using AppForSEII2526.API.DTOs.RentalDTO;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Net;
+
+namespace AppForSEII2526
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    public class RentalController : ControllerBase
+    {
+
+        private readonly ApplicationDbContext _context;
+        private readonly ILogger<RentalController> _logger;
+
+
+        public RentalController(ApplicationDbContext context, ILogger<RentalController> logger)
+        {
+            _context = context;
+            _logger = logger;
+        }
+
+
+        //PASO 7
+        [HttpGet]
+        [Route("[action]")]
+        [ProducesResponseType(typeof(RentalDetailDTO), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<ActionResult> GetRental(int id)
+        {
+            if (_context.Rental == null)
+            {
+                _logger.LogError("Error: Rentals table does not exist");
+                return NotFound();
+            }
+
+            var rental = await _context.Rental
+                .Where(r => r.Id == id)
+                .Include(r => r.RentalItems)
+                    .ThenInclude(ri => ri.Car)
+                        .ThenInclude(c => c.Model)
+                .Select(r => new RentalDetailDTO(
+                    r.Id,
+                    r.StartDate,
+                    r.EndDate,
+                    r.PaymentMethod,
+                    r.DeliveryCarDealer,
+                    r.Client.UserName,
+                    r.TotalPrice,
+                    r.RentalItems.Select(ri => new RentalItemDTO(
+                        ri.Car.Id,
+                        ri.Car.Model.Name,
+                        ri.Car.RentingPrice,
+                        ri.Quantity
+                    )).ToList<RentalItemDTO>()
+                ))
+                .FirstOrDefaultAsync();
+
+            if (rental == null)
+            {
+                _logger.LogError($"Error: Rental with id {id} does not exist");
+                return NotFound();
+            }
+
+            return Ok(rental);
+        }
+
+
+        //PASO 5
+        [HttpPost]
+        [Route("[action]")]
+        [ProducesResponseType(typeof(RentalDetailDTO), (int)HttpStatusCode.Created)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.Conflict)]
+        public async Task<ActionResult> CreateRental([FromBody] RentalCreateDTO rentalForCreate)
+        {
+            // ===== VALIDACIONES BÁSICAS =====
+            if (rentalForCreate.StartDate <= DateTime.Today)
+                ModelState.AddModelError("StartDate", "La fecha de inicio debe ser posterior a hoy.");
+
+            if (rentalForCreate.StartDate >= rentalForCreate.EndDate)
+                ModelState.AddModelError("StartDate&EndDate", "La fecha de fin debe ser posterior a la de inicio.");
+
+            if (rentalForCreate.RentalItems == null || rentalForCreate.RentalItems.Count == 0)
+                ModelState.AddModelError("RentalItems", "Debes incluir al menos un coche para alquilar.");
+
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => u.Id == rentalForCreate.ClientId);
+
+            if (user == null)
+                ModelState.AddModelError("Client", "El usuario especificado no existe.");
+
+            if (ModelState.ErrorCount > 0)
+                return BadRequest(new ValidationProblemDetails(ModelState));
+
+
+            // ===== COMPROBAR DISPONIBILIDAD =====
+            var carIds = rentalForCreate.RentalItems.Select(i => i.CarId).Distinct().ToList();
+
+            var cars = await _context.Car
+                .Include(c => c.Model)
+                .Include(c => c.RentalItems)
+                    .ThenInclude(ri => ri.Rental)
+                .Where(c => carIds.Contains(c.Id))
+                .Select(c => new
+                {
+                    Car = c,
+                    RentedQty = c.RentalItems
+                        .Where(ri => ri.Rental.StartDate <= rentalForCreate.EndDate
+                                     && ri.Rental.EndDate >= rentalForCreate.StartDate)
+                        .Sum(ri => ri.Quantity)
+                })
+                .ToListAsync();
+
+            foreach (var item in rentalForCreate.RentalItems)
+            {
+                var entry = cars.FirstOrDefault(x => x.Car.Id == item.CarId);
+                if (entry == null)
+                {
+                    ModelState.AddModelError("RentalItems", $"El coche con Id={item.CarId} no existe.");
+                    continue;
+                }
+
+                var disponible = entry.Car.QuantityForRenting - entry.RentedQty;
+                if (item.Quantity <= 0)
+                    ModelState.AddModelError("RentalItems", $"La cantidad para {entry.Car.Model.Name} debe ser mayor que 0.");
+                else if (disponible < item.Quantity)
+                    ModelState.AddModelError("RentalItems", $"No hay disponibilidad suficiente de {entry.Car.Model.Name}.");
+            }
+
+            if (ModelState.ErrorCount > 0)
+                return BadRequest(new ValidationProblemDetails(ModelState));
+
+
+            // ===== CALCULAR PRECIO TOTAL =====
+            var numDays = (rentalForCreate.EndDate - rentalForCreate.StartDate).TotalDays;
+            if (numDays < 1) numDays = 1;
+
+            decimal total = 0m;
+            var rentalItems = new List<RentalItem>();
+
+            foreach (var item in rentalForCreate.RentalItems)
+            {
+                var car = cars.First(c => c.Car.Id == item.CarId).Car;
+                total += car.RentingPrice * item.Quantity * (decimal)numDays;
+
+                rentalItems.Add(new RentalItem
+                {
+                    Car = car,
+                    Quantity = item.Quantity
+                });
+            }
+
+            // ===== CREAR EL OBJETO RENTAL =====
+            var rental = new Rental
+            {
+                Client = user, // ← aquí usamos el ApplicationUser directamente
+                DeliveryCarDealer = rentalForCreate.DeliveryCarDealer,
+                StartDate = rentalForCreate.StartDate,
+                EndDate = rentalForCreate.EndDate,
+                RentingDate = DateTime.Now,
+                TotalPrice = total,
+                PaymentMethod = rentalForCreate.PaymentMethod,
+                RentalItems = rentalItems
+            };
+
+            _context.Rental.Add(rental);
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al guardar el alquiler.");
+                return Conflict("Error al guardar el alquiler. Inténtalo de nuevo más tarde.");
+            }
+
+            // ===== CONSTRUIR DTO DE RESPUESTA =====
+            var rentalItemsDTO = rentalItems.Select(ri =>
+            {
+                var car = cars.First(c => c.Car.Id == ri.Car.Id).Car;
+                return new RentalItemDTO(car.Id, car.Model.Name, car.RentingPrice, ri.Quantity);
+            }).ToList();
+
+            var detailDTO = new RentalDetailDTO(
+                rental.Id,
+                rental.StartDate,
+                rental.EndDate,
+                rental.PaymentMethod,
+                rental.DeliveryCarDealer,
+                user.Id, 
+                rental.TotalPrice,
+                rentalItemsDTO
+            );
+
+            return CreatedAtAction(nameof(GetRental), new { id = rental.Id }, detailDTO);
+        }
+
+
+
+
+    }
+}

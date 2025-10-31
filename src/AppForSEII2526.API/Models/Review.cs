@@ -15,7 +15,7 @@ public class Review
 
     public IList<ReviewItem> Cars { get; set; }
 
-    
+
     public ApplicationUser Client { get; set; }
 
     public Review()
