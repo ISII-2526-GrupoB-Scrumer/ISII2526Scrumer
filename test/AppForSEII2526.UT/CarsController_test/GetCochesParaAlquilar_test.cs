@@ -55,8 +55,8 @@ namespace AppForSEII2526
 
             var rentalItems = new List<RentalItem>()
             {
-                new RentalItem(Cars[0].Id, rental.Id, 1),
-                new RentalItem(Cars[1].Id, rental.Id, 1)
+                new RentalItem(Cars[0].Id,1,rental.Id),
+                new RentalItem(Cars[1].Id,1,rental.Id)
             };
 
             rental.RentalItems = rentalItems;

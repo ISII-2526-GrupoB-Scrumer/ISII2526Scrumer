@@ -18,5 +18,10 @@
             Quantity = quantity;
         }
 
+        public override bool Equals(object? obj)
+        {
+            return obj is RentalItemDTO dTO &&
+                   Quantity == dTO.Quantity;
+        }
     }
 }

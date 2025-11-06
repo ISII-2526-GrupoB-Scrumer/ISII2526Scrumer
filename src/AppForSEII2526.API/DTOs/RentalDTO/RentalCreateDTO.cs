@@ -17,5 +17,10 @@
             RentalItems = new List<RentalItemDTO>();
         }
 
+        public override bool Equals(object? obj)
+        {
+            return obj is RentalCreateDTO dTO &&
+                   DeliveryCarDealer == dTO.DeliveryCarDealer;
+        }
     }
 }
