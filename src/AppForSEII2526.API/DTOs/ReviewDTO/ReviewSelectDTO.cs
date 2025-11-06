@@ -1,4 +1,5 @@
-﻿namespace AppForSEII2526
+﻿
+namespace AppForSEII2526
 {
     public class ReviewSelectDTO
     {
@@ -19,5 +20,18 @@
             FuelType = fuelType;
             Color = color;
         }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is ReviewSelectDTO dTO &&
+                   Id == dTO.Id &&
+                   ModelName == dTO.ModelName &&
+                   CarClass == dTO.CarClass &&
+                   Manufacturer == dTO.Manufacturer &&
+                   FuelType == dTO.FuelType &&
+                   Color == dTO.Color;
+        }
+
+       
     }
 }

@@ -90,6 +90,16 @@ namespace AppForSEII2526
         [ProducesResponseType(typeof(IList<ReviewSelectDTO>), (int)HttpStatusCode.OK)]
         public async Task<ActionResult> GetCochesParaReview(string? fabricante, string? fuelType)
         {
+            if (_context.Car == null || !_context.Car.Any())
+            {
+                var problemDetails = new ValidationProblemDetails(new Dictionary<string, string[]>
+                {
+                    { "Error", new[] { "Error: Cars table does not exist or no cars available" } }
+            });
+
+                return BadRequest(problemDetails);
+            }
+
             IList<ReviewSelectDTO> coches = await _context.Car
                 .Include(c => c.Model)
                 .Where(c =>
