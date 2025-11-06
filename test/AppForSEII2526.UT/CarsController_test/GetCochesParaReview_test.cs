@@ -13,7 +13,6 @@ namespace AppForSEII2526
     {
         public GetCochesParaReview_test()
         {
-            // --- MODELOS ---
             var Models = new List<Model>()
             {
                 new Model("1", "Q5"),
@@ -22,7 +21,6 @@ namespace AppForSEII2526
                 new Model("4", "Corolla")
             };
 
-            // --- COCHES ---
             var Cars = new List<Car>()
             {
                 new Car("Turismo","Blanco","","1.8","Gasolina",1,"Estandar","Audi",18000,2,4,180,18,Models[0]),
@@ -31,14 +29,12 @@ namespace AppForSEII2526
                 new Car("Familiar","Rojo","","1.6","Gasolina",4,"Estandar","Toyota",17000,4,5,140,17,Models[3])
             };
 
-            // --- USUARIOS ---
             var users = new List<ApplicationUser>()
             {
                 new ApplicationUser("Albacete 1","600000001","Manuel","Garcia","manolito"),
                 new ApplicationUser("Albacete 2","600000002","Lucia","Martinez","luci")
             };
 
-            // --- REVIEW ---
             var review = new Review(1, new DateTime(2025, 10, 20))
             {
                 Country = "España",
@@ -46,7 +42,6 @@ namespace AppForSEII2526
                 Client = users[0]
             };
 
-            // --- REVIEW ITEMS ---
             var reviewItems = new List<ReviewItem>()
             {
                 new ReviewItem(Cars[0].Id, "Muy buen coche, cómodo", 5, review.Id),
@@ -55,7 +50,6 @@ namespace AppForSEII2526
 
             review.Cars = reviewItems;
 
-            // --- Guardamos en la base de datos in-memory ---
             _context.AddRange(Models);
             _context.AddRange(Cars);
             _context.AddRange(users);
@@ -64,7 +58,6 @@ namespace AppForSEII2526
             _context.SaveChanges();
         }
 
-        // --- TEST CASES ---
         public static IEnumerable<object[]> TestCasesFor_GetCochesParaReview_OK()
         {
             var cocheDTOs = new List<ReviewSelectDTO>()
@@ -92,7 +85,7 @@ namespace AppForSEII2526
             };
         }
 
-        // --- TEST OK ---
+        // Test Correcto
         [Theory]
         [MemberData(nameof(TestCasesFor_GetCochesParaReview_OK))]
         [Trait("Database", "WithoutFixture")]
@@ -117,7 +110,7 @@ namespace AppForSEII2526
             }
         }
 
-        // --- TEST BAD REQUEST ---
+        // Test Fallo
         [Fact]
         [Trait("Database", "WithoutFixture")]
         [Trait("LevelTesting", "Unit Testing")]
