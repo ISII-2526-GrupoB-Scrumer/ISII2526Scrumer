@@ -43,7 +43,7 @@ namespace AppForSEII2526.API.Controllers
                     r.Created,
                     r.Country,
                     r.DriverType,
-                    r.Client.UserName, // mostramos el username del cliente
+                    r.Client.UserName, 
                     r.Cars.Select(ri => new ReviewItemDTO(
                         ri.Car.Id,
                         ri.Car.Model.Name,
@@ -88,7 +88,7 @@ namespace AppForSEII2526.API.Controllers
                 Country = reviewCreate.Country,
                 DriverType = reviewCreate.DriverType,
                 Client = user,
-                Cars = new List<ReviewItem>() // se usa Cars porque así está en tu modelo
+                Cars = new List<ReviewItem>() 
             };
 
             var carIds = reviewCreate.ReviewItems.Select(ri => ri.CarId).ToList();

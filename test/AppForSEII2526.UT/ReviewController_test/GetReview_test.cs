@@ -52,6 +52,7 @@ namespace AppForSEII2526
             _context.SaveChanges();
         }
 
+        // Test Correcto
         [Fact]
         [Trait("Database", "WithoutFixture")]
         [Trait("LevelTesting", "Unit Testing")]
@@ -93,6 +94,7 @@ namespace AppForSEII2526
             }
         }
 
+        // Test Fallo
         [Fact]
         [Trait("Database", "WithoutFixture")]
         [Trait("LevelTesting", "Unit Testing")]

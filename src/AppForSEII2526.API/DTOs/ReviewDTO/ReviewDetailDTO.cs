@@ -15,5 +15,16 @@
             ClientId = clientId;
             ReviewItems = reviewItems;
         }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is ReviewDetailDTO dTO &&
+                   base.Equals(obj) &&
+                   Created == dTO.Created &&
+                   Country == dTO.Country &&
+                   DriverType == dTO.DriverType &&
+                   ClientId == dTO.ClientId &&
+                   Id == dTO.Id;
+        }
     }
 }

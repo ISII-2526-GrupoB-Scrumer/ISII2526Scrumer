@@ -34,6 +34,7 @@ namespace AppForSEII2526
             _context.SaveChanges();
         }
 
+        // Test Correcto
         [Fact]
         [Trait("Database", "WithoutFixture")]
         [Trait("LevelTesting", "Unit Testing")]
@@ -66,6 +67,7 @@ namespace AppForSEII2526
             Assert.Equal(2, dto.ReviewItems.Count);
         }
 
+        // Test Fallo
         [Fact]
         [Trait("Database", "WithoutFixture")]
         [Trait("LevelTesting", "Unit Testing")]
@@ -79,8 +81,8 @@ namespace AppForSEII2526
                 Created = DateTime.Now,
                 Country = "España",
                 DriverType = "Habitual",
-                ClientId = "usuarioInexistente", // No existe
-                ReviewItems = new List<ReviewItemDTO>() // Vacío
+                ClientId = "usuarioInexistente", 
+                ReviewItems = new List<ReviewItemDTO>() 
             };
 
             var result = await controller.CreateReview(reviewCreate);

@@ -13,5 +13,14 @@
         {
             ReviewItems = new List<ReviewItemDTO>();
         }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is ReviewCreateDTO dTO &&
+                   Created == dTO.Created &&
+                   Country == dTO.Country &&
+                   DriverType == dTO.DriverType &&
+                   ClientId == dTO.ClientId;  
+        }
     }
 }

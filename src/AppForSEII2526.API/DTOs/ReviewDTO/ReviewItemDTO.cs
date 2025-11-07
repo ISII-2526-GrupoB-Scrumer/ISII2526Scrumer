@@ -16,6 +16,15 @@
             Description = description;
             Rating = rating;
         }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is ReviewItemDTO dTO &&
+                   CarId == dTO.CarId &&
+                   CarModel == dTO.CarModel &&
+                   Description == dTO.Description &&
+                   Rating == dTO.Rating;
+        }
     }
 }
 
