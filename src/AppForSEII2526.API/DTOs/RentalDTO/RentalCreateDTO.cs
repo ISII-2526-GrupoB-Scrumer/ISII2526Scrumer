@@ -17,10 +17,27 @@
             RentalItems = new List<RentalItemDTO>();
         }
 
+        public RentalCreateDTO(DateTime startDate, DateTime endDate, string paymentMethod, string deliveryCarDealer, string clientId, decimal totalPrice, List<RentalItemDTO> rentalItems)
+        {
+            StartDate = startDate;
+            EndDate = endDate;
+            PaymentMethod = paymentMethod;
+            DeliveryCarDealer = deliveryCarDealer;
+            ClientId = clientId;
+            TotalPrice = totalPrice;
+            RentalItems = rentalItems;
+        }
+
         public override bool Equals(object? obj)
         {
             return obj is RentalCreateDTO dTO &&
-                   DeliveryCarDealer == dTO.DeliveryCarDealer;
+                   StartDate == dTO.StartDate &&
+                   EndDate == dTO.EndDate &&
+                   PaymentMethod == dTO.PaymentMethod &&
+                   DeliveryCarDealer == dTO.DeliveryCarDealer &&
+                   ClientId == dTO.ClientId &&
+                   TotalPrice == dTO.TotalPrice &&
+                   RentalItems.SequenceEqual(dTO.RentalItems);
         }
     }
 }

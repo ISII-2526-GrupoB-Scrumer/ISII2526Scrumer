@@ -21,6 +21,9 @@
         public override bool Equals(object? obj)
         {
             return obj is RentalItemDTO dTO &&
+                   CarId == dTO.CarId &&
+                   CarModel == dTO.CarModel &&
+                   RentingPrice == dTO.RentingPrice &&
                    Quantity == dTO.Quantity;
         }
     }
