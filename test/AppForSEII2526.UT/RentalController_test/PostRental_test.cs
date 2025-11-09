@@ -1,6 +1,6 @@
 ﻿using AppForSEII2526.API;
 using AppForSEII2526.API.Controllers;
-using AppForSEII2526.API.DTOs.RentalDTO;
+using AppForSEII2526;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -61,8 +61,8 @@ namespace AppForSEII2526
                 ClientId = "U1",
                 RentalItems = new List<RentalItemDTO>
                 {
-                    new RentalItemDTO(1, "Q5", 180m, 2),
-                    new RentalItemDTO(2, "Civic", 160m, 1)
+                    new RentalItemDTO(1, "Q5", 180m, 2, "Audi"),
+                    new RentalItemDTO(2, "Civic", 160m, 1, "Honda")
                 }
             };
 
@@ -75,10 +75,13 @@ namespace AppForSEII2526
 
             var dto = Assert.IsType<RentalDetailDTO>(createdResult.Value);
 
-            Assert.Equal(rentalCreate.DeliveryCarDealer, dto.DeliveryCarDealer);
+            // Verificar datos
             Assert.Equal(rentalCreate.PaymentMethod, dto.PaymentMethod);
-            Assert.Equal("U1", dto.ClientId);
-            Assert.Equal(3, dto.RentalItems.Sum(i => i.Quantity)); 
+            Assert.Equal(rentalCreate.DeliveryCarDealer, dto.DeliveryCarDealer);
+            Assert.Equal("Manuel", dto.Name);
+            Assert.Equal("Garcia", dto.Surname);
+            Assert.Equal("Avda. España 1", dto.Address);
+            Assert.Equal(3, dto.RentalItems.Sum(i => i.Quantity)); // 2 + 1 coches alquilados
             Assert.True(dto.TotalPrice > 0);
         }
 
@@ -97,7 +100,6 @@ namespace AppForSEII2526
                 StartDate = new DateTime(2026, 1, 10),
                 EndDate = new DateTime(2026, 1, 12),
                 PaymentMethod = "Visa",
-                DeliveryCarDealer = "Concesionario Albacete",
                 ClientId = "U0", 
                 RentalItems = new List<RentalItemDTO>() 
             };

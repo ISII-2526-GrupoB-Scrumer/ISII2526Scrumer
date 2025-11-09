@@ -1,4 +1,4 @@
-﻿using AppForSEII2526.API.DTOs.RentalDTO;
+﻿using AppForSEII2526;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc;
@@ -43,17 +43,21 @@ namespace AppForSEII2526
                         .ThenInclude(c => c.Model)
                 .Select(r => new RentalDetailDTO(
                     r.Id,
+                    r.Client.Name,
+                    r.Client.Surname,
+                    r.Client.ClientAddress,
+                    r.PaymentMethod,
+                    r.RentingDate,
                     r.StartDate,
                     r.EndDate,
-                    r.PaymentMethod,
-                    r.DeliveryCarDealer,
-                    r.Client.UserName,
                     r.TotalPrice,
+                    r.DeliveryCarDealer,
                     r.RentalItems.Select(ri => new RentalItemDTO(
                         ri.Car.Id,
                         ri.Car.Model.Name,
                         ri.Car.RentingPrice,
-                        ri.Quantity
+                        ri.Quantity,
+                        ri.Car.Manufacturer
                     )).ToList<RentalItemDTO>()
                 ))
                 .FirstOrDefaultAsync();
@@ -86,11 +90,11 @@ namespace AppForSEII2526
             if (rentalForCreate.RentalItems == null || rentalForCreate.RentalItems.Count == 0)
                 ModelState.AddModelError("RentalItems", "Debes incluir al menos un coche para alquilar.");
 
-            var user = await _context.Users
-                .FirstOrDefaultAsync(u => u.Id == rentalForCreate.ClientId);
+            // Buscar el usuario por ClientId
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == rentalForCreate.ClientId);
 
             if (user == null)
-                ModelState.AddModelError("Client", "El usuario especificado no existe.");
+                ModelState.AddModelError("ClientId", "El usuario especificado no existe.");
 
             if (ModelState.ErrorCount > 0)
                 return BadRequest(new ValidationProblemDetails(ModelState));
@@ -156,13 +160,13 @@ namespace AppForSEII2526
             // ===== CREAR EL OBJETO RENTAL =====
             var rental = new Rental
             {
-                Client = user, // ← aquí usamos el ApplicationUser directamente
-                DeliveryCarDealer = rentalForCreate.DeliveryCarDealer,
+                Client = user,
                 StartDate = rentalForCreate.StartDate,
                 EndDate = rentalForCreate.EndDate,
                 RentingDate = DateTime.Now,
                 TotalPrice = total,
                 PaymentMethod = rentalForCreate.PaymentMethod,
+                DeliveryCarDealer = rentalForCreate.DeliveryCarDealer,
                 RentalItems = rentalItems
             };
 
@@ -182,22 +186,32 @@ namespace AppForSEII2526
             var rentalItemsDTO = rentalItems.Select(ri =>
             {
                 var car = cars.First(c => c.Car.Id == ri.Car.Id).Car;
-                return new RentalItemDTO(car.Id, car.Model.Name, car.RentingPrice, ri.Quantity);
+                return new RentalItemDTO(
+                    car.Id,
+                    car.Model.Name,
+                    car.RentingPrice,
+                    ri.Quantity,
+                    car.Manufacturer
+                );
             }).ToList();
 
             var detailDTO = new RentalDetailDTO(
                 rental.Id,
+                rental.Client.Name,
+                rental.Client.Surname,
+                rental.Client.ClientAddress,          // ← campo correcto según ApplicationUser
+                rental.PaymentMethod,
+                rental.RentingDate,
                 rental.StartDate,
                 rental.EndDate,
-                rental.PaymentMethod,
+                rental.TotalPrice, 
                 rental.DeliveryCarDealer,
-                user.Id, 
-                rental.TotalPrice,
                 rentalItemsDTO
             );
 
             return CreatedAtAction(nameof(GetRental), new { id = rental.Id }, detailDTO);
         }
+
 
 
 

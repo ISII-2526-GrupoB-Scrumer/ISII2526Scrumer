@@ -1,5 +1,5 @@
 ﻿using AppForSEII2526.API;
-using AppForSEII2526.API.DTOs.RentalDTO;
+using AppForSEII2526;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -84,15 +84,18 @@ namespace AppForSEII2526
             // ====== Expected DTO ======
             var expectedRental = new RentalDetailDTO(
                 1,
+                "Manuel",
+                "Garcia",
+                "Albacete 1",
+                "Tarjeta",
+                DateTime.Today,                 // RentingDate (aproximado)
                 DateTime.Today.AddDays(1),
                 DateTime.Today.AddDays(3),
-                "Tarjeta",
-                "Albacete Center",
-                "manolito",  // coincide con el username del usuario
                 360m,
+                "Albacete Center",
                 new List<RentalItemDTO>
                 {
-                    new RentalItemDTO(1, "Q5", 180m, 2)
+                    new RentalItemDTO(1, "Q5", 180m, 2, "Audi")
                 }
             );
 
@@ -105,12 +108,17 @@ namespace AppForSEII2526
 
             Assert.Equal(expectedRental.Id, rentalDTOActual.Id);
             Assert.Equal(expectedRental.DeliveryCarDealer, rentalDTOActual.DeliveryCarDealer);
-            Assert.Equal(expectedRental.ClientId, rentalDTOActual.ClientId);
             Assert.Equal(expectedRental.TotalPrice, rentalDTOActual.TotalPrice);
 
-            // Verificar también que el primer item coincide
+            // Verificar también que los RentalItems coinciden
             Assert.Single(rentalDTOActual.RentalItems);
-            Assert.Equal(expectedRental.RentalItems[0].CarId, rentalDTOActual.RentalItems[0].CarId);
+            var expectedItem = expectedRental.RentalItems.First();
+            var actualItem = rentalDTOActual.RentalItems.First();
+
+            Assert.Equal(expectedItem.CarId, actualItem.CarId);
+            Assert.Equal(expectedItem.CarModel, actualItem.CarModel);
+            Assert.Equal(expectedItem.Manufacturer, actualItem.Manufacturer);
+            Assert.Equal(expectedItem.Quantity, actualItem.Quantity);
         }
     }
 }

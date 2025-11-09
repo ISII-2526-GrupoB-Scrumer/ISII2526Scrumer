@@ -7,15 +7,17 @@
         public string CarModel { get; set; } = string.Empty;
         public decimal RentingPrice { get; set; }
         public int Quantity { get; set; }
+        public string Manufacturer { get; set; } = string.Empty;
 
         public RentalItemDTO() { }
 
-        public RentalItemDTO(int carId, string carModel, decimal rentingPrice, int quantity)
+        public RentalItemDTO(int carId, string carModel, decimal rentingPrice, int quantity, string manufacturer)
         {
             CarId = carId;
             CarModel = carModel;
             RentingPrice = rentingPrice;
             Quantity = quantity;
+            Manufacturer = manufacturer;
         }
 
         public override bool Equals(object? obj)
@@ -24,7 +26,8 @@
                    CarId == dTO.CarId &&
                    CarModel == dTO.CarModel &&
                    RentingPrice == dTO.RentingPrice &&
-                   Quantity == dTO.Quantity;
+                   Quantity == dTO.Quantity &&
+                   Manufacturer == dTO.Manufacturer;
         }
     }
 }
