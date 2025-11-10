@@ -3,28 +3,29 @@
     public class ReviewDetailDTO : ReviewCreateDTO
     {
         public int Id { get; set; }
+        public DateTime Created { get; set; }
 
         public ReviewDetailDTO() { }
 
-        public ReviewDetailDTO(int id, DateTime created, string country, string driverType, string clientId, List<ReviewItemDTO> reviewItems)
+        public ReviewDetailDTO(int id, DateTime created, string name, string country, string driverType, List<ReviewItemDTO> reviewItems)
         {
             Id = id;
             Created = created;
+            Name = name;
             Country = country;
             DriverType = driverType;
-            ClientId = clientId;
             ReviewItems = reviewItems;
         }
 
         public override bool Equals(object? obj)
         {
             return obj is ReviewDetailDTO dTO &&
-                   base.Equals(obj) &&
-                   Created == dTO.Created &&
-                   Country == dTO.Country &&
-                   DriverType == dTO.DriverType &&
-                   ClientId == dTO.ClientId &&
-                   Id == dTO.Id;
+                base.Equals(obj) &&
+                Created == dTO.Created &&
+                Name == dTO.Name &&
+                Country == dTO.Country &&
+                DriverType == dTO.DriverType &&
+                Id == dTO.Id;
         }
     }
 }

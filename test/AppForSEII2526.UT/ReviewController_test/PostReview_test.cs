@@ -46,13 +46,13 @@ namespace AppForSEII2526
             var reviewCreate = new ReviewCreateDTO
             {
                 Created = new DateTime(2025, 10, 15),
+                Name = "Manuel",
                 Country = "España",
                 DriverType = "Habitual",
-                ClientId = _context.Users.First().Id,
                 ReviewItems = new List<ReviewItemDTO>
                 {
-                    new ReviewItemDTO(1, "Q5", "Buen coche", 5),
-                    new ReviewItemDTO(2, "Civic", "Cómodo y ágil", 4)
+                    new ReviewItemDTO(1, "Q5", "Audi", "Gasolina", "Blanco", "Buen coche", 5),
+                    new ReviewItemDTO(2, "Civic", "Honda", "Hibrido", "Azul", "Cómodo y ágil", 4)
                 }
             };
 
@@ -63,7 +63,7 @@ namespace AppForSEII2526
 
             Assert.Equal(reviewCreate.Country, dto.Country);
             Assert.Equal(reviewCreate.DriverType, dto.DriverType);
-            Assert.Equal("manolito", dto.ClientId);
+            Assert.Equal("Manuel", dto.Name);
             Assert.Equal(2, dto.ReviewItems.Count);
         }
 
@@ -79,10 +79,10 @@ namespace AppForSEII2526
             var reviewCreate = new ReviewCreateDTO
             {
                 Created = DateTime.Now,
+                Name = "Manuel",
                 Country = "España",
                 DriverType = "Habitual",
-                ClientId = "usuarioInexistente", 
-                ReviewItems = new List<ReviewItemDTO>() 
+                ReviewItems = new List<ReviewItemDTO>()
             };
 
             var result = await controller.CreateReview(reviewCreate);
@@ -90,8 +90,7 @@ namespace AppForSEII2526
             var badRequest = Assert.IsType<BadRequestObjectResult>(result);
             var problemDetails = Assert.IsType<ValidationProblemDetails>(badRequest.Value);
 
-            Assert.True(problemDetails.Errors.ContainsKey("ClientId") ||
-                        problemDetails.Errors.ContainsKey("ReviewItems"));
+            Assert.True(problemDetails.Errors.ContainsKey("ReviewItems"));
         }
     }
 }

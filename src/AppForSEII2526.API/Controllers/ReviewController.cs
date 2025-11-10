@@ -20,7 +20,8 @@ namespace AppForSEII2526.API.Controllers
         }
 
 
-        //PASO 7
+        // Paso 7
+
         [HttpGet]
         [Route("[action]")]
         [ProducesResponseType(typeof(ReviewDetailDTO), (int)HttpStatusCode.OK)]
@@ -41,15 +42,19 @@ namespace AppForSEII2526.API.Controllers
                 .Select(r => new ReviewDetailDTO(
                     r.Id,
                     r.Created,
+                    r.Client.Name,
                     r.Country,
                     r.DriverType,
-                    r.Client.UserName, 
                     r.Cars.Select(ri => new ReviewItemDTO(
                         ri.Car.Id,
                         ri.Car.Model.Name,
+                        ri.Car.Manufacturer,
+                        ri.Car.FuelType,
+                        ri.Car.Color,
                         ri.Description,
                         ri.Rating
                     )).ToList()
+
                 ))
                 .FirstOrDefaultAsync();
 
@@ -62,6 +67,7 @@ namespace AppForSEII2526.API.Controllers
             return Ok(review);
         }
 
+
         // Paso 5: 
 
         [HttpPost]
@@ -71,24 +77,28 @@ namespace AppForSEII2526.API.Controllers
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.Conflict)]
         public async Task<ActionResult> CreateReview(ReviewCreateDTO reviewCreate)
         {
-          
+
             if (reviewCreate.ReviewItems.Count == 0)
                 ModelState.AddModelError("ReviewItems", "Error: Debes incluir al menos un coche en la review.");
 
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == reviewCreate.ClientId);
-            if (user == null)
-                ModelState.AddModelError("ClientId", "Error: El usuario no existe.");
+            if (string.IsNullOrWhiteSpace(reviewCreate.Name))
+                ModelState.AddModelError("Name", "Error: Debes indicar tu nombre.");
+
+            if (string.IsNullOrWhiteSpace(reviewCreate.Country))
+                ModelState.AddModelError("Country", "Error: Debes indicar tu país.");
+
+            if (string.IsNullOrWhiteSpace(reviewCreate.DriverType))
+                ModelState.AddModelError("DriverType", "Error: Debes indicar el tipo de conductor.");
 
             if (ModelState.ErrorCount > 0)
                 return BadRequest(new ValidationProblemDetails(ModelState));
 
             var review = new Review
             {
-                Created = reviewCreate.Created == default ? DateTime.Now : reviewCreate.Created,
+                Created = DateTime.Now,
                 Country = reviewCreate.Country,
                 DriverType = reviewCreate.DriverType,
-                Client = user,
-                Cars = new List<ReviewItem>() 
+                Cars = new List<ReviewItem>()
             };
 
             var carIds = reviewCreate.ReviewItems.Select(ri => ri.CarId).ToList();
@@ -132,13 +142,12 @@ namespace AppForSEII2526.API.Controllers
                 return Conflict("Error: No se pudo guardar la review. " + ex.Message);
             }
 
-            
             var detailDTO = new ReviewDetailDTO(
                 review.Id,
                 review.Created,
+                reviewCreate.Name,
                 review.Country,
                 review.DriverType,
-                review.Client.UserName,
                 reviewCreate.ReviewItems
             );
 

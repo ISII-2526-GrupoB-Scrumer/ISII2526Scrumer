@@ -26,7 +26,8 @@ namespace AppForSEII2526
                 new Car("Familiar","Azul","","2.0","Hibrido",2,"Estandar","Honda",22000,4,5,160,20,models[1])
             };
 
-            var user = new ApplicationUser("Avda. España 1", "600000001", "Manuel", "Garcia", "manolito");
+            var user = new ApplicationUser("Avda. España 1", "600000001", "Manuel", "Garcia", "manolito")
+            { Id = "U1" };
 
             var review = new Review(1, new DateTime(2025, 10, 20))
             {
@@ -65,15 +66,16 @@ namespace AppForSEII2526
             var expected = new ReviewDetailDTO(
                 1,
                 new DateTime(2025, 10, 20),
+                "Manuel",
                 "España",
                 "Habitual",
-                "manolito",
                 new List<ReviewItemDTO>
                 {
-                    new ReviewItemDTO(1, "Q5", "Buen coche para ciudad", 5),
-                    new ReviewItemDTO(2, "Civic", "Cómodo y eficiente", 4)
+                    new ReviewItemDTO(1, "Q5", "Audi", "Gasolina", "Blanco", "Buen coche para ciudad", 5),
+                    new ReviewItemDTO(2, "Civic", "Honda", "Hibrido", "Azul", "Cómodo y eficiente", 4)
                 }
             );
+
 
             var result = await controller.GetReview(1);
 
@@ -83,7 +85,7 @@ namespace AppForSEII2526
             Assert.Equal(expected.Id, reviewDTOActual.Id);
             Assert.Equal(expected.Country, reviewDTOActual.Country);
             Assert.Equal(expected.DriverType, reviewDTOActual.DriverType);
-            Assert.Equal(expected.ClientId, reviewDTOActual.ClientId);
+            Assert.Equal(expected.Name, reviewDTOActual.Name);
             Assert.Equal(expected.ReviewItems.Count, reviewDTOActual.ReviewItems.Count);
 
             for (int i = 0; i < expected.ReviewItems.Count; i++)
