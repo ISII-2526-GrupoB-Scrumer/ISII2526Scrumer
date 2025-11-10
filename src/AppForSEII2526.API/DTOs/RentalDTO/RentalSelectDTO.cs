@@ -19,5 +19,16 @@
             RentingPrice = rentingPrice;
             Color = color;
         }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is RentalSelectDTO dTO &&
+                   Id == dTO.Id &&
+                   ModelName == dTO.ModelName &&
+                   Manufacturer == dTO.Manufacturer &&
+                   FuelType == dTO.FuelType &&
+                   RentingPrice == dTO.RentingPrice &&
+                   Color == dTO.Color;
+        }
     }
 }

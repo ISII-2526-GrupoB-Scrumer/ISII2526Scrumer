@@ -36,7 +36,7 @@ public class Rental
 
     public Rental() { }
 
-    public Rental(string deliveryCarDealer, DateTime endDate, int id, DateTime rentingDate, DateTime startDate, decimal totalPrice)
+    public Rental(string deliveryCarDealer, DateTime endDate, int id, DateTime rentingDate, DateTime startDate, decimal totalPrice, string paymentmethod)
     {
         DeliveryCarDealer = deliveryCarDealer;
         EndDate = endDate;
@@ -44,6 +44,7 @@ public class Rental
         RentingDate = rentingDate;
         StartDate = startDate;
         TotalPrice = totalPrice;
+        PaymentMethod = paymentmethod;
     }
 
     public override bool Equals(object obj)

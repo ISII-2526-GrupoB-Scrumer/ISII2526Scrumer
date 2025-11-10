@@ -1,4 +1,6 @@
-﻿namespace AppForSEII2526.API.DTOs.RentalDTO
+﻿using System.Net;
+
+namespace AppForSEII2526
 {
     public class RentalDetailDTO : RentalCreateDTO
     {
@@ -7,15 +9,19 @@
 
         public RentalDetailDTO() { }
 
-        public RentalDetailDTO(int id, DateTime startDate, DateTime endDate, string paymentMethod, string deliveryCarDealer, string clientId, decimal totalPrice, List<RentalItemDTO> rentalItems)
+        public RentalDetailDTO(int id,string clientid, string name, string surname, string address, string paymentMethod,DateTime rentingdate, DateTime startDate, DateTime endDate, decimal totalPrice,string deliverycardealer, List<RentalItemDTO> rentalItems)
         {
             Id = id;
+            ClientId = clientid;
+            Name = name;
+            Surname = surname;
+            Address = address;
+            PaymentMethod = paymentMethod;
+            RentingDate = rentingdate;
             StartDate = startDate;
             EndDate = endDate;
-            PaymentMethod = paymentMethod;
-            DeliveryCarDealer = deliveryCarDealer;
-            ClientId = clientId;
             TotalPrice = totalPrice;
+            DeliveryCarDealer = deliverycardealer;
             RentalItems = rentalItems;
         }
 
