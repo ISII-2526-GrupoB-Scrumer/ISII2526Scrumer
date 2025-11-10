@@ -25,7 +25,7 @@ namespace AppForSEII2526
                 new Car("Turismo","Negro","","1.5","Diesel", 2,"Deportivo","Peugeot", 15000, 2, 4, 200, 15, models[1])
             };
 
-            var user = new ApplicationUser("Albacete 1", "600000001", "Manuel", "Garcia", "manolito");
+            var user = new ApplicationUser("Albacete 1", "600000001", "Manuel", "Garcia", "manolito") { Id="U1"};
 
             // ====== Rental ======
             var rental = new Rental
@@ -84,6 +84,7 @@ namespace AppForSEII2526
             // ====== Expected DTO ======
             var expectedRental = new RentalDetailDTO(
                 1,
+                "U1",
                 "Manuel",
                 "Garcia",
                 "Albacete 1",

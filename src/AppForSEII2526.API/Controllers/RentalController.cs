@@ -43,6 +43,7 @@ namespace AppForSEII2526
                         .ThenInclude(c => c.Model)
                 .Select(r => new RentalDetailDTO(
                     r.Id,
+                    r.Client.Id,
                     r.Client.Name,
                     r.Client.Surname,
                     r.Client.ClientAddress,
@@ -197,6 +198,7 @@ namespace AppForSEII2526
 
             var detailDTO = new RentalDetailDTO(
                 rental.Id,
+                rental.Client.Id,
                 rental.Client.Name,
                 rental.Client.Surname,
                 rental.Client.ClientAddress,          // ← campo correcto según ApplicationUser
