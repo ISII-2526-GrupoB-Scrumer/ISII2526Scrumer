@@ -55,7 +55,7 @@ namespace AppForSEII2526
             _context.SaveChanges();
         }
 
-        //❌ RENTAL NO ENCONTRADO
+        //RENTAL NO ENCONTRADO
         [Fact]
         [Trait("Database", "WithoutFixture")]
         [Trait("LevelTesting", "Unit Testing")]
@@ -71,7 +71,7 @@ namespace AppForSEII2526
             Assert.IsType<NotFoundResult>(result);
         }
 
-        //✅ RENTAL ENCONTRADO
+        //RENTAL ENCONTRADO
         [Fact]
         [Trait("Database", "WithoutFixture")]
         [Trait("LevelTesting", "Unit Testing")]

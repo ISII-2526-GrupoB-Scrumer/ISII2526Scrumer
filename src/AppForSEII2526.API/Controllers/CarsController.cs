@@ -71,7 +71,7 @@ namespace AppForSEII2526
                     { "Error", new[] { "Error: Cars table does not exist or no cars available" } }
                 });
 
-                return BadRequest(problemDetails); // 👈 esto devuelve BadRequestObjectResult
+                return BadRequest(problemDetails); 
             }
 
             IList<RentalSelectDTO> coches = await _context.Car

@@ -201,7 +201,7 @@ namespace AppForSEII2526
                 rental.Client.Id,
                 rental.Client.Name,
                 rental.Client.Surname,
-                rental.Client.ClientAddress,          // ← campo correcto según ApplicationUser
+                rental.Client.ClientAddress,
                 rental.PaymentMethod,
                 rental.RentingDate,
                 rental.StartDate,
