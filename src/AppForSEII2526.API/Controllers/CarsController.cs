@@ -36,14 +36,14 @@ namespace AppForSEII2526
         [ProducesResponseType(typeof(IList<PurchaseSelectDTO>), (int)HttpStatusCode.OK)]
         public async Task<ActionResult> GetCochesParaCompra(string? modelo, string? color)
         {
+            // 1. Obtenemos los coches de la BD sin la ordenación problemática
+            //    (Sacamos el OrderBy y ThenBy de la consulta a la BD)
             IList<PurchaseSelectDTO> coches = await _context.Car
                 .Include(c => c.Model)
                 .Where(c =>
                     (modelo == null || c.Model.Name.Contains(modelo)) &&
                     (color == null || c.Color.Contains(color))
                 )
-                .OrderBy(c => c.Model.Name)
-                .ThenBy(c => c.PurchasingPrice)
                 .Select(c => new PurchaseSelectDTO(
                     c.Id,
                     c.Model.Name,
@@ -51,9 +51,16 @@ namespace AppForSEII2526
                     c.Color,
                     c.PurchasingPrice
                 ))
-                .ToListAsync();
+                .ToListAsync(); // <-- Traemos la lista a memoria
 
-            return Ok(coches);
+            // 2. Ahora ordenamos la lista en memoria (LINQ to Objects)
+            //    Esto sí soporta ordenar por decimales.
+            var cochesOrdenados = coches
+                .OrderBy(c => c.ModelName)
+                .ThenBy(c => c.PurchasingPrice)
+                .ToList();
+
+            return Ok(cochesOrdenados);
         }
 
 
