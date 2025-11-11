@@ -3,10 +3,10 @@
     public string ClientId { get; set; } = string.Empty;
     public string PaymentMethod { get; set; } = string.Empty;
     public DateTime Date { get; set; }
-    public List<MaintenanceItemDTO> Maintenances { get; set; }
+    public List<MaintenanceItemDTO> MaintenanceItems { get; set; }
 
     public MaintenanceCreateDTO()
     {
-        Maintenances = new List<MaintenanceItemDTO>();
+        MaintenanceItems = new List<MaintenanceItemDTO>();
     }
 }

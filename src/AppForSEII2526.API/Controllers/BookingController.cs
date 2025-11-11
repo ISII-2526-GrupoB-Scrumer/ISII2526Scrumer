@@ -42,19 +42,22 @@ namespace AppForSEII2526.API.Controllers
                 .Include(b => b.Client)
                 .Select(b => new MaintenanceDetailDTO(
                     b.Id,
-                    b.Date,
-                    b.Client.UserName,
-                    b.Client.Name + " " + b.Client.Surname,
+                    b.Client.Id,            // o b.Client.UserName si prefieres mostrar el nombre
                     b.PaymentMethod,
-                    b.Items
-                        .Select(bi => new MaintenanceItemDTO(
-                            bi.Maintenance.Id,
-                            bi.Maintenance.Name,
-                            bi.Maintenance.Price,
-                            bi.Maintenance.NumberOfDays,
-                            bi.Comment
-                        )).ToList()
+                    b.Date,
+                    b.Items.Sum(bi => bi.Maintenance.Price), // o b.Items.Sum(...) si quieres el total
+                    b.Items.Select(bi => new MaintenanceItemDTO(
+                        bi.Maintenance.Id,
+                        bi.Maintenance.Name,
+                        bi.Maintenance.MaintenanceTypes != null ?
+                            string.Join(", ", bi.Maintenance.MaintenanceTypes.Select(mt => mt.TypeName)) :
+                            "Desconocido",
+                        bi.Maintenance.Price,
+                        bi.Maintenance.NumberOfDays,
+                        bi.Comment
+                    )).ToList()
                 ))
+
                 .FirstOrDefaultAsync();
 
             if (booking == null)
@@ -115,7 +118,6 @@ namespace AppForSEII2526.API.Controllers
                 booking.Items.Add(new BookingItem
                 {
                     MaintenanceID = maintenance.Id,
-                    MantId = maintenance.Id,
                     Comment = item.Comment,
                 });
 
@@ -139,15 +141,18 @@ namespace AppForSEII2526.API.Controllers
             // Devuelve el DTO con los datos creados
             var detailDTO = new MaintenanceDetailDTO(
                 booking.Id,
-                booking.Date,
                 booking.Client.UserName,
-                booking.Client.Name + " " + booking.Client.Surname,
                 booking.PaymentMethod,
+                booking.Date,
+                booking.Items.Sum(bi => bi.Maintenance.Price),
                 booking.Items.Select(bi => new MaintenanceItemDTO(
-                    bi.MaintenanceID,
-                    bi.Maintenance?.Name ?? "Desconocido",
-                    bi.Maintenance?.Price ?? 0,
-                    bi.Maintenance?.NumberOfDays ?? 0,
+                    bi.Maintenance.Id,
+                    bi.Maintenance.Name ?? "Desconocido",
+                    bi.Maintenance.MaintenanceTypes != null ?
+                        string.Join(", ", bi.Maintenance.MaintenanceTypes.Select(mt => mt.TypeName)) :
+                        "Desconocido",
+                    bi.Maintenance.Price,
+                    bi.Maintenance.NumberOfDays,
                     bi.Comment
                 )).ToList()
             );

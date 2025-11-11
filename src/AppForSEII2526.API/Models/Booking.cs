@@ -19,6 +19,7 @@ public class Booking
 
     [ForeignKey("ClientId")]
     public ApplicationUser Client { get; set; }
+    public string ClientId { get; set; }
 
     // Constructor por defecto
     public Booking()

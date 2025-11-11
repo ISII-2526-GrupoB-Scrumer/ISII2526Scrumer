@@ -1,7 +1,11 @@
 ﻿public class MaintenanceDetailDTO : MaintenanceCreateDTO
 {
     public int Id { get; set; }
+    public string ClientId { get; set; }
+    public string PaymentMethod { get; set; }
+    public DateTime Date { get; set; }
     public decimal TotalPrice { get; set; }
+    public List<MaintenanceItemDTO> Maintenances { get; set; }
 
     public MaintenanceDetailDTO() { }
 
