@@ -1,6 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using AppForSEII2526.API.DTOs.MaintenanceDTO;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Net;
 
 namespace AppForSEII2526.API.Controllers
 {
@@ -8,10 +9,8 @@ namespace AppForSEII2526.API.Controllers
     [ApiController]
     public class MaintenanceController : ControllerBase
     {
-
         private readonly ApplicationDbContext _context;
         private readonly ILogger<MaintenanceController> _logger;
-
 
         public MaintenanceController(ApplicationDbContext context, ILogger<MaintenanceController> logger)
         {
@@ -19,7 +18,33 @@ namespace AppForSEII2526.API.Controllers
             _logger = logger;
         }
 
+        // ===============================================================
+        // Paso 2 (Select): mostrar mantenimientos disponibles
+        // Flujo alternativo al paso 2: filtro por nombre y tipo
+        // ===============================================================
+        [HttpGet]
+        [Route("[action]")]
+        [ProducesResponseType(typeof(IList<MaintenanceSelectDTO>), (int)HttpStatusCode.OK)]
+        public async Task<ActionResult> GetMaintenances(string? nombre, string? tipo)
+        {
+            var mantenimientos = await _context.Maintenance
+                .Include(m => m.MaintenanceTypes)
+                .Where(m =>
+                    (nombre == null || m.Name.Contains(nombre)) &&
+                    (tipo == null || m.MaintenanceTypes.Any(t => t.Type.Contains(tipo)))
+                )
+                .OrderBy(m => m.Name)
+                .ThenBy(m => m.Price)
+                .Select(m => new MaintenanceSelectDTO(
+                    m.Id,
+                    m.Name,
+                    m.MaintenanceTypes.Select(t => t.Type).FirstOrDefault() ?? "Sin tipo",
+                    m.Price,
+                    m.NumberOfDays
+                ))
+                .ToListAsync();
 
-       
+            return Ok(mantenimientos);
+        }
     }
 }
