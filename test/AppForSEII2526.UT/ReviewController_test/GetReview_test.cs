@@ -82,18 +82,7 @@ namespace AppForSEII2526
             var okResult = Assert.IsType<OkObjectResult>(result);
             var reviewDTOActual = Assert.IsType<ReviewDetailDTO>(okResult.Value);
 
-            Assert.Equal(expected.Id, reviewDTOActual.Id);
-            Assert.Equal(expected.Country, reviewDTOActual.Country);
-            Assert.Equal(expected.DriverType, reviewDTOActual.DriverType);
-            Assert.Equal(expected.Name, reviewDTOActual.Name);
-            Assert.Equal(expected.ReviewItems.Count, reviewDTOActual.ReviewItems.Count);
-
-            for (int i = 0; i < expected.ReviewItems.Count; i++)
-            {
-                Assert.Equal(expected.ReviewItems[i].CarModel, reviewDTOActual.ReviewItems[i].CarModel);
-                Assert.Equal(expected.ReviewItems[i].Description, reviewDTOActual.ReviewItems[i].Description);
-                Assert.Equal(expected.ReviewItems[i].Rating, reviewDTOActual.ReviewItems[i].Rating);
-            }
+            Assert.Equal(expected, reviewDTOActual);
         }
 
         // Test Fallo

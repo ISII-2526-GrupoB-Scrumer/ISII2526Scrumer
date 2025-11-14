@@ -25,7 +25,8 @@
                 Name == dTO.Name &&
                 Country == dTO.Country &&
                 DriverType == dTO.DriverType &&
-                Id == dTO.Id;
+                Id == dTO.Id &&
+                ReviewItems.SequenceEqual(dTO.ReviewItems);
         }
     }
 }
