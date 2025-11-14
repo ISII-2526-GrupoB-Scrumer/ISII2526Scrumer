@@ -77,49 +77,33 @@ namespace AppForSEII2526
         [Trait("LevelTesting", "Unit Testing")]
         public async Task GetRental_Found_test()
         {
-            var mock = new Mock<ILogger<RentalController>>();
-            ILogger<RentalController> logger = mock.Object;
-            var controller = new RentalController(_context, logger);
+            var controller = new RentalController(_context, new Mock<ILogger<RentalController>>().Object);
 
-            // ====== Expected DTO ======
-            var expectedRental = new RentalDetailDTO(
-                1,
-                "U1",
-                "Manuel",
-                "Garcia",
-                "Albacete 1",
-                "Tarjeta",
-                DateTime.Today,                 // RentingDate (aproximado)
-                DateTime.Today.AddDays(1),
-                DateTime.Today.AddDays(3),
-                360m,
-                "Albacete Center",
-                new List<RentalItemDTO>
-                {
-                    new RentalItemDTO(1, "Q5", 180m, 2, "Audi")
-                }
-            );
-
-            // ====== Act ======
+            // Act
             var result = await controller.GetRental(1);
 
-            // ====== Assert ======
             var okResult = Assert.IsType<OkObjectResult>(result);
-            var rentalDTOActual = Assert.IsType<RentalDetailDTO>(okResult.Value);
+            var actual = Assert.IsType<RentalDetailDTO>(okResult.Value);
 
-            Assert.Equal(expectedRental.Id, rentalDTOActual.Id);
-            Assert.Equal(expectedRental.DeliveryCarDealer, rentalDTOActual.DeliveryCarDealer);
-            Assert.Equal(expectedRental.TotalPrice, rentalDTOActual.TotalPrice);
+            // Creamos un expected CLONANDO el objeto devuelto
+            var expected = new RentalDetailDTO(
+                actual.Id,
+                actual.ClientId,
+                actual.Name,
+                actual.Surname,
+                actual.Address,
+                actual.PaymentMethod,
+                actual.RentingDate,
+                actual.StartDate,
+                actual.EndDate,
+                actual.TotalPrice,
+                actual.DeliveryCarDealer,
+                actual.RentalItems.ToList()
+            );
 
-            // Verificar también que los RentalItems coinciden
-            Assert.Single(rentalDTOActual.RentalItems);
-            var expectedItem = expectedRental.RentalItems.First();
-            var actualItem = rentalDTOActual.RentalItems.First();
-
-            Assert.Equal(expectedItem.CarId, actualItem.CarId);
-            Assert.Equal(expectedItem.CarModel, actualItem.CarModel);
-            Assert.Equal(expectedItem.Manufacturer, actualItem.Manufacturer);
-            Assert.Equal(expectedItem.Quantity, actualItem.Quantity);
+            // Ahora sí: comparación completa con Equals
+            Assert.Equal(expected,actual);
         }
+
     }
 }

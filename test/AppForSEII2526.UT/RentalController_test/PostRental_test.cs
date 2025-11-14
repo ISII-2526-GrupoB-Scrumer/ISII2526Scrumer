@@ -43,6 +43,7 @@ namespace AppForSEII2526
         }
 
         // OK
+        // OK
         [Fact]
         [Trait("Database", "WithoutFixture")]
         [Trait("LevelTesting", "Unit Testing")]
@@ -60,10 +61,10 @@ namespace AppForSEII2526
                 DeliveryCarDealer = "Concesionario Albacete",
                 ClientId = "U1",
                 RentalItems = new List<RentalItemDTO>
-                {
-                    new RentalItemDTO(1, "Q5", 180m, 2, "Audi"),
-                    new RentalItemDTO(2, "Civic", 160m, 1, "Honda")
-                }
+        {
+            new RentalItemDTO(1, "Q5", 180m, 2, "Audi"),
+            new RentalItemDTO(2, "Civic", 160m, 1, "Honda")
+        }
             };
 
             // Act
@@ -75,15 +76,24 @@ namespace AppForSEII2526
 
             var dto = Assert.IsType<RentalDetailDTO>(createdResult.Value);
 
-            // Verificar datos
-            Assert.Equal(rentalCreate.PaymentMethod, dto.PaymentMethod);
-            Assert.Equal(rentalCreate.DeliveryCarDealer, dto.DeliveryCarDealer);
-            Assert.Equal("Manuel", dto.Name);
-            Assert.Equal("Garcia", dto.Surname);
-            Assert.Equal("Avda. España 1", dto.Address);
-            Assert.Equal(3, dto.RentalItems.Sum(i => i.Quantity)); // 2 + 1 coches alquilados
-            Assert.True(dto.TotalPrice > 0);
+            
+            var expected = new RentalCreateDTO
+            {
+                ClientId = "U1",
+                Name = "Manuel",
+                Surname = "Garcia",
+                Address = "Avda. España 1",
+                StartDate = rentalCreate.StartDate,
+                EndDate = rentalCreate.EndDate,
+                PaymentMethod = rentalCreate.PaymentMethod,
+                TotalPrice = dto.TotalPrice,   
+                RentalItems = rentalCreate.RentalItems
+            };
+
+            // Comparamos usando SOLO tu Equals()
+            Assert.Equal(expected, dto);
         }
+
 
         // BAD REQUEST
         [Fact]

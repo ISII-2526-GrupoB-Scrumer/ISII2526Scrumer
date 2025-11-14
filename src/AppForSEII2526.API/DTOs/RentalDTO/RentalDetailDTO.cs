@@ -25,5 +25,22 @@ namespace AppForSEII2526
             RentalItems = rentalItems;
         }
 
+        public override bool Equals(object? obj)
+        {
+            return obj is RentalDetailDTO dTO &&
+                   base.Equals(obj) &&
+                   StartDate == dTO.StartDate &&
+                   EndDate == dTO.EndDate &&
+                   PaymentMethod == dTO.PaymentMethod &&
+                   TotalPrice == dTO.TotalPrice &&
+                   ClientId == dTO.ClientId &&
+                   Name == dTO.Name &&
+                   Surname == dTO.Surname &&
+                   Address == dTO.Address &&
+                   DeliveryCarDealer == dTO.DeliveryCarDealer &&
+                   RentingDate == dTO.RentingDate &&
+                   RentalItems.SequenceEqual(dTO.RentalItems) &&
+                   Id == dTO.Id;
+        }
     }
 }
