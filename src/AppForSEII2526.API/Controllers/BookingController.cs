@@ -50,7 +50,7 @@ namespace AppForSEII2526.API.Controllers
                         bi.Maintenance.Id,
                         bi.Maintenance.Name,
                         bi.Maintenance.MaintenanceTypes != null ?
-                            string.Join(", ", bi.Maintenance.MaintenanceTypes.Select(mt => mt.TypeName)) :
+                            string.Join(", ", bi.Maintenance.MaintenanceTypes.Select(mt => mt.Type)) :
                             "Desconocido",
                         bi.Maintenance.Price,
                         bi.Maintenance.NumberOfDays,
@@ -149,7 +149,7 @@ namespace AppForSEII2526.API.Controllers
                     bi.Maintenance.Id,
                     bi.Maintenance.Name ?? "Desconocido",
                     bi.Maintenance.MaintenanceTypes != null ?
-                        string.Join(", ", bi.Maintenance.MaintenanceTypes.Select(mt => mt.TypeName)) :
+                        string.Join(", ", bi.Maintenance.MaintenanceTypes.Select(mt => mt.Type)) :
                         "Desconocido",
                     bi.Maintenance.Price,
                     bi.Maintenance.NumberOfDays,
