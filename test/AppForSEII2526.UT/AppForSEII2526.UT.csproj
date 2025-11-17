@@ -34,9 +34,4 @@
     <ProjectReference Include="..\..\src\AppForSEII2526.API\AppForSEII2526.API.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="MaintenanceController_test\" />
-    <Folder Include="BookingController_test\" />
-  </ItemGroup>
-
 </Project>
