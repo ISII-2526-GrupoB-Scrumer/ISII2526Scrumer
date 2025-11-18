@@ -65,6 +65,7 @@ namespace AppForSEII2526
 
             var expected = new ReviewDetailDTO(
                 1,
+                "U1",
                 new DateTime(2025, 10, 20),
                 "Manuel",
                 "España",
