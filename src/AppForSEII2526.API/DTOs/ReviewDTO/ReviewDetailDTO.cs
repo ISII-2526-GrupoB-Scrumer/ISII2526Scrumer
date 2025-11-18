@@ -7,9 +7,10 @@
 
         public ReviewDetailDTO() { }
 
-        public ReviewDetailDTO(int id, DateTime created, string name, string country, string driverType, List<ReviewItemDTO> reviewItems)
+        public ReviewDetailDTO(int id, string clientid, DateTime created, string name, string country, string driverType, List<ReviewItemDTO> reviewItems)
         {
             Id = id;
+            ClientId = clientid;
             Created = created;
             Name = name;
             Country = country;
