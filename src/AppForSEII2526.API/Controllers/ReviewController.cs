@@ -41,6 +41,7 @@ namespace AppForSEII2526.API.Controllers
                         .ThenInclude(c => c.Model)
                 .Select(r => new ReviewDetailDTO(
                     r.Id,
+                    r.Client.Id,
                     r.Created,
                     r.Client.Name,
                     r.Country,
@@ -155,6 +156,7 @@ namespace AppForSEII2526.API.Controllers
 
             var detailDTO = new ReviewDetailDTO(
                 review.Id,
+                review.Client.Id,
                 review.Created,
                 reviewCreate.Name,
                 review.Country,
