@@ -77,6 +77,15 @@ namespace AppForSEII2526.API.Controllers
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.Conflict)]
         public async Task<ActionResult> CreateReview(ReviewCreateDTO reviewCreate)
         {
+            var user = await _context.ApplicationUsers
+                .FirstOrDefaultAsync(u => u.UserName == reviewCreate.ClientId);
+
+            if (user == null)
+                ModelState.AddModelError("Client", "El usuario indicado no existe.");
+
+            if (ModelState.ErrorCount > 0)
+                return BadRequest(new ValidationProblemDetails(ModelState));
+
 
             if (reviewCreate.ReviewItems.Count == 0)
                 ModelState.AddModelError("ReviewItems", "Error: Debes incluir al menos un coche en la review.");
@@ -98,8 +107,10 @@ namespace AppForSEII2526.API.Controllers
                 Created = DateTime.Now,
                 Country = reviewCreate.Country,
                 DriverType = reviewCreate.DriverType,
+                Client = user,
                 Cars = new List<ReviewItem>()
             };
+
 
             var carIds = reviewCreate.ReviewItems.Select(ri => ri.CarId).ToList();
 
