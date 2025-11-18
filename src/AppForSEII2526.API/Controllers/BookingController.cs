@@ -34,40 +34,46 @@ namespace AppForSEII2526.API.Controllers
                 return NotFound();
             }
 
-            var booking = await _context.Booking
+            
+            var bookingEntity = await _context.Booking
                 .Where(b => b.Id == id)
                 .Include(b => b.Items)
                     .ThenInclude(bi => bi.Maintenance)
                         .ThenInclude(m => m.MaintenanceTypes)
                 .Include(b => b.Client)
-                .Select(b => new MaintenanceDetailDTO(
-                    b.Id,
-                    b.Client.Id,            // o b.Client.UserName si prefieres mostrar el nombre
-                    b.PaymentMethod,
-                    b.Date,
-                    b.Items.Sum(bi => bi.Maintenance.Price), // o b.Items.Sum(...) si quieres el total
-                    b.Items.Select(bi => new MaintenanceItemDTO(
-                        bi.Maintenance.Id,
-                        bi.Maintenance.Name,
-                        bi.Maintenance.MaintenanceTypes != null ?
-                            string.Join(", ", bi.Maintenance.MaintenanceTypes.Select(mt => mt.Type)) :
-                            "Desconocido",
-                        bi.Maintenance.Price,
-                        bi.Maintenance.NumberOfDays,
-                        bi.Comment
-                    )).ToList()
-                ))
-
                 .FirstOrDefaultAsync();
 
-            if (booking == null)
+            if (bookingEntity == null)
             {
                 _logger.LogError($"Error: Booking with id {id} does not exist");
                 return NotFound();
             }
 
-            return Ok(booking);
+            
+            var totalPrice = bookingEntity.Items.Sum(bi => bi.Maintenance.Price);
+
+            
+            var bookingDTO = new MaintenanceDetailDTO(
+                bookingEntity.Id,
+                bookingEntity.Client.Id,
+                bookingEntity.PaymentMethod,
+                bookingEntity.Date,
+                totalPrice,
+                bookingEntity.Items.Select(bi => new MaintenanceItemDTO(
+                    bi.Maintenance.Id,
+                    bi.Maintenance.Name ?? "Desconocido",
+                    bi.Maintenance.MaintenanceTypes != null ?
+                        string.Join(", ", bi.Maintenance.MaintenanceTypes.Select(mt => mt.Type)) :
+                        "Desconocido",
+                    bi.Maintenance.Price,
+                    bi.Maintenance.NumberOfDays,
+                    bi.Comment
+                )).ToList()
+            );
+
+            return Ok(bookingDTO);
         }
+
 
         // ===========================================================
         // POST Booking (Paso 5 del caso de uso)
@@ -93,7 +99,7 @@ namespace AppForSEII2526.API.Controllers
             if (ModelState.ErrorCount > 0)
                 return BadRequest(new ValidationProblemDetails(ModelState));
 
-            // Se crean los objetos del dominio
+            
             var booking = new Booking
             {
                 Date = DateTime.Now,
@@ -138,7 +144,7 @@ namespace AppForSEII2526.API.Controllers
                 return Conflict("Error al guardar la reserva. Inténtalo más tarde.");
             }
 
-            // Devuelve el DTO con los datos creados
+            
             var detailDTO = new MaintenanceDetailDTO(
                 booking.Id,
                 booking.Client.UserName,

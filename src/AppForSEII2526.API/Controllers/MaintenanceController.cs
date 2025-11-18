@@ -27,14 +27,13 @@ namespace AppForSEII2526.API.Controllers
         [ProducesResponseType(typeof(IList<MaintenanceSelectDTO>), (int)HttpStatusCode.OK)]
         public async Task<ActionResult> GetMaintenances(string? nombre, string? tipo)
         {
-            var mantenimientos = await _context.Maintenance
+            
+            var query = await _context.Maintenance
                 .Include(m => m.MaintenanceTypes)
                 .Where(m =>
                     (nombre == null || m.Name.Contains(nombre)) &&
                     (tipo == null || m.MaintenanceTypes.Any(t => t.Type.Contains(tipo)))
                 )
-                .OrderBy(m => m.Name)
-                .ThenBy(m => m.Price)
                 .Select(m => new MaintenanceSelectDTO(
                     m.Id,
                     m.Name,
@@ -42,9 +41,16 @@ namespace AppForSEII2526.API.Controllers
                     m.Price,
                     m.NumberOfDays
                 ))
-                .ToListAsync();
+                .ToListAsync();    
 
-            return Ok(mantenimientos);
+            
+            var ordered = query
+                .OrderBy(m => m.Name)
+                .ThenBy(m => m.Price) 
+                .ToList();
+
+            return Ok(ordered);
         }
+
     }
 }
