@@ -1,5 +1,7 @@
 ﻿namespace AppForSEII2526
 {
+    // DTO que representa una reseña realizada sobre un coche concreto.
+    // Se usa dentro de ReviewCreateDTO y ReviewDetailDTO para enviar/recibir información de cada coche reseñado.
     public class ReviewItemDTO
     {
         public int CarId { get; set; }

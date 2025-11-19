@@ -107,32 +107,63 @@ namespace AppForSEII2526
         [ProducesResponseType(typeof(IList<ReviewSelectDTO>), (int)HttpStatusCode.OK)]
         public async Task<ActionResult> GetCochesParaReview(string? fabricante, string? fuelType)
         {
+            // ------------------------------------------------------------
+            // PRIMERA VALIDACIÓN: COMPROBAR SI EXISTE LA TABLA DE CARS
+            // Y QUE HAYA COCHES EN LA BASE DE DATOS.
+            //
+            // Esto evita que el programa intente buscar coches si la base
+            // no está cargada o está vacía, lo cual causaría errores.
+            // ------------------------------------------------------------
             if (_context.Car == null || !_context.Car.Any())
             {
+                // Creamos un objeto de error estructurado para enviarlo al usuario
                 var problemDetails = new ValidationProblemDetails(new Dictionary<string, string[]>
                 {
                     { "Error", new[] { "Error: Cars table does not exist or no cars available" } }
             });
 
+                // Respondemos con BadRequest porque NO es un error de ID sino de estado
                 return BadRequest(problemDetails);
             }
 
+
+
+
+            // ------------------------------------------------------------
+            // SI LLEGAMOS AQUÍ, SIGNIFICA QUE SÍ HAY COCHES EN LA BASE
+            // AHORA LOS FILTRAMOS SEGÚN LOS PARÁMETROS RECIBIDOS
+            //
+            // fabricante → filtra por marca (Audi, Honda, Toyota…)
+            // fuelType   → filtra por tipo de combustible (Gasolina, Híbrido…)
+            //
+            // Los parámetros pueden ser nulos, eso significa "no filtrar"
+            // ------------------------------------------------------------
             IList<ReviewSelectDTO> coches = await _context.Car
+
+                // Para cada coche, incluimos también datos del modelo del coche
                 .Include(c => c.Model)
+
+                // FILTROS: Sólo se aplica si el parámetro NO es null
                 .Where(c =>
                     (fabricante == null || c.Manufacturer.Contains(fabricante)) &&
                     (fuelType == null || c.FuelType.Contains(fuelType))
                 )
+
+                // Ordenamos para devolver lista ordenada por modelo y marca
                 .OrderBy(c => c.Model.Name)
                 .ThenBy(c => c.Manufacturer)
+
+                // Convertimos los datos de la base en un DTO
+                // (Este objeto es la versión "visible" de la información)
                 .Select(c => new ReviewSelectDTO(
-                    c.Id,
-                    c.Model.Name,
-                    c.CarClass,
-                    c.Manufacturer,
-                    c.FuelType,
-                    c.Color
+                    c.Id,                  // ID del coche
+                    c.Model.Name,          // Nombre del modelo (Ej: "Q5")
+                    c.CarClass,            // Clase del coche (Turismo, SUV…)
+                    c.Manufacturer,        // Marca (Audi, Toyota…)
+                    c.FuelType,            // Tipo combustible
+                    c.Color                // Color
                 ))
+                // Finalmente convertimos la consulta en una lista
                 .ToListAsync();
 
             return Ok(coches);
