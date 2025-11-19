@@ -7,11 +7,13 @@ using System.Net;
 
 namespace AppForSEII2526
 {
+
+    // Controlador encargado de gestionar operaciones relacionadas con alquileres (Rentals)
     [Route("api/[controller]")]
     [ApiController]
     public class RentalController : ControllerBase
     {
-
+        // Dependencias inyectadas: contexto de base de datos y logger para registrar eventos
         private readonly ApplicationDbContext _context;
         private readonly ILogger<RentalController> _logger;
 
@@ -23,24 +25,27 @@ namespace AppForSEII2526
         }
 
 
-        //PASO 7
+        //PASO 7 -> Obtener un alquiler por su ID
         [HttpGet]
         [Route("[action]")]
         [ProducesResponseType(typeof(RentalDetailDTO), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public async Task<ActionResult> GetRental(int id)
         {
+
+            // Validación inicial -> si la tabla Rental no existe en el contexto
             if (_context.Rental == null)
             {
                 _logger.LogError("Error: Rentals table does not exist");
                 return NotFound();
             }
 
+            // Consulta -> busca el alquiler con el ID recibido e incluye datos relacionados
             var rental = await _context.Rental
-                .Where(r => r.Id == id)
-                .Include(r => r.RentalItems)
-                    .ThenInclude(ri => ri.Car)
-                        .ThenInclude(c => c.Model)
+                .Where(r => r.Id == id)                 
+                .Include(r => r.RentalItems)            // Incluye los ítems del alquiler
+                    .ThenInclude(ri => ri.Car)          // Incluye la información del coche
+                        .ThenInclude(c => c.Model)      // Incluye el modelo del coche
                 .Select(r => new RentalDetailDTO(
                     r.Id,
                     r.Client.Id,
@@ -61,14 +66,16 @@ namespace AppForSEII2526
                         ri.Car.Manufacturer
                     )).ToList<RentalItemDTO>()
                 ))
-                .FirstOrDefaultAsync();
+                .FirstOrDefaultAsync(); //Devuelve el primer resultado o null si no encuentra ninguno
 
+            // Si no encuentra el alquiler -> devuelve NotFound
             if (rental == null)
             {
                 _logger.LogError($"Error: Rental with id {id} does not exist");
                 return NotFound();
             }
 
+            // Si lo encuentra, lo retorna con estado OK
             return Ok(rental);
         }
 

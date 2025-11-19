@@ -71,6 +71,7 @@ namespace AppForSEII2526
         public async Task<ActionResult> GetCochesParaAlquilar(string? modelo, decimal? precio)
         {
 
+            // Si la tabla de coches no existe o no hay coches registrados, devolvemos BadRequest
             if (_context.Car == null || !_context.Car.Any())
             {
                 var problemDetails = new ValidationProblemDetails(new Dictionary<string, string[]>
@@ -81,13 +82,15 @@ namespace AppForSEII2526
                 return BadRequest(problemDetails); 
             }
 
+            // Consulta de coches aplicando filtros opcionales (modelo y/o precio),
+            // incluyendo datos del modelo asociado y ordenando por nombre del modelo
             IList<RentalSelectDTO> coches = await _context.Car
-                .Include(c => c.Model)
+                .Include(c => c.Model)          // Se incluye la entidad Model para acceder al nombre del modelo
                 .Where(c =>
-                    (modelo == null || c.Model.Name.Contains(modelo)) &&
-                    (precio == null || c.RentingPrice <= precio)
+                    (modelo == null || c.Model.Name.Contains(modelo)) &&            // Filtro por nombre si modelo está definido
+                    (precio == null || c.RentingPrice <= precio)                    // Filtro por precio si precio está definido
                 )
-                .OrderBy(c => c.Model.Name)
+                .OrderBy(c => c.Model.Name)             // Se ordenan los resultados alfabéticamente por modelo
                 .Select(c => new RentalSelectDTO(
                     c.Id,
                     c.Model.Name,
@@ -96,8 +99,9 @@ namespace AppForSEII2526
                     c.RentingPrice,
                     c.Color
                 ))
-                .ToListAsync();
+                .ToListAsync();             // Ejecución de la consulta y transformación a lista
 
+            // Devolvemos la lista resultante en formato JSON con código 200 OK
             return Ok(coches);
         }
 
