@@ -1,5 +1,9 @@
 ﻿namespace AppForSEII2526
 {
+
+    // DTO que representa cada coche incluido dentro de un alquiler.
+    // Contiene información del coche asociado (modelo, precio, fabricante, cantidad, etc.).
+    // Se utiliza tanto al enviar como al recibir datos de los items del alquiler.
     public class RentalItemDTO
     {
 

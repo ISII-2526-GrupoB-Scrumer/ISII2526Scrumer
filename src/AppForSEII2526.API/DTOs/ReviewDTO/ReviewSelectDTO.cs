@@ -1,5 +1,7 @@
 ﻿namespace AppForSEII2526
 {
+    // DTO usado para devolver información resumida de un coche asociado a una review
+    // Se emplea principalmente en consultas donde no se requieren detalles completos.
     public class ReviewSelectDTO
     {
         public int Id { get; set; }

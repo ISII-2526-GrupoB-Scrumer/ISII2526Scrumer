@@ -13,21 +13,25 @@ namespace AppForSEII2526
         public GetRental_test()
         {
             // ====== Datos base ======
+            // Se crean modelos de coches para insertarlos en la BD en memoria
             var models = new List<Model>()
             {
                 new Model("1", "Q5"),
                 new Model("2", "508"),
             };
 
+            // Se crean coches asociados a los modelos anteriores
             var cars = new List<Car>()
             {
                 new Car("Turismo","Blanco","","1.8","Gasolina", 1,"Estandar","Audi", 18000, 2, 4, 180, 18, models[0]),
                 new Car("Turismo","Negro","","1.5","Diesel", 2,"Deportivo","Peugeot", 15000, 2, 4, 200, 15, models[1])
             };
 
+            // Se crea un usuario cliente
             var user = new ApplicationUser("Albacete 1", "600000001", "Manuel", "Garcia", "manolito") { Id="U1"};
 
             // ====== Rental ======
+            // Se construye un alquiler asociado al usuario anterior
             var rental = new Rental
             {
                 Id = 1,
@@ -41,6 +45,7 @@ namespace AppForSEII2526
                 RentalItems = new List<RentalItem>()
             };
 
+            // Se agrega un coche alquilado dentro del rental
             rental.RentalItems.Add(new RentalItem
             {
                 Car = cars[0],
@@ -48,6 +53,7 @@ namespace AppForSEII2526
             });
 
             // ====== Guardar en DB ======
+            // Guardamos todo en la BD en memoria para que los tests puedan consultarlo
             _context.AddRange(models);
             _context.AddRange(cars);
             _context.Add(user);
@@ -56,6 +62,7 @@ namespace AppForSEII2526
         }
 
         //RENTAL NO ENCONTRADO
+        // Verifica que si el ID no existe, el controlador devuelve NotFound()
         [Fact]
         [Trait("Database", "WithoutFixture")]
         [Trait("LevelTesting", "Unit Testing")]
@@ -64,14 +71,18 @@ namespace AppForSEII2526
             var mock = new Mock<ILogger<RentalController>>();
             ILogger<RentalController> logger = mock.Object;
 
+            // Se instancia el controlador con la BD en memoria
             var controller = new RentalController(_context, logger);
 
+            // Se pide un rental inexistente
             var result = await controller.GetRental(999);
 
+            // Se comprueba que la respuesta es 404
             Assert.IsType<NotFoundResult>(result);
         }
 
         //RENTAL ENCONTRADO
+        // Comprueba que el alquiler existe y que el DTO devuelto coincide con lo esperado
         [Fact]
         [Trait("Database", "WithoutFixture")]
         [Trait("LevelTesting", "Unit Testing")]
@@ -82,6 +93,7 @@ namespace AppForSEII2526
             var controller = new RentalController(_context, logger);
 
             // ====== Expected DTO ======
+            // Se construye manualmente el DTO esperado
             var expectedRental = new RentalDetailDTO(
                 1,
                 "U1",
@@ -101,25 +113,22 @@ namespace AppForSEII2526
             );
 
             // ====== Act ======
+            // Se ejecuta la llamada al controlador
             var result = await controller.GetRental(1);
 
             // ====== Assert ======
+            // Se asegura que la respuesta es 200 OK
             var okResult = Assert.IsType<OkObjectResult>(result);
             var rentalDTOActual = Assert.IsType<RentalDetailDTO>(okResult.Value);
 
-            Assert.Equal(expectedRental.Id, rentalDTOActual.Id);
-            Assert.Equal(expectedRental.DeliveryCarDealer, rentalDTOActual.DeliveryCarDealer);
-            Assert.Equal(expectedRental.TotalPrice, rentalDTOActual.TotalPrice);
+            // Se compara el objeto devuelto con el esperado usando Equals()
+            Assert.Equal(expectedRental, rentalDTOActual);
 
+            // También comparamos el elemento dentro de la lista
             // Verificar también que los RentalItems coinciden
-            Assert.Single(rentalDTOActual.RentalItems);
             var expectedItem = expectedRental.RentalItems.First();
             var actualItem = rentalDTOActual.RentalItems.First();
-
-            Assert.Equal(expectedItem.CarId, actualItem.CarId);
-            Assert.Equal(expectedItem.CarModel, actualItem.CarModel);
-            Assert.Equal(expectedItem.Manufacturer, actualItem.Manufacturer);
-            Assert.Equal(expectedItem.Quantity, actualItem.Quantity);
+            Assert.Equal(expectedItem, actualItem);
         }
     }
 }

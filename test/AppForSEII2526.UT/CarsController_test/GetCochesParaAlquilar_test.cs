@@ -8,12 +8,15 @@ using Humanizer;
 
 namespace AppForSEII2526
 {
+    // Clase de pruebas unitarias para el método GetCochesParaAlquilar del CarsController
     public class GetCochesParaAlquilar_test : AppForSEII25264SqliteUT
     {
+        // Constructor que inicializa una base de datos en memoria con datos de prueba
         public GetCochesParaAlquilar_test()
         {
 
             //MODELOS
+            // Se crean modelos de coche con distintos nombres para usar en los vehículos
             var Models = new List<Model>()
             {
                 new Model("1", "Q5"),
@@ -24,6 +27,7 @@ namespace AppForSEII2526
 
 
             //Coches
+            // Se crean varios coches asociados a los modelos anteriores
             var Cars = new List<Car>()
             {
                 new Car("Turimo","Blanco","","1.8","Gasolina", 1,"Estandar","Audi", 18000, 2, 4, 180, 18, Models[0]),
@@ -33,6 +37,7 @@ namespace AppForSEII2526
             };
 
             //Usuarios
+            // Se crean usuarios de ejemplo para simular clientes
             var users = new List<ApplicationUser>()
             {
                 new ApplicationUser("Albacete 1","600000001","Manuel","Garcia","manolito"),
@@ -41,6 +46,8 @@ namespace AppForSEII2526
                 new ApplicationUser("Albacete 4","600000004","Ana","Gonzalez","anita")
             };
 
+            //Rental
+            // Se crea un alquiler ya existente en la BD para comprobar disponibilidad más adelante
             var rental = new Rental(
                 "Albacete center",    //DeliveryCarDealer
                 new DateTime(2025, 10, 20), //EndDate
@@ -52,7 +59,7 @@ namespace AppForSEII2526
 
             rental.Client = users[0];
 
-
+            //Items asociados al alquiler
             var rentalItems = new List<RentalItem>()
             {
                 new RentalItem(Cars[0].Id,1,rental.Id),
@@ -62,7 +69,7 @@ namespace AppForSEII2526
             rental.RentalItems = rentalItems;
 
 
-
+            // Se guardan los datos en la BD en memoria
             _context.AddRange(Models);
             _context.AddRange(Cars);
             _context.AddRange(users);
@@ -73,10 +80,11 @@ namespace AppForSEII2526
         }
 
 
-        
-
+        //GENERADOR DE CASOS DE PRUEBA
+        // Devuelve varios escenarios con diferentes filtros para testear el GET
         public static IEnumerable<object[]> TestCasesFor_GetCochesParaAlquilar_OK()
         {
+            // Lista esperada de coches convertidos a DTO
             var cocheDTOs = new List<RentalSelectDTO>()
             {
                 new RentalSelectDTO(1, "Q5", "Audi", "Gasolina", 180m, "Blanco"),
@@ -85,26 +93,30 @@ namespace AppForSEII2526
                 new RentalSelectDTO(4, "Corolla", "Toyota", "Gasolina", 140m, "Rojo"),
             };
 
+            // Sin filtros -> devuelve todos
             var expected1 = cocheDTOs
                 .OrderBy(c => c.ModelName)
                 .ToList();
 
+            // Filtro por modelo
             var expected2 = cocheDTOs
                 .Where(c => c.ModelName.Contains("Civic"))
                 .OrderBy(c => c.ModelName)
                 .ToList();
 
+            // Filtro por precio
             var expected3 = cocheDTOs
                 .Where(c => c.RentingPrice <= 150m)
                 .OrderBy(c => c.ModelName)
                 .ToList();
 
+            // Filtro combinado
             var expected4 = cocheDTOs
                .Where(c => c.ModelName.Contains("Q5") && c.RentingPrice <= 180m)
                .OrderBy(c => c.ModelName)
                .ToList();
 
-
+            // Se devuelven como colección de tests parametrizados
             var allTests = new List<object[]>
             {
                 new object[] { null, null, expected1 },      // sin filtros
@@ -116,41 +128,38 @@ namespace AppForSEII2526
             return allTests;
         }
 
-
+        // ===== TEST PRINCIPAL (OK) =====
+        // Comprueba que el método devuelve la lista correcta de coches según filtros
         [Theory]
         [MemberData(nameof(TestCasesFor_GetCochesParaAlquilar_OK))]
         [Trait("Database", "WithoutFixture")]
         [Trait("LevelTesting", "Unit Testing")]
         public async Task GetCochesParaAlquilar_OK_test(string? modelo, decimal? precio, IList<RentalSelectDTO> expected)
         {
-            // Arrange
+            // Arrange -> Preparamos el escenario
             var controller = new CarsController(_context, null);
 
-            // Act
+            // Act -> Ejecutamos la accion a testear
             var result = await controller.GetCochesParaAlquilar(modelo, precio);
 
-            // Assert
+            // Assert -> Comprobamos el resultado esperado
             var okResult = Assert.IsType<OkObjectResult>(result);
             var actual = Assert.IsType<List<RentalSelectDTO>>(okResult.Value);
 
             // Comprobamos que las listas sean iguales (mismo número y orden)
-            Assert.Equal(expected.Count, actual.Count);
-            for (int i = 0; i < expected.Count; i++)
-            {
-                Assert.Equal(expected[i].ModelName, actual[i].ModelName);
-                Assert.Equal(expected[i].Manufacturer, actual[i].Manufacturer);
-                Assert.Equal(expected[i].FuelType, actual[i].FuelType);
-                Assert.Equal(expected[i].RentingPrice, actual[i].RentingPrice);
-            }
+            Assert.Equal(expected,actual);
+            
         }
 
 
+        // ===== TEST DE ERROR =====
+        // Si no hay coches en la BD, debe devolver BadRequest con mensaje
         [Fact]
         [Trait("Database", "WithoutFixture")]
         [Trait("LevelTesting", "Unit Testing")]
         public async Task GetCochesParaAlquilar_BadRequest_test()
         {
-            // Arrange
+            // Arrange -> Preparamos el escenario
             // Simulamos un logger para el controlador
             var mockLogger = new Mock<ILogger<CarsController>>();
             ILogger<CarsController> logger = mockLogger.Object;
@@ -162,10 +171,10 @@ namespace AppForSEII2526
             _context.Car.RemoveRange(_context.Car);
             await _context.SaveChangesAsync();
 
-            // Act
+            // Act -> Ejecutamos la accion a testear
             var result = await controller.GetCochesParaAlquilar("Civic", null);
 
-            // Assert
+            // Assert -> Comprobamos el resultado esperado
             // Verificamos que devuelve un BadRequest
             var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
             var problemDetails = Assert.IsType<ValidationProblemDetails>(badRequestResult.Value);
