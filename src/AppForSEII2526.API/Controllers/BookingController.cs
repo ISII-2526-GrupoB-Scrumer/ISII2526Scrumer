@@ -28,6 +28,10 @@ namespace AppForSEII2526.API.Controllers
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public async Task<ActionResult> GetBooking(int id)
         {
+            if (id < 0)
+            {
+                return NotFound();
+            }
             if (_context.Booking == null)
             {
                 _logger.LogError("Error: Booking table does not exist");
