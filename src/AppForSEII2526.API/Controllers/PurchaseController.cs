@@ -29,7 +29,11 @@ namespace AppForSEII2526
                 _logger.LogError("Error: Purchase table does not exist");
                 return NotFound();
             }
-
+            if (id < 0)
+            {
+                return NotFound();
+            }
+            
             var purchase = await _context.Purchase
                 .Where(p => p.Id == id)
                 .Include(p => p.PurchaseItems)
