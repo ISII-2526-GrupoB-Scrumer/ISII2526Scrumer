@@ -32,6 +32,7 @@ namespace AppForSEII2526
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public async Task<ActionResult> GetRental(int id)
         {
+            
 
             // Validación inicial -> si la tabla Rental no existe en el contexto
             if (_context.Rental == null)
@@ -39,6 +40,12 @@ namespace AppForSEII2526
                 _logger.LogError("Error: Rentals table does not exist");
                 return NotFound();
             }
+
+            if (id < 0)
+            {
+                return NotFound();
+            }
+
 
             // Consulta -> busca el alquiler con el ID recibido e incluye datos relacionados
             var rental = await _context.Rental

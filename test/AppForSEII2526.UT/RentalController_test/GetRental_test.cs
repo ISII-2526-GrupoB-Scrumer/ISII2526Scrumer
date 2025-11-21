@@ -63,10 +63,12 @@ namespace AppForSEII2526
 
         //RENTAL NO ENCONTRADO
         // Verifica que si el ID no existe, el controlador devuelve NotFound()
-        [Fact]
+        [Theory]
+        [InlineData(999)]
+        [InlineData(-1)]
         [Trait("Database", "WithoutFixture")]
         [Trait("LevelTesting", "Unit Testing")]
-        public async Task GetRental_NotFound_test()
+        public async Task GetRental_NotFound_test(int id)
         {
             var mock = new Mock<ILogger<RentalController>>();
             ILogger<RentalController> logger = mock.Object;
@@ -75,12 +77,12 @@ namespace AppForSEII2526
             var controller = new RentalController(_context, logger);
 
             // Se pide un rental inexistente
-            var result = await controller.GetRental(999);
+            var result = await controller.GetRental(id);
 
             // Se comprueba que la respuesta es 404
             Assert.IsType<NotFoundResult>(result);
         }
-
+        
         //RENTAL ENCONTRADO
         // Comprueba que el alquiler existe y que el DTO devuelto coincide con lo esperado
         [Fact]
