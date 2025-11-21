@@ -146,7 +146,7 @@ namespace AppForSEII2526
             var logger = new Mock<ILogger<BookingController>>().Object;
             var controller = new BookingController(_context, logger);
 
-            var result = await controller.GetBooking(999);
+            var result = await controller.GetBooking(-1);
 
             Assert.IsType<NotFoundResult>(result);
         }
