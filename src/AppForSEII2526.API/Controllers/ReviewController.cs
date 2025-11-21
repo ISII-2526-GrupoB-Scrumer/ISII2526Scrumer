@@ -42,6 +42,14 @@ namespace AppForSEII2526.API.Controllers
         public async Task<ActionResult> GetReview(int id)
         {
 
+            // Modificación evaluación
+            if (id < 0)
+            {
+                return NotFound();
+            }
+
+
+
             // Comprobamos si la tabla existe en la base de datos.
             // Si por algún motivo está vacía o no cargó, devolvemos error.
             if (_context.Review == null)
