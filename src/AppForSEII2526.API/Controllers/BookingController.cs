@@ -127,9 +127,12 @@ namespace AppForSEII2526.API.Controllers
 
                 booking.Items.Add(new BookingItem
                 {
+                    BookingId = booking.Id,
                     MaintenanceID = maintenance.Id,
-                    Comment = item.Comment,
+                    Maintenance = maintenance,
+                    Comment = item.Comment
                 });
+
 
                 total += maintenance.Price;
             }
