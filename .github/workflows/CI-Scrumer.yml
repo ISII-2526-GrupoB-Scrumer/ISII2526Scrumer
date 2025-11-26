@@ -49,6 +49,4 @@ jobs:
       with:
         name: TestResults
         path: ./test/AppForSEII2526.UT/TestResults.trx
-      
-    - name: Test
-      run: dotnet test --no-build --verbosity normal
+
