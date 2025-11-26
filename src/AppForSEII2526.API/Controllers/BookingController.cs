@@ -38,10 +38,10 @@ namespace AppForSEII2526.API.Controllers
             var bookingEntity = await _context.Booking
                 .Where(b => b.Id == id)
                 .Include(b => b.Items)
-                    .ThenInclude(bi => bi.Maintenance)
-                        .ThenInclude(m => m.MaintenanceTypes)
+                    .ThenInclude(bi => bi.Maintenance)  //Por cada BookingItem, carga el objeto Maintenance asociado
+                        .ThenInclude(m => m.MaintenanceTypes)   //Por cada Maintenance, carga sus MaintenanceTypes
                 .Include(b => b.Client)
-                .FirstOrDefaultAsync();
+                .FirstOrDefaultAsync(); //Devuelve el primer elemento o null si no existe
 
             if (bookingEntity == null)
             {
@@ -50,10 +50,10 @@ namespace AppForSEII2526.API.Controllers
             }
 
             
-            var totalPrice = bookingEntity.Items.Sum(bi => bi.Maintenance.Price);
+            var totalPrice = bookingEntity.Items.Sum(bi => bi.Maintenance.Price);//Suma de los precios de todos los mantenimientos de cada Items 
 
-            
-            var bookingDTO = new MaintenanceDetailDTO(
+
+            var bookingDTO = new MaintenanceDetailDTO(  //Este fragmento crea un objeto DTO (MaintenanceDetailDTO) que contiene toda la información de una reserva de mantenimiento (Booking)
                 bookingEntity.Id,
                 bookingEntity.Client.Id,
                 bookingEntity.PaymentMethod,
@@ -123,9 +123,12 @@ namespace AppForSEII2526.API.Controllers
 
                 booking.Items.Add(new BookingItem
                 {
+                    BookingId = booking.Id,
                     MaintenanceID = maintenance.Id,
-                    Comment = item.Comment,
+                    Maintenance = maintenance,
+                    Comment = item.Comment
                 });
+
 
                 total += maintenance.Price;
             }

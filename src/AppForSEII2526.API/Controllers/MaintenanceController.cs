@@ -37,19 +37,19 @@ namespace AppForSEII2526.API.Controllers
                 .Select(m => new MaintenanceSelectDTO(
                     m.Id,
                     m.Name,
-                    m.MaintenanceTypes.Select(t => t.Type).FirstOrDefault() ?? "Sin tipo",
+                    m.MaintenanceTypes.Select(t => t.Type).FirstOrDefault() ?? "Sin tipo", //aunque haya varios types se devuelve el primero
                     m.Price,
                     m.NumberOfDays
                 ))
-                .ToListAsync();    
+                .ToListAsync();    //Después del ToListAsync(), ya es una lista cargada con datos reales.
 
-            
+
             var ordered = query
-                .OrderBy(m => m.Name)
-                .ThenBy(m => m.Price) 
-                .ToList();
+                .OrderBy(m => m.Name) //primero orden:alfabetico de Name
+                .ThenBy(m => m.Price)  //segunda prioridad: precio ascendente
+                .ToList();             //convertir a lista
 
-            return Ok(ordered);
+            return Ok(ordered);     //devuelve cada DTO ordenado con los criterios antes vistos
         }
 
     }
