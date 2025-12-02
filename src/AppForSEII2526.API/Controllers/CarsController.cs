@@ -23,7 +23,7 @@ namespace AppForSEII2526
         [HttpGet]
         [Route("[action]")]
         [ProducesResponseType(typeof(IList<Car>), (int)HttpStatusCode.OK)]
-        public async Task<ActionResult> GetCars_sinDTOs()
+        public async Task<ActionResult> GetCarssinDTOs()
         {
             IList<Car> coches = await _context.Car.ToListAsync();
             return Ok(coches);
