@@ -1,7 +1,53 @@
 ﻿@page "/"
 
+@using AppForSEII2526.Web.API;
+
+@* Este es el servicio que se ha definido como HttpClient en Program.cs. *@
+
+@inject AppForSEII2526APIClient pruebaClient;
+
 <PageTitle>Home</PageTitle>
 
 <h1>Hello, world!</h1>
 
 Welcome to your new app.
+
+<br>
+<br>
+
+@if (_articulos == null)
+
+{
+
+    // Esto hace falta, porque si no la página intentar cargarse y puede que todavía no le haya dado tiempo
+
+    // a traer los datos desde el API.
+    <p><em>Cargando...</em></p>
+
+}
+
+else foreach (var articulo in _articulos)
+
+    {
+
+        @articulo.Color
+        <br>
+
+    }
+
+
+@code {
+
+    private ICollection<RentalSelectDTO> _articulos;
+
+    // Se ejecutará al cargarse la página.
+
+    protected override async Task OnInitializedAsync()
+
+    {
+
+        _articulos = await pruebaClient.GetCochesParaAlquilarAsync(null,null);
+
+    }
+
+}
