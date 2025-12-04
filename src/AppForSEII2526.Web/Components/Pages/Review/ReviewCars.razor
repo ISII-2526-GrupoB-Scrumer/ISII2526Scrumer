@@ -1,0 +1,196 @@
+﻿@page "/review/selectcarsforreview"
+
+@using Microsoft.AspNetCore.Authorization
+@using AppForSEII2526.Web.API
+@using AppForSEII2526
+@inject AppForSEII2526APIClient apiclient
+@inject ILogger<ReviewCars> logger
+@inject ReviewStateContainer reviewState
+@inject NavigationManager navigation
+
+<h3>Select Cars For Review</h3>
+
+<div class="container-fluid">
+    <!-- Zona de errores -->
+    <div class="row alert alert-danger" role="alert" hidden="@hideErrors">
+        <p id="ErrorsShown">Errors: @errors</p>
+    </div>
+
+    <div class="row">
+        <!-- Columna izquierda: filtros + listado de coches -->
+        <div class="col-8">
+            <!-- Filtros -->
+            <div class="row">
+                <div class="col">
+                    <div class="input-group mb-3">
+                        <span class="input-group-text" id="basic-addon1">Manufacturer</span>
+                        <input type="text"
+                               id="inputManufacturer"
+                               @bind="manufacturer"
+                               class="form-control"
+                               placeholder="Manufacturer"
+                               aria-label="Manufacturer"
+                               aria-describedby="basic-addon1" />
+                    </div>
+                </div>
+
+                <div class="col">
+                    <div class="input-group mb-3">
+                        <span class="input-group-text" id="basic-addon2">Fuel type</span>
+                        <input type="text"
+                               id="inputFuelType"
+                               @bind="fuelType"
+                               class="form-control"
+                               placeholder="Fuel type"
+                               aria-label="Fuel type"
+                               aria-describedby="basic-addon2" />
+                    </div>
+                </div>
+
+                <div class="col">
+                    <button type="button"
+                            class="btn btn-primary"
+                            id="searchCars"
+                            @onclick="SearchCars">
+                        Search cars
+                    </button>
+                </div>
+            </div>
+
+            <!-- Listado de coches -->
+            <div class="row">
+                @if (cars == null)
+                {
+                    <p>Loading cars....</p>
+                }
+                else
+                {
+                    <div class="mh-100 table-responsive">
+                        <table class="table table-condensed table-hover" id="TableOfCars">
+                            <thead>
+                                <tr>
+                                    <th>Model</th>
+                                    <th>Class</th>
+                                    <th>Manufacturer</th>
+                                    <th>Fuel type</th>
+                                    <th>Color</th>
+                                    <th>Select</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var car in cars)
+                                {
+                                    <tr id="CarData_@car.ModelName">
+                                        <td>@car.ModelName</td>
+                                        <td>@car.CarClass</td>
+                                        <td>@car.Manufacturer</td>
+                                        <td>@car.FuelType</td>
+                                        <td>@car.Color</td>
+                                        <td>
+                                            <button class="btn btn-outline-secondary"
+                                                    id="carToReview_@car.Id"
+                                                    @onclick="@(() => AddCar(car))">
+                                                Add
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Columna derecha: "carrito" de coches seleccionados para reseñar -->
+        <div class="col-2" hidden="@hideReviewCart">
+            <div class="row">
+                <h3>Selected cars</h3>
+            </div>
+
+            @foreach (ReviewItemDTO item in review.ReviewItems)
+            {
+                <div class="row mb-1">
+                    <button type="button"
+                            class="btn btn-light"
+                            id="removeCar_@item.CarId"
+                            @onclick="@(() => RemoveReviewItem(item))">
+                        x @item.Manufacturer @item.CarModel (@item.Color)
+                    </button>
+                </div>
+            }
+
+            <div class="row mt-2">
+                <button type="button"
+                        class="btn btn-primary"
+                        id="continueReviewButton"
+                        @onclick="ContinueToCreateReview">
+                    Continue
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    // filtros
+    private string? manufacturer;
+    private string? fuelType;
+
+    // listado devuelto por la API
+    private ICollection<ReviewSelectDTO>? cars;
+
+    // gestión de errores
+    private string errors = "";
+    private bool hideErrors => string.IsNullOrEmpty(errors);
+
+    // acceso cómodo al objeto de estado
+    private ReviewCreateDTO review => reviewState.Review;
+
+    // carrito visible solo si hay coches seleccionados
+    private bool hideReviewCart => review.ReviewItems.Count == 0;
+
+    private void AddCar(ReviewSelectDTO car)
+    {
+        reviewState.AddCarToReview(car);
+        StateHasChanged();
+    }
+
+    private void RemoveReviewItem(ReviewItemDTO item)
+    {
+        reviewState.RemoveReviewItem(item);
+        StateHasChanged();
+    }
+
+    private async Task SearchCars()
+    {
+        try
+        {
+            // Si están vacíos, mandamos null para que el backend no filtre por ese campo
+            var fabricanteFilter = string.IsNullOrWhiteSpace(manufacturer) ? null : manufacturer;
+            var fuelTypeFilter = string.IsNullOrWhiteSpace(fuelType) ? null : fuelType;
+
+            cars = await apiclient.GetCochesParaReviewAsync(fabricanteFilter, fuelTypeFilter);
+            errors = "";
+        }
+        catch (ApiException ex)
+        {
+            logger.LogError($"{DateTime.Now} Error: {ex}");
+            errors = "Error while connecting to the system";
+        }
+
+        StateHasChanged();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Cargamos la lista inicial sin filtros
+        await SearchCars();
+    }
+
+    private void ContinueToCreateReview()
+    {
+        // Página siguiente del flujo de review (la crearás después)
+        navigation.NavigateTo("/review/createreview");
+    }
+}
