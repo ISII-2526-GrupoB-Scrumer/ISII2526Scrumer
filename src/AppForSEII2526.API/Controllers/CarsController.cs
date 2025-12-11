@@ -53,6 +53,7 @@ namespace AppForSEII2526
                 ))
                 .ToListAsync(); // <-- Traemos la lista a memoria
 
+
             // 2. Ahora ordenamos la lista en memoria (LINQ to Objects)
             //    Esto sí soporta ordenar por decimales.
             var cochesOrdenados = coches
@@ -60,6 +61,7 @@ namespace AppForSEII2526
                 .ThenBy(c => c.PurchasingPrice)
                 .ToList();
 
+            _logger.LogInformation("Coches ordenados correctamente en memoria.");
             return Ok(cochesOrdenados);
         }
 
@@ -101,6 +103,7 @@ namespace AppForSEII2526
                 ))
                 .ToListAsync();             // Ejecución de la consulta y transformación a lista
 
+            _logger.LogInformation("Coches ordenados correctamente en memoria.");
             // Devolvemos la lista resultante en formato JSON con código 200 OK
             return Ok(coches);
         }
@@ -169,7 +172,7 @@ namespace AppForSEII2526
                 ))
                 // Finalmente convertimos la consulta en una lista
                 .ToListAsync();
-
+            _logger.LogInformation("Coches ordenados correctamente en memoria.");
             return Ok(coches);
         }
 

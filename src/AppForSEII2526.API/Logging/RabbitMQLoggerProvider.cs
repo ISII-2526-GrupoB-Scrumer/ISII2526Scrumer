@@ -13,7 +13,7 @@ public class RabbitMQLoggerProvider : ILoggerProvider
     public RabbitMQLoggerProvider(IOptions<RabbitMQLoggerConfiguration> config)
     {
         _config = config.Value;
-    }s
+    }
 
     public ILogger CreateLogger(string categoryName)
     {

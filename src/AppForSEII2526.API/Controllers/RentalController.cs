@@ -43,6 +43,7 @@ namespace AppForSEII2526
 
             if (id < 0)
             {
+                _logger.LogError("No se permiten IDs negativos");
                 return NotFound();
             }
 

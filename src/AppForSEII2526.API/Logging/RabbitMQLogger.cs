@@ -2,7 +2,10 @@ using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
 using System.Text;
 using System.Text.Json;
-using System.Threading.Channels;
+using AppForSEII2526;
+using RabbitMQModel = RabbitMQ.Client.IModel;
+using RabbitMQConnection = RabbitMQ.Client.IConnection;
+using ConnectionFactory = RabbitMQ.Client.ConnectionFactory;
 
 namespace AppForSEII2526;
 
@@ -10,15 +13,16 @@ public class RabbitMQLogger : ILogger, IDisposable
 {
     private readonly string _name;
     private readonly RabbitMQLoggerConfiguration _config;
-    private readonly IConnection _connection;
-    private readonly IModel _channel;
+    private readonly RabbitMQConnection _connection;
+    private readonly RabbitMQModel _channel;
     private readonly IBasicProperties _properties;
+
 
     public RabbitMQLogger(string name, RabbitMQLoggerConfiguration config)
     {
         _name = name ?? throw new ArgumentNullException(nameof(name));
         _config = config ?? throw new ArgumentNullException(nameof(config));
-        
+
         ValidateConfiguration(_config);
 
         var factory = new ConnectionFactory
@@ -32,11 +36,13 @@ public class RabbitMQLogger : ILogger, IDisposable
         _connection = factory.CreateConnection();
         _channel = _connection.CreateModel();
 
+        // Declaración del exchange fanout (requisito de la práctica)
         _channel.ExchangeDeclare(
-        exchange: _config.Exchange,
-        type: _config.ExchangeType,
-        durable: _config.Durable);
+            exchange: _config.Exchange,
+            type: _config.ExchangeType,
+            durable: _config.Durable);
 
+        // Propiedades persistentes para el mensaje
         _properties = _channel.CreateBasicProperties();
         _properties.Persistent = true;
         _properties.ContentType = "application/json";
@@ -85,11 +91,19 @@ public class RabbitMQLogger : ILogger, IDisposable
                 Exception = exception?.ToString()
             };
 
+            // SERIALIZAR A JSON
+            string json = JsonSerializer.Serialize(logEntry);
+
+            // CONVERTIR A BYTES
+            var body = Encoding.UTF8.GetBytes(json);
+
+            var routingKey = GetRoutingKey(logLevel);
+
             _channel.BasicPublish(
-                 exchange: _config.Exchange,
-                 routingKey: "",
-                 basicProperties: _properties,
-                 body: body);
+                exchange: _config.Exchange,
+                routingKey: routingKey,
+                basicProperties: _properties,
+                body: body);
 
         }
         catch (Exception ex)
@@ -111,6 +125,21 @@ public class RabbitMQLogger : ILogger, IDisposable
         {
             Console.Error.WriteLine($"Error disposing RabbitMQ logger: {ex.Message}");
         }
+
         GC.SuppressFinalize(this);
     }
+
+    private string GetRoutingKey(LogLevel level)
+    {
+        return level switch
+        {
+            LogLevel.Information => "logs.information",
+            LogLevel.Error => "logs.error",
+            LogLevel.Warning => "logs.warning",
+            LogLevel.Debug => "logs.debug",
+            LogLevel.Critical => "logs.critical",
+            _ => "logs.any"
+        };
+    }
+
 }
