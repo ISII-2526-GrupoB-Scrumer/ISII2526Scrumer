@@ -125,7 +125,7 @@
     {
         get
         {
-            int days = (rental.EndDate.DateTime - rental.StartDate.DateTime).Days;
+            int days = (rental.EndDate - rental.StartDate).Days;
             double price = rental.RentalItems.Sum(ri => ri.RentingPrice * days);
             return Convert.ToDecimal(price);
         }

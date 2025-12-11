@@ -1,0 +1,117 @@
+﻿@page "/rental/detailrental"
+
+@using AppForSEII2526.Web.API
+@using Microsoft.AspNetCore.Authorization
+@inject AppForSEII2526APIClient apiclient
+
+
+@if (rental == null)
+{
+    <p>@error</p>
+}
+else
+{
+
+<table class="table table-borderless table-sm">
+    <tr>
+        <th>Nombre y Apellidos</th>
+        <td id="NameSurname">@rental.Name @rental.Surname</td>
+    </tr>
+    <tr>
+        <th>Direcciin</th>
+        <td id="DeliveryAddress">@rental.Address</td>
+    </tr>
+    <tr>
+        <th>Metodo de pago</th>
+        <td id="PaymentMethod">@rental.PaymentMethod</td>
+    </tr>
+    <tr>
+        <th>Fecha de alquiler</th>
+        <td id="RentalDate">@rental.RentingDate.ToString("dd/MM/yyyy hh:mm:ss")</td>
+    </tr>
+    <tr>
+        <th>Periodo de alquiler</th>
+        <td id="RentalPeriod">@rental.EndDate.ToString("dd/MM/yyyy") - @rental.StartDate.ToString("dd/MM/yyyy")</td>
+    </tr>
+</table>
+
+<h4>Coches alquilados</h4>
+
+<table class="table" id="RentedCars">
+    <thead>
+        <tr>
+            <th scope="col">Fabricante</th>
+            <th scope="col">Modelo</th>
+            <th scope="col">Precio de alquiler</th>
+            <th scope="col">Cantidad</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (RentalItemDTO item in rental.RentalItems)
+        {
+            <tr id="RentalItem_@item.Manufacturer">
+                <td>@item.Manufacturer</td>
+                <td>@item.CarModel</td>
+                <td>@item.RentingPrice €</td>
+                <td>@item.Quantity</td>
+            </tr>
+        }
+    </tbody>
+    <tfoot>
+        <tr>
+            @*colspan is used to state that TWO columns are collapsed*@
+            <th scope="row" colspan="3" class="text-end">Precio total</th>
+            <td id="TotalPrice">@rental.TotalPrice €</td>
+        </tr>
+    </tfoot>
+
+</table>
+
+}
+@code {
+
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public int RentalID { get; set; }
+    private RentalDetailDTO rental;
+    private string error = "";
+
+    [CascadingParameter]
+    private Task<AuthenticationState>? authenticationState { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        //we check the user is logged in
+        string userName = "";
+        if (authenticationState is not null)
+        {
+            var authState = await authenticationState;
+            var user = authState?.User;
+
+            //we retrieve the id of the user logged in
+            if (user is not null)
+            {
+                if (user.Identity is not null && user.Identity.IsAuthenticated && user.IsInRole("User"))
+                {
+                    userName = user.Identity.Name;
+                }
+            }
+        }
+
+        try
+        {
+            rental = await apiclient.GetRentalAsync(RentalID);
+        }
+        catch (ApiException exception)
+        {
+            rental = null;
+        }
+        if ((rental == null) || (rental.ClientId != userName))
+        {
+            error = $"Error! You are not authorized to see this rental or there is not a rental with id={RentalID}";
+        }
+
+
+    }
+}
