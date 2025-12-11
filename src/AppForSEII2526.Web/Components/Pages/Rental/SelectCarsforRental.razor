@@ -1,0 +1,201 @@
+﻿@page "/rental/selectcarsforrental"
+
+@using Microsoft.AspNetCore.Authorization
+@using AppForSEII2526
+@using AppForSEII2526.Web.API
+@inject AppForSEII2526APIClient apiclient
+@inject ILogger<SelectCarsforRental> logger
+@inject RentalStateContainer rentalState
+@inject NavigationManager navigation
+
+
+<h3>Selecciona coches para alquilar</h3>
+
+<div class="container-fluid">
+
+    <!-- ERRORES -->
+    <div class="row alert alert-danger" role="alert" hidden="@hideErrors">
+        <p>@errors</p>
+    </div>
+
+    <div class="row">
+
+        <!-- IZQUIERDA: filtros + tabla -->
+        <div class="col-8">
+
+            <!-- FILTROS -->
+            <div class="row mb-3">
+                <!-- Filtro por modelo -->
+                <div class="col">
+                    <div class="input-group">
+                        <span class="input-group-text">Modelo</span>
+                        <input type="text"
+                               class="form-control"
+                               placeholder="Modelo"
+                               @bind="modelFilter" />
+                    </div>
+                </div>
+
+                <!-- Filtro por precio máximo -->
+                <div class="col">
+                    <div class="input-group">
+                        <span class="input-group-text">Precio max</span>
+                        <input type="number"
+                               step="0.01"
+                               class="form-control"
+                               placeholder="Max €/dia"
+                               @bind="priceFilter" />
+                    </div>
+                </div>
+
+                <div class="col">
+                    <button class="btn btn-primary w-100"
+                            @onclick="SearchCars">
+                        Buscar
+                    </button>
+                </div>
+            </div>
+
+            <!-- LISTADO DE COCHES -->
+            <div class="row">
+                @if (cars == null)
+                {
+                    <p>Cargando coches...</p>
+                }
+                else
+                {
+                    <div class="table-responsive mh-100">
+                        <table class="table table-hover table-condensed">
+                            <thead>
+                                <tr>
+                                    <th>Modelo</th>
+                                    <th>Fabricante</th>
+                                    <th>Combustible</th>
+                                    <th>Color</th>
+                                    <th>Precio alquiler</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var car in cars)
+                                {
+                                    <tr>
+                                        <td>@car.ModelName</td>
+                                        <td>@car.Manufacturer</td>
+                                        <td>@car.FuelType</td>
+                                        <td>@car.Color</td>
+                                        <td>@car.RentingPrice € / dia</td>
+                                        <td>
+                                            <button class="btn btn-outline-secondary"
+                                                    @onclick="@(() => AddCar(car))">
+                                                Alquilar
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+
+        </div>
+
+        <!-- DERECHA: carrito -->
+        <div class="col-3" hidden="@hideCart">
+            <h3>Carrito</h3>
+
+            @foreach (var item in rental.RentalItems)
+            {
+                <div class="row mb-2">
+                    <button class="btn btn-light w-100 text-start"
+                            @onclick="@(() => RemoveItem(item))">
+                        x @item.Manufacturer @item.CarModel
+                        (Cantidad: @item.Quantity)
+                        – @item.RentingPrice € / dia
+                    </button>
+                </div>
+            }
+
+            <div class="row mt-3">
+                <strong>Total:</strong>
+                <p>@rentalState.TotalPrice €</p>
+            </div>
+
+            <button class="btn btn-primary w-100"
+                    @onclick="Continue">
+                Continuar
+            </button>
+        </div>
+
+    </div>
+</div>
+
+@code {
+    // Filtros que mapean 1:1 con GetCochesParaAlquilar(string? modelo, decimal? precio)
+    private string? modelFilter;
+    private double? priceFilter;
+
+    // Listado devuelto por la API
+    private ICollection<RentalSelectDTO>? cars;
+
+    // Errores
+    private string errors = "";
+    private bool hideErrors => string.IsNullOrEmpty(errors);
+
+    // Acceso rápido al alquiler actual
+    private RentalCreateDTO rental => rentalState.Rental;
+
+    // Ocultar carrito si no hay items
+    private bool hideCart => rental.RentalItems.Count == 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Según el CU: periodo por defecto = hoy → hoy + 7 días
+        if (rental.StartDate == default)
+            rental.StartDate = DateTime.Today;
+
+        if (rental.EndDate == default)
+            rental.EndDate = DateTime.Today.AddDays(7);
+
+        await SearchCars();
+    }
+
+
+    private async Task SearchCars()
+    {
+        try
+        {
+            // El cliente generado tiene: GetCochesParaAlquilarAsync(string modelo, double? precio)
+            string modelo = string.IsNullOrWhiteSpace(modelFilter) ? null : modelFilter;
+            double? precio = priceFilter;
+
+            cars = await apiclient.GetCochesParaAlquilarAsync(modelo, precio);
+            errors = "";
+        }
+        catch (ApiException ex)
+        {
+            logger.LogError($"{DateTime.Now} ERROR: {ex}");
+            errors = "Error while connecting to the system.";
+        }
+
+        StateHasChanged();
+    }
+
+    private void AddCar(RentalSelectDTO car)
+    {
+        rentalState.AddCarToRental(car);
+        StateHasChanged();
+    }
+
+    private void RemoveItem(RentalItemDTO item)
+    {
+        rentalState.RemoveRentalItem(item);
+        StateHasChanged();
+    }
+
+    private void Continue()
+    {
+        navigation.NavigateTo("/rental/createrental");
+    }
+}

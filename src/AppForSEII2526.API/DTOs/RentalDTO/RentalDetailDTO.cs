@@ -2,8 +2,12 @@
 
 namespace AppForSEII2526
 {
+
+    // DTO detallado para mostrar información completa de un alquiler
+    // Hereda de RentalCreateDTO para reutilizar los mismos atributos del modelo de creación
     public class RentalDetailDTO : RentalCreateDTO
     {
+
 
         public int Id { get; set; }
 

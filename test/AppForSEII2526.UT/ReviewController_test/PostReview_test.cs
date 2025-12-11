@@ -45,6 +45,7 @@ namespace AppForSEII2526
 
             var reviewCreate = new ReviewCreateDTO
             {
+                ClientId = "manolito",
                 Created = new DateTime(2025, 10, 15),
                 Name = "Manuel",
                 Country = "España",
@@ -78,6 +79,7 @@ namespace AppForSEII2526
 
             var reviewCreate = new ReviewCreateDTO
             {
+                ClientId = "manolito",
                 Created = DateTime.Now,
                 Name = "Manuel",
                 Country = "España",

@@ -1,5 +1,8 @@
 ﻿namespace AppForSEII2526
 {
+
+    // DTO utilizado para mostrar coches disponibles para alquilar en listados filtrados.
+    // Contiene información resumida del coche sin detalles del alquiler.
     public class RentalSelectDTO
     {
 

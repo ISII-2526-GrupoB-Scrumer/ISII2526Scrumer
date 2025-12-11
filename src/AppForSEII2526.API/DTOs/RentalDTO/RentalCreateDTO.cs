@@ -1,7 +1,11 @@
-﻿using System.Drawing;
+﻿using Humanizer;
+using System.Drawing;
 
 namespace AppForSEII2526
 {
+
+    // DTO utilizado para recibir los datos necesarios al crear un alquiler(inputs del cliente).
+    // No contiene lógica ni datos calculados, solo la información que el usuario envía para crear el alquiler.
     public class RentalCreateDTO
     {
 

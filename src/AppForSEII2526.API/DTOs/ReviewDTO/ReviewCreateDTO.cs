@@ -1,14 +1,19 @@
 ﻿namespace AppForSEII2526
 {
+    // DTO utilizado para crear una reseña desde el cliente.
+    // Contiene los datos del usuario y la lista de coches a reseñar.
     public class ReviewCreateDTO
     {
+        public string ClientId { get; set; }
         public DateTime Created { get; set; }
         public string Name { get; set; } = string.Empty;
         public string Country { get; set; } = string.Empty;
         public string DriverType { get; set; } = string.Empty;
 
+        // Lista de coches reseñados, cada uno con puntuación y descripción
         public List<ReviewItemDTO> ReviewItems { get; set; }
 
+        // Constructor vacío necesario para deserialización y binding desde el controlador
         public ReviewCreateDTO()
         {
             ReviewItems = new List<ReviewItemDTO>();

@@ -19,4 +19,10 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 
     public DbSet<Purchase> Purchase { get; set; }
 
+    public DbSet<Booking> Booking { get; set; }
+    public DbSet<BookingItem> BookingItem { get; set; }
+    public DbSet<ApplicationUser> ApplicationUsers { get; set; }
+
+
+
 }
