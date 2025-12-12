@@ -153,10 +153,10 @@
     {
         // Según el CU: periodo por defecto = hoy → hoy + 7 días
         if (rental.StartDate == default)
-            rental.StartDate = DateTime.Today;
+            rental.StartDate = DateTime.Today.AddDays(1);
 
         if (rental.EndDate == default)
-            rental.EndDate = DateTime.Today.AddDays(7);
+            rental.EndDate = DateTime.Today.AddDays(8);
 
         await SearchCars();
     }
