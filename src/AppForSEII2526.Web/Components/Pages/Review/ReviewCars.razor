@@ -8,7 +8,7 @@
 @inject ReviewStateContainer reviewState
 @inject NavigationManager navigation
 
-<h3>Select Cars For Review</h3>
+<h3>Seleccionar coches para resenyar</h3>
 
 <div class="container-fluid">
     <!-- Zona de errores -->
@@ -23,12 +23,12 @@
             <div class="row">
                 <div class="col">
                     <div class="input-group mb-3">
-                        <span class="input-group-text" id="basic-addon1">Manufacturer</span>
+                        <span class="input-group-text" id="basic-addon1">Fabricante</span>
                         <input type="text"
                                id="inputManufacturer"
                                @bind="manufacturer"
                                class="form-control"
-                               placeholder="Manufacturer"
+                               placeholder="Fabricante"
                                aria-label="Manufacturer"
                                aria-describedby="basic-addon1" />
                     </div>
@@ -36,12 +36,12 @@
 
                 <div class="col">
                     <div class="input-group mb-3">
-                        <span class="input-group-text" id="basic-addon2">Fuel type</span>
+                        <span class="input-group-text" id="basic-addon2">Tipo de Combustible</span>
                         <input type="text"
                                id="inputFuelType"
                                @bind="fuelType"
                                class="form-control"
-                               placeholder="Fuel type"
+                               placeholder="Tipo de Combustible"
                                aria-label="Fuel type"
                                aria-describedby="basic-addon2" />
                     </div>
@@ -52,7 +52,7 @@
                             class="btn btn-primary"
                             id="searchCars"
                             @onclick="SearchCars">
-                        Search cars
+                        Buscar
                     </button>
                 </div>
             </div>
@@ -69,12 +69,12 @@
                         <table class="table table-condensed table-hover" id="TableOfCars">
                             <thead>
                                 <tr>
-                                    <th>Model</th>
-                                    <th>Class</th>
-                                    <th>Manufacturer</th>
-                                    <th>Fuel type</th>
+                                    <th>Modelo</th>
+                                    <th>Tipo</th>
+                                    <th>Fabricante</th>
+                                    <th>Tipo de Combustible</th>
                                     <th>Color</th>
-                                    <th>Select</th>
+
                                 </tr>
                             </thead>
                             <tbody>
@@ -90,7 +90,7 @@
                                             <button class="btn btn-outline-secondary"
                                                     id="carToReview_@car.Id"
                                                     @onclick="@(() => AddCar(car))">
-                                                Add
+                                                Seleccionar
                                             </button>
                                         </td>
                                     </tr>
@@ -105,7 +105,7 @@
         <!-- Columna derecha: "carrito" de coches seleccionados para reseñar -->
         <div class="col-2" hidden="@hideReviewCart">
             <div class="row">
-                <h3>Selected cars</h3>
+                <h3>Coches seleccionados</h3>
             </div>
 
             @foreach (ReviewItemDTO item in review.ReviewItems)
@@ -125,7 +125,7 @@
                         class="btn btn-primary"
                         id="continueReviewButton"
                         @onclick="ContinueToCreateReview">
-                    Continue
+                    Continuar
                 </button>
             </div>
         </div>
