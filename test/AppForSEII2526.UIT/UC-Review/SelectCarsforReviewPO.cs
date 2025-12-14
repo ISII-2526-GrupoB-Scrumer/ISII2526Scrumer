@@ -11,43 +11,54 @@ namespace AppForSEII2526.UIT.UC_Review
         }
 
         // ===== Locators =====
-        private IWebElement InputManufacturer => _driver.FindElement(By.Id("inputManufacturer"));
-        private IWebElement InputFuelType => _driver.FindElement(By.Id("inputFuelType"));
-        private IWebElement SearchButton => _driver.FindElement(By.Id("searchCars"));
+        private By InputManufacturerBy => By.Id("inputManufacturer");
+        private By InputFuelTypeBy => By.Id("inputFuelType");
+        private By SearchButtonBy => By.Id("searchCars");
 
-        private IReadOnlyCollection<IWebElement> AddButtons =>
-            _driver.FindElements(By.CssSelector("button[id^='carToReview_']"));
+        private By ContinueButtonBy => By.Id("continueReviewButton");
 
-        private IWebElement ContinueButton =>
-            _driver.FindElement(By.Id("continueReviewButton"));
+        private By AddCarButtonBy(int carId) => By.Id($"carToReview_{carId}");
+        private By RemoveCarButtonBy(int carId) => By.Id($"removeCar_{carId}");
 
         // ===== Actions =====
+
         public void SearchCars(string manufacturer, string fuelType)
         {
-            InputManufacturer.Clear();
-            InputManufacturer.SendKeys(manufacturer);
+            WaitForBeingClickable(InputManufacturerBy);
+            _driver.FindElement(InputManufacturerBy).Clear();
+            _driver.FindElement(InputManufacturerBy).SendKeys(manufacturer);
 
-            InputFuelType.Clear();
-            InputFuelType.SendKeys(fuelType);
+            _driver.FindElement(InputFuelTypeBy).Clear();
+            _driver.FindElement(InputFuelTypeBy).SendKeys(fuelType);
 
-            SearchButton.Click();
+            _driver.FindElement(SearchButtonBy).Click();
         }
 
-        public void AddCars(int id)
+        public bool HasCars()
         {
-            WaitForBeingClickable(By.Id("carToReview_" + id));
-            _driver.FindElement(By.Id("carToReview_" + id)).Click();
+            return _driver.FindElements(By.CssSelector("button[id^='carToReview_']")).Count > 0;
         }
 
-        public void RemoveCars(int id)
+        public void AddCar(int carId)
         {
-            WaitForBeingClickable(By.Id("removeCar_" + id));
-            _driver.FindElement(By.Id("removeCar_" + id)).Click();
+            WaitForBeingClickable(AddCarButtonBy(carId));
+            _driver.FindElement(AddCarButtonBy(carId)).Click();
+        }
+
+        public void RemoveCar(int carId)
+        {
+            WaitForBeingClickable(RemoveCarButtonBy(carId));
+            _driver.FindElement(RemoveCarButtonBy(carId)).Click();
         }
 
         public bool ReviewNotAvailable()
         {
-            return _driver.FindElement(By.Id("continueReviewButton")).Displayed == false;
+            return !_driver.FindElement(ContinueButtonBy).Displayed;
+        }
+
+        public void Continue()
+        {
+            _driver.FindElement(ContinueButtonBy).Click();
         }
     }
 }
