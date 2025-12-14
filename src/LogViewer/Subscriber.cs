@@ -19,7 +19,7 @@ public class Subscriber
 
         var factory = new ConnectionFactory
         {
-            HostName = "localhost",
+            HostName = "10.89.49.63",
             Port = 5672,
             UserName = "guest",
             Password = "guest"
