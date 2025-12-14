@@ -48,6 +48,7 @@ namespace AppForSEII2526.API.Controllers
                 .OrderBy(m => m.Name)
                 .ThenBy(m => m.Price) 
                 .ToList();
+            _logger.LogInformation("Mostrando mantenimientos.");
 
             return Ok(ordered);
         }

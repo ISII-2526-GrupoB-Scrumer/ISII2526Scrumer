@@ -19,7 +19,7 @@ public class Subscriber
 
         var factory = new ConnectionFactory
         {
-            HostName = "10.89.49.63",
+            HostName = "10.89.49.63", //ip para que funcione 
             Port = 5672,
             UserName = "guest",
             Password = "guest"
@@ -65,7 +65,7 @@ public class Subscriber
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"❌ Error procesando mensaje: {ex.Message}");
+                Console.WriteLine($"Error procesando mensaje: {ex.Message}");
             }
         };
 
@@ -87,7 +87,7 @@ public class Subscriber
 
         if (!string.IsNullOrEmpty(log.Exception))
         {
-            Console.WriteLine($"   ⚠️ Exception: {log.Exception}");
+            Console.WriteLine($"Exception: {log.Exception}");
         }
 
         Console.WriteLine();

@@ -111,7 +111,7 @@ namespace AppForSEII2526.API.Controllers
                 return NotFound();
             }
 
-
+            _logger.LogInformation($"Review con id {id} mostrada correctamente.");
             // Si existe, la enviamos al usuario
             return Ok(review);
         }

@@ -83,6 +83,7 @@ namespace AppForSEII2526
                 return NotFound();
             }
 
+            _logger.LogInformation("El alquler con id {id} se ha encontrado correctamente.", id);
             // Si lo encuentra, lo retorna con estado OK
             return Ok(rental);
         }

@@ -26,6 +26,8 @@ namespace AppForSEII2526
         public async Task<ActionResult> GetCarssinDTOs()
         {
             IList<Car> coches = await _context.Car.ToListAsync();
+
+            _logger.LogInformation("Coches obtenidos correctamente.");
             return Ok(coches);
         }
 
@@ -61,7 +63,7 @@ namespace AppForSEII2526
                 .ThenBy(c => c.PurchasingPrice)
                 .ToList();
 
-            _logger.LogInformation("Coches ordenados correctamente en memoria.");
+            _logger.LogInformation("Coches ordenados correctamente.");
             return Ok(cochesOrdenados);
         }
 
@@ -103,7 +105,7 @@ namespace AppForSEII2526
                 ))
                 .ToListAsync();             // Ejecución de la consulta y transformación a lista
 
-            _logger.LogInformation("Coches ordenados correctamente en memoria.");
+            _logger.LogInformation("Coches ordenados correctamente.");
             // Devolvemos la lista resultante en formato JSON con código 200 OK
             return Ok(coches);
         }
@@ -172,7 +174,7 @@ namespace AppForSEII2526
                 ))
                 // Finalmente convertimos la consulta en una lista
                 .ToListAsync();
-            _logger.LogInformation("Coches ordenados correctamente en memoria.");
+            _logger.LogInformation("Coches ordenados correctamente.");
             return Ok(coches);
         }
 

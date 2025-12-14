@@ -75,6 +75,7 @@ namespace AppForSEII2526.API.Controllers
                 )).ToList()
             );
 
+            _logger.LogInformation($"Booking con id {id} mostrada correctamente.");
             return Ok(bookingDTO);
         }
 
