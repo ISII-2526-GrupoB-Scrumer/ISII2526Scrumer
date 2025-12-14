@@ -22,6 +22,7 @@
         <p id="ErrorsShown">Errors: @messageError</p>
     </div>
 
+
     <div class="row g-3">
         <div class="col-md">
             <div class="form-floating mb-3">
@@ -35,6 +36,16 @@
                 <label for="Name">Apellidos </label>
             </div>
         </div>
+
+        <div class="col-md">
+            <div class="form-floating mb-3">
+                <InputText @bind-Value="rental.ClientId"
+                           class="form-control"
+                           id="ClientId" />
+                <label for="ClientId">Identificador de usuario</label>
+            </div>
+        </div>
+
         <div class="col-md">
             <div class="form-floating mb-3">
                 <InputText @bind-Value="rental.Address" class="form-control" id="DeliveryAddress" />
@@ -48,8 +59,9 @@
             <div class="form-floating">
                 @*a dropdown for selecting the payment method*@
                 <InputSelect class="form-select" @bind-Value="rental.PaymentMethod" id="PaymentMethod">
-                    <option value="visa">Visa</option>
-                    <option value="google pay">Google Pay</option>
+                    <option>Eliga una opcion</option>
+                    <option value="Visa">Visa</option>
+                    <option value="Google Pay">Google Pay</option>
                     <option value="Paypal">Paypal</option>
                 </InputSelect>
 
@@ -61,7 +73,7 @@
             <div class="form-floating">
                 @*this button will be used to ask the user if he want to proceed to rent the movies*@
                 <button class="btn btn-primary" type="submit" id="Submit">
-                    Alquilla coches
+                    Alquila coches
                 </button>
             </div>
         </div>
@@ -153,6 +165,12 @@
             {
                 try
                 {
+                    if (string.IsNullOrWhiteSpace(rental.ClientId))
+                    {
+                        messageError = "Debes indicar un identificador de usuario válido.";
+                        return;
+                    }
+
                     var rented = await apiclient.CreateRentalAsync(rental);
                     rentalState.RentalProcessed();
                     navigation.NavigateTo($"/rental/detailrental/?RentalID={rented.Id}");
