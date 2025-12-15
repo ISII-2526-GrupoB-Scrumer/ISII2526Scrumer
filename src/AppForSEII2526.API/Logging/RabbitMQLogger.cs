@@ -11,21 +11,22 @@ namespace AppForSEII2526;
 
 public class RabbitMQLogger : ILogger, IDisposable
 {
-    private readonly string _name;
-    private readonly RabbitMQLoggerConfiguration _config;
-    private readonly RabbitMQConnection _connection;
-    private readonly RabbitMQModel _channel;
-    private readonly IBasicProperties _properties;
+    private readonly string _name; //nombre del logger
+    private readonly RabbitMQLoggerConfiguration _config; //configuracion del logger
+    private readonly RabbitMQConnection _connection;   //conexion al broker
+    private readonly RabbitMQModel _channel; //canal de comunicacion
+    private readonly IBasicProperties _properties; //propiedades del mensaje
+
 
 
     public RabbitMQLogger(string name, RabbitMQLoggerConfiguration config)
     {
-        _name = name ?? throw new ArgumentNullException(nameof(name));
-        _config = config ?? throw new ArgumentNullException(nameof(config));
+        _name = name ?? throw new ArgumentNullException(nameof(name)); //nombre del logger
+        _config = config ?? throw new ArgumentNullException(nameof(config)); //configuracion del logger
 
         ValidateConfiguration(_config);
 
-        var factory = new ConnectionFactory
+        var factory = new ConnectionFactory //crear conexion
         {
             HostName = _config.HostName,
             Port = _config.Port,
@@ -36,7 +37,7 @@ public class RabbitMQLogger : ILogger, IDisposable
         _connection = factory.CreateConnection();
         _channel = _connection.CreateModel();
 
-        // Declaración del exchange fanout (requisito de la práctica)
+        // declarar exchange
         _channel.ExchangeDeclare(
             exchange: _config.Exchange,
             type: _config.ExchangeType,
@@ -69,7 +70,7 @@ public class RabbitMQLogger : ILogger, IDisposable
     public bool IsEnabled(LogLevel logLevel) => logLevel != LogLevel.None;
 
     public void Log<TState>(
-        LogLevel logLevel,
+        LogLevel logLevel, 
         EventId eventId,
         TState state,
         Exception? exception,
