@@ -20,5 +20,17 @@
             NumberOfDays = numberOfDays;
             Comment = comment;
         }
+        public override bool Equals(object? obj)
+        {
+            if (obj is not MaintenanceItemDTO other)
+                return false;
+
+            return MaintenanceId == other.MaintenanceId &&
+                   MaintenanceName == other.MaintenanceName &&
+                   Type == other.Type &&
+                   Price == other.Price &&
+                   NumberOfDays == other.NumberOfDays &&
+                   Comment == other.Comment;
+        }
     }
 }

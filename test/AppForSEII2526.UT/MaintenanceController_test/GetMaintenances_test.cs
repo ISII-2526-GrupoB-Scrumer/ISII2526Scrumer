@@ -115,17 +115,9 @@ namespace AppForSEII2526
             var ok = Assert.IsType<OkObjectResult>(result);
             var actual = Assert.IsType<List<MaintenanceSelectDTO>>(ok.Value);
 
-            Assert.Equal(expected.Count, actual.Count);
-
-            for (int i = 0; i < expected.Count; i++)
-            {
-                Assert.Equal(expected[i].Id, actual[i].Id);
-                Assert.Equal(expected[i].Name, actual[i].Name);
-                Assert.Equal(expected[i].Type, actual[i].Type);
-                Assert.Equal(expected[i].Price, actual[i].Price);
-                Assert.Equal(expected[i].NumberOfDays, actual[i].NumberOfDays);
-            }
+            Assert.Equal(expected, actual);
         }
+
 
         // =====================================================
         //   TEST: Lista vacía (no es error)

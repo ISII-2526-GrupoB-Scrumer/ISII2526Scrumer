@@ -74,30 +74,34 @@ namespace AppForSEII2526
                 ClientId = "manolito",
                 PaymentMethod = "Tarjeta",
                 MaintenanceItems = new List<MaintenanceItemDTO>
-                {
-                    new MaintenanceItemDTO(1,"Cambio aceite","Motor",120,1,"Todo correcto"),
-                    new MaintenanceItemDTO(2,"Cambio pastillas","Frenos",90,1,"Revisar desgaste")
-                }
+        {
+            new MaintenanceItemDTO(1,"Cambio aceite","Motor",120,1,"Todo correcto"),
+            new MaintenanceItemDTO(2,"Cambio pastillas","Frenos",90,1,"Revisar desgaste")
+        }
             };
+
+            // ===== EXPECTED DTO =====
+            var expected = new MaintenanceDetailDTO(
+                id: 1, // primer booking creado en la BD de test
+                clientId: "manolito",
+                paymentMethod: "Tarjeta",
+                date: DateTime.Today, // se compara solo el día (ver nota abajo)
+                totalPrice: 210,
+                maintenances: new List<MaintenanceItemDTO>
+                {
+            new MaintenanceItemDTO(1,"Cambio aceite","Motor",120,1,"Todo correcto"),
+            new MaintenanceItemDTO(2,"Cambio pastillas","Frenos",90,1,"Revisar desgaste")
+                }
+            );
 
             var result = await controller.CreateBooking(bookingCreate);
 
             var created = Assert.IsType<CreatedAtActionResult>(result);
-            var dto = Assert.IsType<MaintenanceDetailDTO>(created.Value);
+            var actual = Assert.IsType<MaintenanceDetailDTO>(created.Value);
 
-            // Validaciones principales
-            Assert.Equal("manolito", dto.ClientId);
-            Assert.Equal("Tarjeta", dto.PaymentMethod);
-
-            // Total esperado = 120 + 90
-            Assert.Equal(210, dto.TotalPrice);
-
-            // Validación de items
-            Assert.Equal(2, dto.Maintenances.Count);
-
-            Assert.Equal(1, dto.Maintenances[0].MaintenanceId);
-            Assert.Equal(2, dto.Maintenances[1].MaintenanceId);
+            Assert.Equal(expected, actual);
         }
+
 
         // =======================================================
         // TEST 2 - CreateBooking BAD REQUEST (usuario no existe)
