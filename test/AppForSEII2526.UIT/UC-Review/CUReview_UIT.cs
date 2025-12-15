@@ -1,5 +1,6 @@
 ﻿using AppForMovies.UIT.Shared;
-using AppForSEII2526.UIT.Shared;
+using Microsoft.VisualStudio.TestPlatform.Utilities;
+using System;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -7,52 +8,51 @@ namespace AppForSEII2526.UIT.UC_Review
 {
     public class CUReview_UIT : UC_UIT
     {
-        public CUReview_UIT(ITestOutputHelper output) : base(output)
+        private const int carId = 6; // Honda Civic
+
+        public CUReview_UIT(ITestOutputHelper output) : base(output) { }
+
+        [Fact]
+        [Trait("LevelTesting", "Functional Testing")]
+        public void UC4_CompleteReviewFlow()
         {
+            // Arrange
+            Initial_step_opening_the_web_page();
+            _driver.Navigate().GoToUrl(_URI + "review/selectcarsforreview");
+
+            var selectPO = new SelectCarsForReviewPO(_driver, _output);
+            var createPO = new CreateReviewPO(_driver, _output);
+            var detailPO = new DetailReviewPO(_driver, _output);
+
+            // Act: seleccionar coche
+            selectPO.AddCarToReview(carId);
+            selectPO.Continue();
+
+            // Act: crear reseña
+            createPO.FillReviewerData("Carlos", "carlitos_l", "España", "Experto");
+            createPO.FillReviewItemByCarId(carId, "5", "Muy buen coche");
+            createPO.SubmitReview();
+            createPO.ConfirmDialog();
+
+            // Assert
+            Assert.True(
+                detailPO.CheckReviewHeader("Carlos", "España", "Experto")
+            );
         }
 
         [Fact]
         [Trait("LevelTesting", "Functional Testing")]
-        public void UC4_AF0_FilterCars()
+        public void UC4_AF1_NoCarsSelected()
         {
             Initial_step_opening_the_web_page();
             _driver.Navigate().GoToUrl(_URI + "review/selectcarsforreview");
 
-            var po = new SelectCarsforReviewPO(_driver, _output);
+            var selectPO = new SelectCarsForReviewPO(_driver, _output);
 
-            po.SearchCars("Honda", "Gasolina");
+            selectPO.AddCarToReview(carId);
+            selectPO.RemoveCarFromReview(carId);
 
-            Assert.True(po.HasCars());
-        }
-
-        [Fact]
-        [Trait("LevelTesting", "Functional Testing")]
-        public void UC4_AF1_NoCarsSelected_CannotContinue()
-        {
-            Initial_step_opening_the_web_page();
-            _driver.Navigate().GoToUrl(_URI + "review/selectcarsforreview");
-
-            var po = new SelectCarsforReviewPO(_driver, _output);
-
-            po.AddCar(5);
-            po.RemoveCar(5);
-
-            Assert.True(po.ReviewNotAvailable());
-        }
-
-        [Fact]
-        [Trait("LevelTesting", "Functional Testing")]
-        public void UC4_AF2_RemoveSelectedCar()
-        {
-            Initial_step_opening_the_web_page();
-            _driver.Navigate().GoToUrl(_URI + "review/selectcarsforreview");
-
-            var po = new SelectCarsforReviewPO(_driver, _output);
-
-            po.AddCar(5);
-            po.RemoveCar(5);
-
-            Assert.True(po.ReviewNotAvailable());
+            Assert.True(selectPO.ReviewNotAvailable());
         }
     }
 }

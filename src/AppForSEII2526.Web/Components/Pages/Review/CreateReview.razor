@@ -2,6 +2,7 @@
 
 @using AppForSEII2526
 @using AppForSEII2526.Web.API
+@using AppForSEII2526.Web.Components.Shared
 @using Microsoft.AspNetCore.Authorization
 
 @inject AppForSEII2526APIClient apiclient
@@ -31,6 +32,13 @@
 
         <div class="col-md">
             <div class="form-floating mb-3">
+                <InputText @bind-Value="review.ClientId" class="form-control" id="ClientId" />
+                <label for="ClientId">Nombre de usuario</label>
+            </div>
+        </div>
+
+        <div class="col-md">
+            <div class="form-floating mb-3">
                 <InputText @bind-Value="review.Country" class="form-control" id="Country" />
                 <label for="Country">Pais</label>
             </div>
@@ -39,8 +47,8 @@
         <div class="col-md">
             <div class="form-floating">
             <InputSelect class="form-select" @bind-Value="review.DriverType" id="Drivertype">
-                <option value="novato">Novato</option>
-                <option value="experto">Experto</option>
+                <option value="Novato">Novato</option>
+                <option value="Experto">Experto</option>
             </InputSelect>
 
             <label for="Drivertype">Tipo de conductor</label>
@@ -65,18 +73,23 @@
             <tbody>
                 @foreach (var item in review.ReviewItems)
                 {
-                    <tr>
+                    <tr id="CreateReviewItem_@item.CarId">
                         <td>@item.Manufacturer @item.CarModel</td>
                         <td>@item.FuelType</td>
                         <td>@item.Color</td>
                         <td>
                             <InputText class="form-control"
+                                      id="descripciontxt"
                                        @bind-Value="item.Description" />
                         </td>
                         <td>
-                            <InputNumber class="form-control"
-                                         @bind-Value="item.Rating"
-                                         min="1" max="5" />
+                            <input class="form-control"
+                                   type="text"
+                                   id="ratingtxt"
+                                   value="@item.Rating"
+                                   inputmode="numeric"
+                                   pattern="[1-5]*"
+                                   @oninput="e => OnRatingChanged(e, item)" />
                         </td>
                     </tr>
                 }
@@ -103,8 +116,8 @@
 
 @if (DialogIsOpen)
 {
-    <Dialog Caption="Rental movies"
-    Message="Do you want to proceed to rent the selected movies?"
+    <Dialog Caption="Publicar resenyas"
+    Message="Seguro que quieres continuar?"
     OnClose="@OnDialogClose"
     Type=Dialog.Category.SaveNot>
     </Dialog>
@@ -183,4 +196,18 @@
 
     [CascadingParameter]
     private Task<AuthenticationState>? authenticationState { get; set; }
+
+    private void OnRatingChanged(ChangeEventArgs e, ReviewItemDTO item)
+    {
+        var value = e.Value?.ToString();
+
+        if (int.TryParse(value, out var rating))
+        {
+            item.Rating = rating;
+        }
+        else
+        {
+            item.Rating = 0;
+        }
+    }
 }
