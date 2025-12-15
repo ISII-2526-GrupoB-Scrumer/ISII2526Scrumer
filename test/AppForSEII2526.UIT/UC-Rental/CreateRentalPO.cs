@@ -15,6 +15,7 @@ namespace AppForSEII2526.UIT.UC_Rental
         private By inputAddress = By.Id("DeliveryAddress");
         private By paymentMethod = By.Id("PaymentMethod");
         private By submitButton = By.Id("Submit");
+        private By modifyButton = By.Id("ModifyCars");
 
         public CreateRentalPO(IWebDriver driver, ITestOutputHelper output) : base(driver, output)
         {
@@ -56,6 +57,12 @@ namespace AppForSEII2526.UIT.UC_Rental
         public void ConfirmDialog()
         {
             PressOkModalDialog();
+        }
+
+        public void ModifyCars()
+        {
+            WaitForBeingClickable(modifyButton);
+            _driver.FindElement(modifyButton).Click();
         }
     }
 }

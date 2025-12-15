@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Runtime.ConstrainedExecution;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -66,19 +67,55 @@ namespace AppForSEII2526
             Assert.True(detailRental_PO.CheckRentalDetail($"{nombre} {apellido}",direccion,pago,DateTime.Today,empieza,termina,totalprice1));
         }
 
+        [Fact]
+        [Trait("LevelTesting", "Funcional Testing")]
+        public void UC2_4()
+        {
+            Initial_step_opening_the_web_page();
+            _driver.Navigate().GoToUrl(_URI + "rental/selectcarsforrental");
 
+            selectcarsForRental_PO = new SelectCarsForRentalPO(_driver, _output);
+
+            selectcarsForRental_PO.SearchCars("peugeot","1");
+
+            var expected = new List<string[]>();
+
+            Assert.True(selectcarsForRental_PO.CheckBodyTable(expected, By.Id("TableOfRentalItems")));
+        }
+
+        [Theory]
+        [InlineData("Corrola","")]
+        [InlineData("", "75")]
+        [InlineData("Corrola", "75")]
+        [Trait("LevelTesting", "Funcional Testing")]
+        public void UC2_5_6_7(string modelo,string precio)
+        {
+            Initial_step_opening_the_web_page();
+            _driver.Navigate().GoToUrl(_URI + "rental/selectcarsforrental");
+
+            selectcarsForRental_PO = new SelectCarsForRentalPO(_driver, _output);
+
+            selectcarsForRental_PO.SearchCars(modelo, precio);
+
+            var expected = new List<string[]>
+            {
+                new[] { "Corrola", "Toyota" }
+            };
+
+            Assert.True(selectcarsForRental_PO.CheckBodyTable(expected,By.Id("TableOfRentalItems")));
+
+        }
 
         [Fact]
         [Trait("LevelTesting", "Funcional Testing")]
-
-        public void UC2_AF1_UC2_11_RentingNotavailable()
+        public void UC2_8()
         {
             //Arrange
             Initial_step_opening_the_web_page();
             _driver.Navigate().GoToUrl(_URI + "rental/selectcarsforrental");
 
             selectcarsForRental_PO = new SelectCarsForRentalPO(_driver, _output);
-            
+
 
             //Act
             selectcarsForRental_PO.AddCarToCart(carId1);
@@ -89,5 +126,41 @@ namespace AppForSEII2526
             Assert.True(selectcarsForRental_PO.RentingNotAvailable());
 
         }
+
+
+        [Fact]
+        [Trait("LevelTesting", "Funcional Testing")]
+        public void UC2_9()
+        {
+            //Arrange
+            Initial_step_opening_the_web_page();
+            _driver.Navigate().GoToUrl(_URI + "rental/selectcarsforrental");
+
+            selectcarsForRental_PO = new SelectCarsForRentalPO(_driver, _output);
+            createRental_PO = new CreateRentalPO(_driver, _output);
+
+            //Act
+            selectcarsForRental_PO.AddCarToCart(carId1);
+            selectcarsForRental_PO.AddCarToCart(carId2);
+            selectcarsForRental_PO.ConfirmRental();
+
+            createRental_PO.ModifyCars();
+            selectcarsForRental_PO.RemoveCarFromCart(carId2);
+            selectcarsForRental_PO.ConfirmRental();
+
+
+            var expected = new List<string[]>
+            {
+                new[] { "Corrola", "Toyota" }
+            };
+
+            //Assert
+            Assert.True(selectcarsForRental_PO.CheckBodyTable(expected, By.Id("TableOfRentalItems")));
+
+
+        }
+
+
+
     }
 }
