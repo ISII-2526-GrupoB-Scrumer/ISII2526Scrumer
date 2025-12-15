@@ -39,7 +39,7 @@ public class RabbitMQLogger : ILogger, IDisposable
 
         // declarar exchange
         _channel.ExchangeDeclare(
-            exchange: _config.Exchange,
+            exchange: _config.Exchange, // 
             type: _config.ExchangeType,
             durable: _config.Durable);
 
