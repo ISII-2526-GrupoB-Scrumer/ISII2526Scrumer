@@ -64,5 +64,11 @@ namespace AppForSEII2526.UIT.UC_Rental
             WaitForBeingClickable(modifyButton);
             _driver.FindElement(modifyButton).Click();
         }
+
+        public bool ErrorVisible()
+        {
+            
+            return _driver.FindElement(By.Id("ErrorsShown")).Displayed == true;
+        }
     }
 }

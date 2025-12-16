@@ -16,9 +16,6 @@ namespace AppForSEII2526.UIT.UC_Rental
             string name,
             string delivery,
             string paymentMethod,
-            DateTime rentalDate,
-            DateTime from,
-            DateTime to,
             int totalPrice)
         {
             WaitForBeingVisible(By.Id("TotalPrice"));

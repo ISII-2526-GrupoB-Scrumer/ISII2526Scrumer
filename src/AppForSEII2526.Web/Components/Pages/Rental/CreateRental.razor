@@ -59,7 +59,7 @@
             <div class="form-floating">
                 @*a dropdown for selecting the payment method*@
                 <InputSelect class="form-select" @bind-Value="rental.PaymentMethod" id="PaymentMethod">
-                    <option>Eliga una opcion</option>
+                    <option value=""></option>
                     <option value="Visa">Visa</option>
                     <option value="Google Pay">Google Pay</option>
                     <option value="Paypal">Paypal</option>
@@ -67,6 +67,8 @@
 
                 <label for="PaymentMethod">Metodo de pago</label>
             </div>
+
+
         </div>
     
         <div class="col-md">

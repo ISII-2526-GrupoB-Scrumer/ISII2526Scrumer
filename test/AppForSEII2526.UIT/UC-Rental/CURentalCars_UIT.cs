@@ -7,6 +7,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.ConstrainedExecution;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace AppForSEII2526
 {
@@ -28,7 +29,7 @@ namespace AppForSEII2526
 
         public CURentalCars_UIT(ITestOutputHelper output) : base(output)
         {
-           
+
 
         }
 
@@ -36,17 +37,17 @@ namespace AppForSEII2526
 
         [Theory]
         [Trait("LevelTesting", "Functional Testing")]
-        [InlineData("Carlos","Lopez","U1","Calle Sol 123, Madrid","Visa")]
+        [InlineData("Carlos", "Lopez", "U1", "Calle Sol 123, Madrid", "Visa")]
         [InlineData("Carlos", "Lopez", "U1", "Calle Sol 123, Madrid", "Google Pay")]
         [InlineData("Carlos", "Lopez", "U1", "Calle Sol 123, Madrid", "Paypal")]
-        public void UC2_1_2_3(string nombre,string apellido,string id, string direccion,string pago)
+        public void UC2_1_2_3(string nombre, string apellido, string id, string direccion, string pago) //Rental correcto 
         {
 
 
             //Arrange
             var empieza = DateTime.Now.AddDays(1);
             var termina = DateTime.Now.AddDays(8);
-            
+
 
             Initial_step_opening_the_web_page();
             _driver.Navigate().GoToUrl(_URI + "rental/selectcarsforrental");
@@ -64,19 +65,19 @@ namespace AppForSEII2526
             createRental_PO.ConfirmDialog();
 
             //Assert
-            Assert.True(detailRental_PO.CheckRentalDetail($"{nombre} {apellido}",direccion,pago,DateTime.Today,empieza,termina,totalprice1));
+            Assert.True(detailRental_PO.CheckRentalDetail($"{nombre} {apellido}", direccion, pago, totalprice1));
         }
 
         [Fact]
         [Trait("LevelTesting", "Funcional Testing")]
-        public void UC2_4()
+        public void UC2_4() //coches no disponibles
         {
             Initial_step_opening_the_web_page();
             _driver.Navigate().GoToUrl(_URI + "rental/selectcarsforrental");
 
             selectcarsForRental_PO = new SelectCarsForRentalPO(_driver, _output);
 
-            selectcarsForRental_PO.SearchCars("peugeot","1");
+            selectcarsForRental_PO.SearchCars("peugeot", "1");
 
             var expected = new List<string[]>();
 
@@ -84,11 +85,11 @@ namespace AppForSEII2526
         }
 
         [Theory]
-        [InlineData("Corrola","")]
+        [InlineData("Corrola", "")]
         [InlineData("", "75")]
         [InlineData("Corrola", "75")]
         [Trait("LevelTesting", "Funcional Testing")]
-        public void UC2_5_6_7(string modelo,string precio)
+        public void UC2_5_6_7(string modelo, string precio) //buscar coches
         {
             Initial_step_opening_the_web_page();
             _driver.Navigate().GoToUrl(_URI + "rental/selectcarsforrental");
@@ -102,13 +103,13 @@ namespace AppForSEII2526
                 new[] { "Corrola", "Toyota" }
             };
 
-            Assert.True(selectcarsForRental_PO.CheckBodyTable(expected,By.Id("TableOfRentalItems")));
+            Assert.True(selectcarsForRental_PO.CheckBodyTable(expected, By.Id("TableOfRentalItems")));
 
         }
 
         [Fact]
         [Trait("LevelTesting", "Funcional Testing")]
-        public void UC2_8()
+        public void UC2_8() //coches no seleccionados
         {
             //Arrange
             Initial_step_opening_the_web_page();
@@ -128,9 +129,72 @@ namespace AppForSEII2526
         }
 
 
+        [Theory]
+        [InlineData("Carlos", "Lopez", "U1", "Calle Sol 123, Madrid", "Visa")]
+        [Trait("LevelTesting", "Funcional Testing")]
+        public void UC2_9(string nombre,string apellido,string id, string direccion, string pago) //Modificar coches seleccionados
+        {
+            //Arrange
+            Initial_step_opening_the_web_page();
+            _driver.Navigate().GoToUrl(_URI + "rental/selectcarsforrental");
+
+            selectcarsForRental_PO = new SelectCarsForRentalPO(_driver, _output);
+            createRental_PO = new CreateRentalPO(_driver, _output);
+            detailRental_PO = new DetailRentalPO(_driver, _output);
+
+            //Act
+            selectcarsForRental_PO.AddCarToCart(carId1);
+            selectcarsForRental_PO.AddCarToCart(carId2);
+            selectcarsForRental_PO.ConfirmRental();
+
+            
+
+            createRental_PO.FillRentalForm(nombre,apellido,id,direccion,pago);
+            createRental_PO.ModifyCars();
+            selectcarsForRental_PO.RemoveCarFromCart(carId2);
+            selectcarsForRental_PO.ConfirmRental();
+
+            createRental_PO.ConfirmRental();
+            createRental_PO.ConfirmDialog();
+
+            //Assert
+            Assert.True(detailRental_PO.CheckRentalDetail($"{nombre} {apellido}", direccion, pago, totalprice1));
+
+
+        }
+
+
+
+        [Theory]
+        [InlineData("", "Lopez", "U1", "Calle Sol 123, Madrid", "Visa")]
+        [InlineData("Carlos", "", "U1", "Calle Sol 123, Madrid", "Visa")]
+        [InlineData("Carlos", "Lopez", "", "Calle Sol 123, Madrid", "Visa")]
+        [InlineData("Carlos", "Lopez", "U1", "", "Visa")]
+        [InlineData("Carlos", "Lopez", "U1", "Calle Sol 123, Madrid", "")]
+        [Trait("LevelTesting", "Funcional Testing")]
+        public void UC2_10_11_12_13_14(string nombre, string apellido, string id, string direccion, string pago) //Formulario incompleto
+        {
+            //Arrange
+            Initial_step_opening_the_web_page();
+            _driver.Navigate().GoToUrl(_URI + "rental/selectcarsforrental");
+            selectcarsForRental_PO = new SelectCarsForRentalPO(_driver, _output);
+            createRental_PO = new CreateRentalPO(_driver, _output);
+
+            //Act
+            selectcarsForRental_PO.AddCarToCart(carId1);
+            selectcarsForRental_PO.ConfirmRental();
+            createRental_PO.FillRentalForm(nombre, apellido, id, direccion, pago);
+            createRental_PO.ConfirmRental();
+            createRental_PO.ConfirmDialog();
+            System.Threading.Thread.Sleep(1000);
+            //Assert
+            Assert.True(createRental_PO.ErrorVisible());
+
+        }
+
         [Fact]
         [Trait("LevelTesting", "Funcional Testing")]
-        public void UC2_9()
+        public void UC2_15() //Modificar carrito
         {
             //Arrange
             Initial_step_opening_the_web_page();
@@ -142,10 +206,8 @@ namespace AppForSEII2526
             //Act
             selectcarsForRental_PO.AddCarToCart(carId1);
             selectcarsForRental_PO.AddCarToCart(carId2);
-            selectcarsForRental_PO.ConfirmRental();
-
-            createRental_PO.ModifyCars();
             selectcarsForRental_PO.RemoveCarFromCart(carId2);
+
             selectcarsForRental_PO.ConfirmRental();
 
 
@@ -159,8 +221,5 @@ namespace AppForSEII2526
 
 
         }
-
-
-
     }
 }
