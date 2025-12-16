@@ -74,30 +74,34 @@ namespace AppForSEII2526
                 ClientId = "manolito",
                 PaymentMethod = "Tarjeta",
                 MaintenanceItems = new List<MaintenanceItemDTO>
-                {
-                    new MaintenanceItemDTO(1,"Cambio aceite","Motor",120,1,"Todo correcto"),
-                    new MaintenanceItemDTO(2,"Cambio pastillas","Frenos",90,1,"Revisar desgaste")
-                }
+        {
+            new MaintenanceItemDTO(1,"Cambio aceite","Motor",120,1,"Todo correcto"),
+            new MaintenanceItemDTO(2,"Cambio pastillas","Frenos",90,1,"Revisar desgaste")
+        }
             };
+
+            // ===== EXPECTED DTO =====
+            var expected = new MaintenanceDetailDTO(
+                id: 1, // primer booking creado en la BD de test
+                clientId: "manolito",
+                paymentMethod: "Tarjeta",
+                date: DateTime.Today, // se compara solo el día (ver nota abajo)
+                totalPrice: 210,
+                maintenances: new List<MaintenanceItemDTO>
+                {
+            new MaintenanceItemDTO(1,"Cambio aceite","Motor",120,1,"Todo correcto"),
+            new MaintenanceItemDTO(2,"Cambio pastillas","Frenos",90,1,"Revisar desgaste")
+                }
+            );
 
             var result = await controller.CreateBooking(bookingCreate);
 
             var created = Assert.IsType<CreatedAtActionResult>(result);
-            var dto = Assert.IsType<MaintenanceDetailDTO>(created.Value);
+            var actual = Assert.IsType<MaintenanceDetailDTO>(created.Value);
 
-            // Validaciones principales
-            Assert.Equal("manolito", dto.ClientId);
-            Assert.Equal("Tarjeta", dto.PaymentMethod);
-
-            // Total esperado = 120 + 90
-            Assert.Equal(210, dto.TotalPrice);
-
-            // Validación de items
-            Assert.Equal(2, dto.Maintenances.Count);
-
-            Assert.Equal(1, dto.Maintenances[0].MaintenanceId);
-            Assert.Equal(2, dto.Maintenances[1].MaintenanceId);
+            Assert.Equal(expected, actual);
         }
+
 
         // =======================================================
         // TEST 2 - CreateBooking BAD REQUEST (usuario no existe)
@@ -115,9 +119,9 @@ namespace AppForSEII2526
                 ClientId = "UsuarioQueNoExiste",
                 PaymentMethod = "Tarjeta",
                 MaintenanceItems = new List<MaintenanceItemDTO>
-                {
-                    new MaintenanceItemDTO(1,"Cambio aceite","Motor",120,1,"OK")
-                }
+        {
+            new MaintenanceItemDTO(1, "Cambio aceite", "Motor", 120, 1, "OK")
+        }
             };
 
             var result = await controller.CreateBooking(bookingCreate);
@@ -125,8 +129,13 @@ namespace AppForSEII2526
             var badRequest = Assert.IsType<BadRequestObjectResult>(result);
             var details = Assert.IsType<ValidationProblemDetails>(badRequest.Value);
 
-            Assert.True(details.Errors.ContainsKey("Client"));
+            // Expected and Actual for errors
+            var expected = new List<string> { "Client" }; // Expected errors
+            var actual = details.Errors.Keys.ToList(); // Actual errors
+
+            Assert.Equal(expected, actual);
         }
+
 
         // =======================================================
         // TEST 3 - CreateBooking BAD REQUEST (lista vacía)
@@ -151,8 +160,14 @@ namespace AppForSEII2526
             var badRequest = Assert.IsType<BadRequestObjectResult>(result);
             var details = Assert.IsType<ValidationProblemDetails>(badRequest.Value);
 
-            Assert.True(details.Errors.ContainsKey("MaintenanceItems"));
+            // Expected and Actual for errors
+            var expected = new List<string> { "MaintenanceItems" }; // Expected errors
+            var actual = details.Errors.Keys.ToList(); // Actual errors
+
+            Assert.Equal(expected, actual);
         }
+
+
 
         // =======================================================
         // TEST 4 - CreateBooking BAD REQUEST (mantenimiento no existe)
@@ -170,9 +185,9 @@ namespace AppForSEII2526
                 ClientId = "manolito",
                 PaymentMethod = "Tarjeta",
                 MaintenanceItems = new List<MaintenanceItemDTO>
-                {
-                    new MaintenanceItemDTO(999,"Invalido","N/A",0,0,"Error") // NO EXISTE
-                }
+        {
+            new MaintenanceItemDTO(999, "Invalido", "N/A", 0, 0, "Error") // NO EXISTE
+        }
             };
 
             var result = await controller.CreateBooking(bookingCreate);
@@ -180,7 +195,12 @@ namespace AppForSEII2526
             var badRequest = Assert.IsType<BadRequestObjectResult>(result);
             var details = Assert.IsType<ValidationProblemDetails>(badRequest.Value);
 
-            Assert.True(details.Errors.ContainsKey("MaintenanceItems"));
+            // Expected and Actual for errors
+            var expected = new List<string> { "MaintenanceItems" }; // Expected errors
+            var actual = details.Errors.Keys.ToList(); // Actual errors
+
+            Assert.Equal(expected, actual);
         }
+
     }
 }
