@@ -1,0 +1,207 @@
+﻿@page "/purchase/createpurchase"
+
+@using AppForSEII2526
+@using AppForSEII2526.Web.API
+@using Microsoft.AspNetCore.Mvc
+@using System.Text.Json
+@inject PurchaseStateContainer purchaseState
+@inject AppForSEII2526APIClient api
+@inject NavigationManager navigation
+@inject ILogger<CreatePurchase> logger
+
+<h3>Complete Your Purchase</h3>
+
+<div class="container">
+
+    <!-- ERROR ZONE -->
+    <div class="row alert alert-danger" role="alert" hidden="@HideErrors">
+        <p>@Errors</p>
+    </div>
+
+    <div class="row">
+        <!-- LEFT: INPUT FORM -->
+        <div class="col-7">
+
+            <div class="mb-3">
+                <label class="form-label"><strong>Delivery Dealer</strong></label>
+                <input class="form-control" @bind="purchase.DeliveryCarDealer" placeholder="e.g. Madrid Center" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label"><strong>Payment Method</strong></label>
+                <select class="form-select" @bind="purchase.PaymentMethod">
+                    <option value="">Select method</option>
+                    <option>Visa</option>
+                    <option>MasterCard</option>
+                    <option>PayPal</option>
+                    <option>Bank Transfer</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label"><strong>Driver Type</strong></label>
+                <select class="form-select" @bind="purchase.DriverType">
+                    <option value="">Select type</option>
+                    <option>Experienced</option>
+                    <option>Beginner</option>
+                    <option>Professional</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label"><strong>Country</strong></label>
+                <input class="form-control" @bind="purchase.Country" placeholder="e.g. Spain" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label"><strong>Purchasing Date</strong></label>
+                <InputDate class="form-control" @bind-Value="purchase.PurchasingDate" />
+            </div>
+
+        </div>
+
+        <!-- RIGHT: CART SUMMARY -->
+        <div class="col-4">
+            <h4>Purchase Summary</h4>
+            <hr />
+
+            @foreach (var item in purchase.PurchaseItems)
+            {
+                <p>
+                    <strong>@item.CarModel</strong>
+                    (x@item.Quantity) — @item.PurchasingPrice €
+                </p>
+            }
+
+            <hr />
+
+            <h5>Total: @purchaseState.TotalPrice €</h5>
+
+            <button class="btn btn-success mt-3 w-100"
+                    @onclick="ConfirmPurchase">
+                Confirm Purchase
+            </button>
+
+        </div>
+    </div>
+</div>
+
+@code {
+
+    private PurchaseCreateDTO purchase => purchaseState.Purchase;
+
+    private string Errors = "";
+    private bool HideErrors => string.IsNullOrEmpty(Errors);
+
+
+    // -----------------------------
+    // CONFIRM PURCHASE
+    // -----------------------------
+    private async Task ConfirmPurchase()
+    {
+        // VALIDATIONS
+        if (purchase.PurchaseItems.Count == 0)
+        {
+            Errors = "You must add at least one car to the purchase.";
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(purchase.PaymentMethod))
+        {
+            Errors = "Payment Method is required.";
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(purchase.DriverType))
+        {
+            Errors = "Driver Type is required.";
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(purchase.DeliveryCarDealer))
+        {
+            Errors = "Delivery location is required.";
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(purchase.Country))
+        {
+            Errors = "Country is required.";
+            return;
+        }
+
+        if (purchase.PurchasingDate == default)
+        {
+            Errors = "You must select a valid purchase date.";
+            return;
+        }
+
+        // SET TOTAL PRICE (backend recalculates it anyway, but good practice)
+        purchase.PurchasingPrice = purchaseState.TotalPrice;
+
+        // Hardcodear ClientId a "U1"
+        purchase.ClientId = "U1";
+
+        try
+        {
+            var result = await api.CreatePurchaseAsync(purchase);
+
+            // Reset del carrito
+            purchaseState.PurchaseProcessed();
+
+            // Redirigimos a detalles
+            navigation.NavigateTo($"/purchase/details/{result.Id}");
+        }
+        catch (ApiException ex)
+        {
+            // ApiException puede venir sin tipo genérico en el cliente generado.
+            logger.LogError(ex, "Error creating purchase (api).");
+
+            // Intentamos obtener el cuerpo de respuesta (JSON) y deserializar ValidationProblemDetails
+            string? responseContent = null;
+
+            // NSwag/Swagger generated clients suelen exponer 'Response' o 'Content' en ApiException
+            try
+            {
+                var responseProp = ex.GetType().GetProperty("Response") ?? ex.GetType().GetProperty("Content");
+                if (responseProp != null)
+                {
+                    responseContent = responseProp.GetValue(ex) as string;
+                }
+                else
+                {
+                    // fallback: algunas versiones de ApiException guardan Response as object in 'Response' property
+                    var resp = ex.GetType().GetProperty("Response")?.GetValue(ex);
+                    if (resp is string s) responseContent = s;
+                }
+            }
+            catch { /* ignore reflection failures */ }
+
+            if (!string.IsNullOrWhiteSpace(responseContent))
+            {
+                try
+                {
+                    var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                    var problems = JsonSerializer.Deserialize<API.ValidationProblemDetails>(responseContent, options);
+                    if (problems?.Errors != null && problems.Errors.Count > 0)
+                    {
+                        Errors = string.Join(" | ", problems.Errors.SelectMany(kv => kv.Value));
+                        return;
+                    }
+                }
+                catch (Exception deserEx)
+                {
+                    logger.LogWarning(deserEx, "Unable to deserialize validation details from API response.");
+                }
+            }
+
+            // Si no hay cuerpo o no se pudo parsear, mostrar código/razón básico
+            Errors = $"API error: {ex.StatusCode}";
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Unexpected error creating purchase.");
+            Errors = "Unexpected error. Try again later.";
+        }
+    }
+}
