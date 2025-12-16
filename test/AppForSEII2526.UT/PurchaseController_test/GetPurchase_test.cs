@@ -107,29 +107,23 @@ namespace AppForSEII2526
             );
 
             // ====== Act ======
-            var result = await controller.GetPurchase(1); // ID existente
+            // ====== Act ======
+            // Se ejecuta la llamada al controlador
+            var result = await controller.GetPurchase(1);
 
             // ====== Assert ======
+            // Se asegura que la respuesta es 200 OK
             var okResult = Assert.IsType<OkObjectResult>(result);
-            var actualDTO = Assert.IsType<PurchaseDetailDTO>(okResult.Value);
+            var purchaseDTOActual = Assert.IsType<PurchaseDetailDTO>(okResult.Value);
 
-            // Verificar campos principales
-            Assert.Equal(expectedPurchase.Id, actualDTO.Id);
-            Assert.Equal(expectedPurchase.DeliveryCarDealer, actualDTO.DeliveryCarDealer);
-            Assert.Equal(expectedPurchase.PurchasingPrice, actualDTO.PurchasingPrice);
-            // --- CORRECCIÓN ---
-            Assert.Equal(expectedPurchase.ClientId, actualDTO.ClientId);
-            // --- FIN CORRECCIÓN ---
+            // Se compara el objeto devuelto con el esperado usando Equals()
+            Assert.Equal(expectedPurchase, purchaseDTOActual);
 
-            // Verificar que los PurchaseItems coinciden
-            Assert.Single(actualDTO.PurchaseItems);
+            // También comparamos el elemento dentro de la lista
+            // Verificar también que los RentalItems coinciden
             var expectedItem = expectedPurchase.PurchaseItems.First();
-            var actualItem = actualDTO.PurchaseItems.First();
-
-            Assert.Equal(expectedItem.CarId, actualItem.CarId);
-            Assert.Equal(expectedItem.CarModel, actualItem.CarModel);
-            Assert.Equal(expectedItem.PurchasingPrice, actualItem.PurchasingPrice);
-            Assert.Equal(expectedItem.Quantity, actualItem.Quantity);
+            var actualItem = purchaseDTOActual.PurchaseItems.First();
+            Assert.Equal(expectedItem, actualItem);
         }
     }
 }

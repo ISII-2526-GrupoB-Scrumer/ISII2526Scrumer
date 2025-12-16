@@ -1,4 +1,6 @@
-﻿namespace AppForSEII2526
+﻿using System.Linq;
+
+namespace AppForSEII2526
 {
     public class PurchaseCreateDTO
     {
@@ -16,6 +18,18 @@
         {
             PurchaseItems = new List<PurchaseItemDTO>();
         }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is PurchaseCreateDTO dTO &&
+                   ClientId == dTO.ClientId &&
+                   PaymentMethod == dTO.PaymentMethod &&
+                   DriverType == dTO.DriverType &&
+                   DeliveryCarDealer == dTO.DeliveryCarDealer &&
+                   Country == dTO.Country &&
+                   PurchasingPrice == dTO.PurchasingPrice &&
+                   ((PurchaseItems == null && dTO.PurchaseItems == null) ||
+                    (PurchaseItems != null && dTO.PurchaseItems != null && PurchaseItems.SequenceEqual(dTO.PurchaseItems)));
+        }
     }
 }
-
