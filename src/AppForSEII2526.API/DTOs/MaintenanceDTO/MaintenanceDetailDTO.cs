@@ -20,27 +20,17 @@
             TotalPrice = totalPrice;
             Maintenances = maintenances;
         }
-        public override bool Equals(object? obj)
+        public override bool Equals(object obj)
         {
-            if (obj is not MaintenanceDetailDTO other)
-                return false;
-
-            if (Id != other.Id ||
-                ClientId != other.ClientId ||
-                PaymentMethod != other.PaymentMethod ||
-                TotalPrice != other.TotalPrice)
-                return false;
-
-            if (Maintenances.Count != other.Maintenances.Count)
-                return false;
-
-            for (int i = 0; i < Maintenances.Count; i++)
+            if (obj is MaintenanceDetailDTO other)
             {
-                if (!Maintenances[i].Equals(other.Maintenances[i]))
-                    return false;
+                return this.Id == other.Id &&
+                       this.ClientId == other.ClientId &&
+                       this.PaymentMethod == other.PaymentMethod &&
+                       this.TotalPrice == other.TotalPrice &&
+                       this.Maintenances.SequenceEqual(other.Maintenances);
             }
-
-            return true;
+            return false;
         }
     }
 }

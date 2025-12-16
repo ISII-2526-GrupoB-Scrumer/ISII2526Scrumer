@@ -129,12 +129,18 @@ namespace AppForSEII2526
         {
             var controller = new MaintenanceController(_context, null);
 
+            // ===== EXPECTED =====
+            var expected = new List<MaintenanceSelectDTO>();
+
+            // ===== ACT =====
             var result = await controller.GetMaintenances("NoExiste", null);
 
             var ok = Assert.IsType<OkObjectResult>(result);
             var actual = Assert.IsType<List<MaintenanceSelectDTO>>(ok.Value);
 
-            Assert.Empty(actual);
+            // ===== ASSERT =====
+            Assert.Equal(expected, actual);
         }
+
     }
 }
