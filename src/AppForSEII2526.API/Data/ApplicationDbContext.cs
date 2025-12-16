@@ -23,6 +23,9 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<BookingItem> BookingItem { get; set; }
     public DbSet<ApplicationUser> ApplicationUsers { get; set; }
 
+    
+    public DbSet<MaintenanceType> MaintenanceTypes { get; set; }
+
 
 
 }
