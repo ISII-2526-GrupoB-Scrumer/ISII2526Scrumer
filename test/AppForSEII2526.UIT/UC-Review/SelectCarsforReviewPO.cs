@@ -50,5 +50,33 @@ namespace AppForSEII2526.UIT.UC_Review
             WaitForBeingClickable(buttonContinue);
             _driver.FindElement(buttonContinue).Click();
         }
+
+        public bool IsCarShownByModel(string modelName)
+        {
+            var row = By.Id($"CarData_{modelName}");
+            try
+            {
+                WaitForBeingVisible(row);
+                return _driver.FindElement(row).Displayed;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public bool IsCarNotShownByModel(string modelName)
+        {
+            var row = By.Id($"CarData_{modelName}");
+            try
+            {
+                return !_driver.FindElement(row).Displayed;
+            }
+            catch (NoSuchElementException)
+            {
+                return true;
+            }
+        }
+
     }
 }

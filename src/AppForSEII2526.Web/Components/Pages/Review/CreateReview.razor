@@ -47,6 +47,7 @@
         <div class="col-md">
             <div class="form-floating">
             <InputSelect class="form-select" @bind-Value="review.DriverType" id="Drivertype">
+                <option value=""></option>
                 <option value="Novato">Novato</option>
                 <option value="Experto">Experto</option>
             </InputSelect>
@@ -149,7 +150,7 @@
 
         if (review.ReviewItems.Count == 0)
         {
-            messageError = "You must review at least one car.";
+            messageError = "Debes de reseñar al menos un coche.";
             return;
         }
 

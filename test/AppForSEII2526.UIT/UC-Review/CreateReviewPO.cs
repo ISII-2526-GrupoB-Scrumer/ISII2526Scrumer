@@ -56,5 +56,28 @@ namespace AppForSEII2526.UIT.UC_Review
         {
             PressOkModalDialog();
         }
+
+        public bool IsErrorMessageDisplayed()
+        {
+            var errorElement = By.ClassName("error-message");
+            try
+            {
+                WaitForBeingVisible(errorElement);
+                return _driver.FindElement(errorElement).Displayed;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public void GoBackToSelectCars()
+        {
+            var modifyCarsButton = By.CssSelector("button.btn.btn-outline-primary");
+            WaitForBeingClickable(modifyCarsButton);
+            _driver.FindElement(modifyCarsButton).Click();
+        }
+
+
     }
 }
