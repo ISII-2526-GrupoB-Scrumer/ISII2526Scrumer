@@ -1,0 +1,115 @@
+﻿@page "/review/detailreview"
+
+@using Microsoft.AspNetCore.Authorization
+@using AppForSEII2526.Web.API
+@using AppForSEII2526
+
+@inject AppForSEII2526APIClient apiclient
+
+<h3>Detalles de la reseña</h3>
+
+@if (review == null)
+{
+    <p>@error</p>
+}
+else
+{
+    <table class="table table-borderless table-sm">
+        <tr>
+            <th>Nombre</th>
+            <td id="ReviewerName">@review.Name</td>
+        </tr>
+
+        <tr>
+            <th>País</th>
+            <td id="ReviewerCountry">@review.Country</td>
+        </tr>
+
+        <tr>
+            <th>Tipo de Conductor</th>
+            <td id="ReviewerDriverType">@review.DriverType</td>
+        </tr>
+
+        <tr>
+            <th>Fecha</th>
+            <td id="ReviewDate">@review.Created.ToString("dd/MM/yyyy HH:mm:ss")</td>
+        </tr>
+    </table>
+
+    <h4>Coches reseñados</h4>
+
+    <table class="table" id="ReviewedCars">
+        <thead>
+            <tr>
+                <th>Modelo</th>
+                <th>Fabricante</th>
+                <th>Tipo Combustible</th>
+                <th>Color</th>
+                <th>Descripción</th>
+                <th>Puntuación</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var item in review.ReviewItems)
+            {
+                <tr id="ReviewItem_@item.CarId">
+                    <td>@item.CarModel</td>
+                    <td>@item.Manufacturer</td>
+                    <td>@item.FuelType</td>
+                    <td>@item.Color</td>
+                    <td>@item.Description</td>
+                    <td>@item.Rating</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+
+
+
+@code {
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public int ReviewID { get; set; }
+
+    private ReviewDetailDTO? review;
+    private string error = "";
+
+    [CascadingParameter]
+    private Task<AuthenticationState>? authenticationState { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        // 1. Comprobar si el usuario está logueado
+        string userId = "";
+
+        if (authenticationState is not null)
+        {
+            var authState = await authenticationState;
+            var user = authState?.User;
+
+            if (user != null && user.Identity != null && user.Identity.IsAuthenticated)
+            {
+                userId = user.Identity.Name;
+            }
+        }
+
+        // 2. Llamar al API para obtener la review
+        try
+        {
+            review = await apiclient.GetReviewAsync(ReviewID);
+        }
+        catch (ApiException ex)
+        {
+            review = null;
+        }
+
+        // 3. Comprobar si la review es del usuario actual
+        if (review == null || review.ClientId != userId)
+        {
+            error = $"Error: No estás autorizado o no existe la review con ID={ReviewID}";
+        }
+    }
+}
