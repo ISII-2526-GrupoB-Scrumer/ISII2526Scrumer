@@ -1,24 +1,25 @@
-﻿namespace AppForSEII2526.API.DTOs.MaintenanceDTO
+﻿namespace AppForSEII2526
 {
-    public class MaintenanceDetailDTO : MaintenanceCreateDTO
+    public class MaintenanceDetailDTO : MaintenanceForCreateDTO
     {
         public int Id { get; set; }
-        public string ClientId { get; set; }
-        public string PaymentMethod { get; set; }
-        public DateTime Date { get; set; }
-        public decimal TotalPrice { get; set; }
-        public List<MaintenanceItemDTO> Maintenances { get; set; }
 
-        public MaintenanceDetailDTO() { }
-
-        public MaintenanceDetailDTO(int id, string clientId, string paymentMethod, DateTime date, decimal totalPrice, List<MaintenanceItemDTO> maintenances)
+        public MaintenanceDetailDTO(int id, string applicationUser, string clientAddress, string paymentMethod, DateTime date, IList<ReservaItemDTO> reservaItems)
+        : base(applicationUser, clientAddress, paymentMethod, date, reservaItems)
         {
             Id = id;
-            ClientId = clientId;
-            PaymentMethod = paymentMethod;
-            Date = date;
-            TotalPrice = totalPrice;
-            Maintenances = maintenances;
+        }
+        public override bool Equals(object? obj)
+        {
+            return obj is MaintenanceDetailDTO dTO &&
+                Id == dTO.Id &&
+                base.Equals(obj) &&
+                TotalPrice == dTO.TotalPrice;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(base.GetHashCode(), Id);
         }
     }
 }
