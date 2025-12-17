@@ -16,6 +16,14 @@
             PurchasingPrice = purchasingPrice;
             Quantity = quantity;
         }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is PurchaseItemDTO dTO &&
+                   CarId == dTO.CarId &&
+                   CarModel == dTO.CarModel &&
+                   PurchasingPrice == dTO.PurchasingPrice &&
+                   Quantity == dTO.Quantity;
+        }
     }
 }
-

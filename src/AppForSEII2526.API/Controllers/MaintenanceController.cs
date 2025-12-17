@@ -1,7 +1,7 @@
-﻿using AppForSEII2526.API.DTOs.MaintenanceDTO;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
+using AppForSEII2526; // Namespace de tus nuevos DTOs
 
 namespace AppForSEII2526.API.Controllers
 {
@@ -10,47 +10,50 @@ namespace AppForSEII2526.API.Controllers
     public class MaintenanceController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
-        private readonly ILogger<MaintenanceController> _logger;
 
-        public MaintenanceController(ApplicationDbContext context, ILogger<MaintenanceController> logger)
+        public MaintenanceController(ApplicationDbContext context)
         {
             _context = context;
-            _logger = logger;
         }
 
-        // ===============================================================
-        // Paso 2 (Select): mostrar mantenimientos disponibles
-        // Flujo alternativo al paso 2: filtro por nombre y tipo
-        // ===============================================================
+        // Paso 2: Listar mantenimientos con filtros
         [HttpGet]
         [Route("[action]")]
-        [ProducesResponseType(typeof(IList<MaintenanceSelectDTO>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(IList<MantenimientoDTO>), (int)HttpStatusCode.OK)]
         public async Task<ActionResult> GetMaintenances(string? nombre, string? tipo)
         {
-            
-            var query = await _context.Maintenance
-                .Include(m => m.MaintenanceTypes)
-                .Where(m =>
-                    (nombre == null || m.Name.Contains(nombre)) &&
-                    (tipo == null || m.MaintenanceTypes.Any(t => t.Type.Contains(tipo)))
-                )
-                .Select(m => new MaintenanceSelectDTO(
+            var query = _context.Maintenance.AsQueryable();
+
+            if (!string.IsNullOrEmpty(nombre))
+                query = query.Where(m => m.Name.Contains(nombre));
+
+            if (!string.IsNullOrEmpty(tipo))
+                query = query.Where(m => m.MaintenanceTypes.Any(t => t.Type.Contains(tipo)));
+
+            // Extraemos a objeto anónimo para evitar errores de traducción de LINQ
+            var data = await query
+                .Select(m => new
+                {
                     m.Id,
                     m.Name,
-                    m.MaintenanceTypes.Select(t => t.Type).FirstOrDefault() ?? "Sin tipo",
+                    TipoPrincipal = m.MaintenanceTypes.Select(t => t.Type).FirstOrDefault() ?? "General",
                     m.Price,
                     m.NumberOfDays
-                ))
-                .ToListAsync();    
+                })
+                .ToListAsync();
 
-            
-            var ordered = query
-                .OrderBy(m => m.Name)
-                .ThenBy(m => m.Price) 
-                .ToList();
+            // Mapeo al DTO final (MaintenanceSelectDTO.cs)
+            var result = data.Select(d => new MantenimientoDTO(
+                d.Id,
+                d.Name,
+                d.TipoPrincipal,
+                (double)d.Price,
+                d.NumberOfDays
+            ))
+            .OrderBy(m => m.Nombre)
+            .ToList();
 
-            return Ok(ordered);
+            return Ok(result);
         }
-
     }
 }
