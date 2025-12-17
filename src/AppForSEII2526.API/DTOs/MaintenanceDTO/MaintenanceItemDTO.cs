@@ -1,24 +1,35 @@
-﻿namespace AppForSEII2526.API.DTOs.MaintenanceDTO
+﻿namespace AppForSEII2526
 {
-    public class MaintenanceItemDTO
+    public class ReservaItemDTO
     {
-        public int MaintenanceId { get; set; }
-        public string MaintenanceName { get; set; } = string.Empty;
-        public string Type { get; set; } = string.Empty;
-        public decimal Price { get; set; }
+        public int ReservaId { get; set; }
+        public double Price { get; set; }
         public int NumberOfDays { get; set; }
-        public string Comment { get; set; } = string.Empty;
+        public string Comentarios { get; set; }
+        public string Name { get; set; }
 
-        public MaintenanceItemDTO() { }
-
-        public MaintenanceItemDTO(int maintenanceId, string maintenanceName, string type, decimal price, int numberOfDays, string comment)
+        public ReservaItemDTO(int reservaId, string name, double price, int numberofdays, string comentarios = "")
         {
-            MaintenanceId = maintenanceId;
-            MaintenanceName = maintenanceName;
-            Type = type;
+            ReservaId = reservaId;
+            Name = name;
             Price = price;
-            NumberOfDays = numberOfDays;
-            Comment = comment;
+            NumberOfDays = numberofdays;
+            Comentarios = comentarios;
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is ReservaItemDTO dTO &&
+                   ReservaId == dTO.ReservaId &&
+                   Price == dTO.Price &&
+                   NumberOfDays == dTO.NumberOfDays &&
+                   Comentarios == dTO.Comentarios &&
+                   Name == dTO.Name;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(ReservaId, Price, NumberOfDays, Comentarios, Name);
         }
     }
 }

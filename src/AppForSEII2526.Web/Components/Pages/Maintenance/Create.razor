@@ -1,0 +1,59 @@
+﻿@page "/maintenance/create"
+@inject MaintenanceStateContainer State
+@inject HttpClient Http
+@inject NavigationManager Nav
+
+<h3>Datos de la Reserva</h3>
+
+<EditForm Model="State.CurrentBooking" OnValidSubmit="ConfirmarCompra">
+    <DataAnnotationsValidator />
+
+    <div class="mb-3">
+        <label>Usuario (ApplicationUser):</label>
+        <InputText @bind-Value="State.CurrentBooking.ApplicationUser" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label>Dirección:</label>
+        <InputText @bind-Value="State.CurrentBooking.ClientAddress" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label>Teléfono (Opcional):</label>
+        <InputText @bind-Value="State.CurrentBooking.PhoneNumber" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label>Método de Pago:</label>
+        <InputSelect @bind-Value="State.CurrentBooking.PaymentMethod" class="form-control">
+            <option value="">Seleccione...</option>
+            <option value="tarjeta de crédito">Tarjeta de Crédito</option>
+            <option value="Paypal">Paypal</option>
+            <option value="metálico">Metálico</option>
+        </InputSelect>
+    </div>
+
+    <h4>Comentarios por mantenimiento (Obligatorio)</h4>
+    @foreach (var item in State.CurrentBooking.ReservaItems)
+    {
+        <div class="card mb-2 p-2">
+            <label><strong>@item.Name</strong></label>
+            <InputTextArea @bind-Value="item.Comentarios" class="form-control" placeholder="Escribe aquí el comentario..." />
+        </div>
+    }
+
+    <button type="submit" class="btn btn-primary mt-3">Contratar Mantenimientos</button>
+    <button type="button" class="btn btn-secondary mt-3" @onclick='() => Nav.NavigateTo("/mantenimiento/seleccionar")'>
+        Modificar selección
+    </button>
+</EditForm>
+
+@code {
+    private async Task ConfirmarCompra()
+    {
+        var response = await Http.PostAsJsonAsync("api/Booking/CreateBooking", State.CurrentBooking);
+        if (response.IsSuccessStatusCode)
+        {
+            var result = await response.Content.ReadFromJsonAsync<MaintenanceDetailDTO>();
+            Nav.NavigateTo($"/mantenimiento/detalle/{result.Id}");
+            State.Reset();
+        }
+    }
+}
