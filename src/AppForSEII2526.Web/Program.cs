@@ -1,4 +1,6 @@
-using AppForSEII2526;
+using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using AppForSEII2526.Web.Components;
 using AppForSEII2526.Web.Components.Account;
 using AppForSEII2526.Web.Data;
@@ -6,8 +8,6 @@ using AppForSEII2526.Web.API;
 using AppForSEII2526.Web;
 
 var builder = WebApplication.CreateBuilder(args);
-
-builder.Services.AddScoped<MaintenanceStateContainer>();
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
@@ -19,10 +19,10 @@ builder.Services.AddScoped<IdentityRedirectManager>();
 builder.Services.AddScoped<AuthenticationStateProvider, IdentityRevalidatingAuthenticationStateProvider>();
 
 builder.Services.AddAuthentication(options =>
-{
-    options.DefaultScheme = IdentityConstants.ApplicationScheme;
-    options.DefaultSignInScheme = IdentityConstants.ExternalScheme;
-})
+    {
+        options.DefaultScheme = IdentityConstants.ApplicationScheme;
+        options.DefaultSignInScheme = IdentityConstants.ExternalScheme;
+    })
     .AddIdentityCookies();
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
@@ -37,6 +37,7 @@ builder.Services.AddIdentityCore<AppForSEII2526.Web.Data.ApplicationUser>(option
 
 builder.Services.AddSingleton<IEmailSender<AppForSEII2526.Web.Data.ApplicationUser>, IdentityNoOpEmailSender>();
 
+
 //this variable obtains the url where the API has been deployed
 string? URI2API = builder.Configuration.GetValue(typeof(string), "AppForSEII2526_API") as string;
 
@@ -45,7 +46,6 @@ builder.Services.AddScoped<AppForSEII2526APIClient>(sp => new AppForSEII2526APIC
 
 builder.Services.AddScoped<ReviewStateContainer>();
 builder.Services.AddScoped<RentalStateContainer>();
-builder.Services.AddScoped<PurchaseStateContainer>();
 
 var app = builder.Build();
 
@@ -73,6 +73,3 @@ app.MapRazorComponents<App>()
 app.MapAdditionalIdentityEndpoints();
 
 app.Run();
-
-// Expose Program class for WebApplicationFactory
-public partial class Program { }
