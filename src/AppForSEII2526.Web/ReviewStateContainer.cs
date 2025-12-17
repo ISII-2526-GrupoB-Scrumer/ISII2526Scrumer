@@ -28,7 +28,7 @@ namespace AppForSEII2526.Web
                     FuelType = car.FuelType,
                     Color = car.Color,
                     Description = string.Empty,  // lo rellenará el usuario
-                    Rating = 0                   // lo rellenará el usuario
+                    Rating = 1                   // lo rellenará el usuario
                 });
             }
 
