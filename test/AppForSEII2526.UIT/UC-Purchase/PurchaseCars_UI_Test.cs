@@ -1,5 +1,4 @@
-﻿using AppForMovies.UIT.Shared;
-using AppForSEII2526.UIT.PageObjects.Purchase;
+﻿using AppForSEII2526.UIT.PageObjects.Purchase;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
