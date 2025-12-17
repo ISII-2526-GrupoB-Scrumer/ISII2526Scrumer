@@ -117,7 +117,7 @@ namespace AppForSEII2526.UIT.UC_Purchase
         }
 
         [Fact]
-        public void UC1_VisaSuccessfulPurchase_FlowWorksCorrectly()
+        public void UC1_VisaSuccessfulPurchase_FlowWorksCorrectly() //
         {
             // Abre la página de selección de coches
             Initial_step_opening_the_web_page();
@@ -128,17 +128,17 @@ namespace AppForSEII2526.UIT.UC_Purchase
             purchaseCars.AddFirstCar();
             purchaseCars.Continue();
 
-            // Completar el formulario de compra con todos los datos correctos
+            // Completar el formulario (FillPurchaseForm YA HACE EL CLICK INTERNAMENTE)
             FillPurchaseForm(
-                delivery: "Madrid Center",      // Dirección de entrega válida
-                payment: "Visa",               // Método de pago válido
-                driver: "Experienced",         // Tipo de conductor válido
-                country: "Spain",              // País válido
-                date: DateTime.Now.AddDays(1)  // Fecha válida para la compra
+                delivery: "Madrid Center",
+                payment: "Visa",
+                driver: "Experienced",
+                country: "Spain",
+                date: DateTime.Now.AddDays(1)
             );
 
-            // Confirmar la compra
-            _driver.FindElement(By.XPath("//button[contains(text(),'Confirm Purchase')]")).Click();
+            // ❌ BORRA ESTA LÍNEA QUE CAUSA EL ERROR:
+            // _driver.FindElement(By.XPath("//button[contains(text(),'Confirm Purchase')]")).Click();
 
             // Esperar a la redirección a la página de detalles de compra
             var wait = new WebDriverWait(_driver, TimeSpan.FromSeconds(15));
@@ -160,7 +160,7 @@ namespace AppForSEII2526.UIT.UC_Purchase
             purchaseCars.AddFirstCar();
             purchaseCars.Continue();
 
-            // Completar el formulario de compra con todos los datos correctos
+            // Completar el formulario (FillPurchaseForm YA HACE EL CLICK DE CONFIRMAR)
             FillPurchaseForm(
                 delivery: "Madrid Center",      // Dirección de entrega válida
                 payment: "MasterCard",          // Método de pago válido (MasterCard)
@@ -169,8 +169,8 @@ namespace AppForSEII2526.UIT.UC_Purchase
                 date: DateTime.Now.AddDays(1)   // Fecha válida para la compra
             );
 
-            // Confirmar la compra
-            _driver.FindElement(By.XPath("//button[contains(text(),'Confirm Purchase')]")).Click();
+            // ❌ LÍNEA ELIMINADA:
+            // _driver.FindElement(By.XPath("//button[contains(text(),'Confirm Purchase')]")).Click();
 
             // Esperar a la redirección a la página de detalles de compra
             var wait = new WebDriverWait(_driver, TimeSpan.FromSeconds(15));
@@ -214,6 +214,7 @@ namespace AppForSEII2526.UIT.UC_Purchase
         }
 
 
+        
         [Fact]
         public void UC1_SuccessfulPurchase_WithBankTransfer_FlowWorksCorrectly()
         {
@@ -226,17 +227,17 @@ namespace AppForSEII2526.UIT.UC_Purchase
             purchaseCars.AddFirstCar();
             purchaseCars.Continue();
 
-            // Completar el formulario de compra con todos los datos correctos
+            // Completar el formulario y confirmar (FillPurchaseForm ya hace el Click)
             FillPurchaseForm(
-                delivery: "Madrid Center",      // Dirección de entrega válida
-                payment: "Bank Transfer",       // Método de pago válido (Bank Transfer)
-                driver: "Experienced",          // Tipo de conductor válido
-                country: "Spain",               // País válido
-                date: DateTime.Now.AddDays(1)   // Fecha válida para la compra
+                delivery: "Madrid Center",
+                payment: "Bank Transfer",
+                driver: "Experienced",
+                country: "Spain",
+                date: DateTime.Now.AddDays(1)
             );
 
-            // Confirmar la compra
-            _driver.FindElement(By.XPath("//button[contains(text(),'Confirm Purchase')]")).Click();
+            // BORRA ESTA LÍNEA:
+            // _driver.FindElement(By.XPath("//button[contains(text(),'Confirm Purchase')]")).Click();
 
             // Esperar a la redirección a la página de detalles de compra
             var wait = new WebDriverWait(_driver, TimeSpan.FromSeconds(15));
@@ -420,11 +421,11 @@ public void UC_FilterByModel_Civic_DisplaysOnlyCivic()
         }
 
         private void FillPurchaseForm(
-            string delivery,
-            string payment,
-            string driver,
-            string country,
-            DateTime? date)
+    string? delivery,  // Añade ? aquí
+    string? payment,   // Añade ? aquí
+    string? driver,    // Añade ? aquí
+    string? country,   // Añade ? aquí
+    DateTime? date)    // Este ya estaba bien
         {
             if (!string.IsNullOrEmpty(delivery))
                 _driver.FindElement(By.CssSelector("input[placeholder='e.g. Madrid Center']"))

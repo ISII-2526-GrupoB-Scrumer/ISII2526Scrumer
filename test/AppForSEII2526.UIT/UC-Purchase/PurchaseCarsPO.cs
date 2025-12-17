@@ -21,23 +21,60 @@ namespace AppForSEII2526.UIT.PageObjects.Purchase
 
         public void AddFirstCar()
         {
+            // Esperar primero a que la tabla aparezca
             _wait.Until(ExpectedConditions.ElementExists(By.CssSelector("table")));
-            var addButton = _wait.Until(
-                ExpectedConditions.ElementToBeClickable(
-                    By.XPath("//table/tbody/tr[1]//button[contains(text(),'Add')]")
-                )
-            );
-            addButton.Click();
+
+            // Usamos una lógica de reintento: Busca Y Clickea en el mismo paso.
+            // Si el elemento da error (Stale), el Wait lo vuelve a intentar automáticamente.
+            _wait.Until(driver =>
+            {
+                try
+                {
+                    var addButton = driver.FindElement(By.XPath("//table/tbody/tr[1]//button[contains(text(),'Add')]"));
+
+                    if (addButton.Displayed && addButton.Enabled)
+                    {
+                        addButton.Click();
+                        return true; // Éxito, salimos del bucle
+                    }
+                    return false; // Todavía no está listo, reintentar
+                }
+                catch (StaleElementReferenceException)
+                {
+                    return false; // El elemento cambió, reintentar
+                }
+                catch (NoSuchElementException)
+                {
+                    return false; // No encontrado aún, reintentar
+                }
+            });
         }
 
         public void Continue()
         {
-            var continueButton = _wait.Until(
-                ExpectedConditions.ElementToBeClickable(
-                    By.XPath("//button[contains(text(),'Continue')]")
-                )
-            );
-            continueButton.Click();
+            // Aplicamos la misma lógica robusta para el botón Continuar
+            _wait.Until(driver =>
+            {
+                try
+                {
+                    var continueButton = driver.FindElement(By.XPath("//button[contains(text(),'Continue')]"));
+
+                    if (continueButton.Displayed && continueButton.Enabled)
+                    {
+                        continueButton.Click();
+                        return true;
+                    }
+                    return false;
+                }
+                catch (StaleElementReferenceException)
+                {
+                    return false;
+                }
+                catch (NoSuchElementException)
+                {
+                    return false;
+                }
+            });
         }
     }
 }
