@@ -1,8 +1,12 @@
-﻿using System;
+﻿using AppForSEII2526.UIT.Shared;
+using OpenQA.Selenium;
+using OpenQA.Selenium.Support.UI;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Xunit.Abstractions;
 
 namespace AppForSEII2526.UIT.UC_Rental
 {
