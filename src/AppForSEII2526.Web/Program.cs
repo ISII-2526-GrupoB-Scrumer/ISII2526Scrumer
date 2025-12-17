@@ -1,11 +1,12 @@
-using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
+using AppForSEII2526;
+using AppForSEII2526.Web;
+using AppForSEII2526.Web.API;
 using AppForSEII2526.Web.Components;
 using AppForSEII2526.Web.Components.Account;
 using AppForSEII2526.Web.Data;
-using AppForSEII2526.Web.API;
-using AppForSEII2526.Web;
+using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -46,6 +47,7 @@ builder.Services.AddScoped<AppForSEII2526APIClient>(sp => new AppForSEII2526APIC
 
 builder.Services.AddScoped<ReviewStateContainer>();
 builder.Services.AddScoped<RentalStateContainer>();
+builder.Services.AddScoped<MaintenanceStateContainer>();
 
 var app = builder.Build();
 

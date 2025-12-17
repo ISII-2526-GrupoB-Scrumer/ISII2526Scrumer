@@ -30,7 +30,6 @@ namespace AppForSEII2526.API.Controllers
             if (!string.IsNullOrEmpty(tipo))
                 query = query.Where(m => m.MaintenanceTypes.Any(t => t.Type.Contains(tipo)));
 
-            // Extraemos a objeto anónimo para evitar errores de traducción de LINQ
             var data = await query
                 .Select(m => new
                 {
@@ -42,7 +41,6 @@ namespace AppForSEII2526.API.Controllers
                 })
                 .ToListAsync();
 
-            // Mapeo al DTO final (MaintenanceSelectDTO.cs)
             var result = data.Select(d => new MantenimientoDTO(
                 d.Id,
                 d.Name,
@@ -55,5 +53,6 @@ namespace AppForSEII2526.API.Controllers
 
             return Ok(result);
         }
+
     }
 }

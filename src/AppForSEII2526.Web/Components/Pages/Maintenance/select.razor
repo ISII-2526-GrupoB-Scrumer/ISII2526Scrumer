@@ -1,0 +1,115 @@
+﻿@page "/maintenance/selectmaintenance"
+@using AppForSEII2526
+@using AppForSEII2526.Web.API
+@implements IDisposable
+@inject AppForSEII2526APIClient apiclient
+@inject MaintenanceStateContainer maintenanceState
+@inject NavigationManager navigation
+
+<h3>Seleccionar Servicios de Mantenimiento</h3>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="row mb-3">
+                <div class="col">
+                    <input type="text" class="form-control" placeholder="Nombre..." @bind="nombreFilter" />
+                </div>
+                <div class="col">
+                    <input type="text" class="form-control" placeholder="Tipo..." @bind="tipoFilter" />
+                </div>
+                <div class="col">
+                    <button class="btn btn-primary" @onclick="Search">Buscar</button>
+                </div>
+            </div>
+
+            @if (maintenances == null)
+            {
+                <p>Cargando servicios...</p>
+            }
+            else
+            {
+                <table class="table table-hover" id="TableOfMaintenanceItems">
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Tipo</th>
+                            <th>Precio</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var m in maintenances)
+                        {
+                            <tr>
+                                <td>@m.Nombre</td>
+                                <td>@m.Tipo</td>
+                                <td>@m.Precio.ToString("C")</td>
+                                <td>
+                                    <button class="btn btn-success btn-sm" @onclick="() => AddMaintenanceToCart(m)">Añadir</button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+
+        <div class="col-md-4" hidden="@(maintenanceState.Maintenance.ReservaItems.Count == 0)">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5>Servicios Seleccionados</h5>
+                    <ul class="list-group list-group-flush mb-3">
+                        @foreach (var item in maintenanceState.Maintenance.ReservaItems)
+                        {
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                @item.Name (x@item.NumberOfDays) @* Corregido: MaintenanceName *@
+                                <button class="btn btn-danger btn-sm" @onclick="() => RemoveMaintenanceItem(item)">x</button>
+                            </li>
+                        }
+                    </ul>
+                    <strong>Total: @maintenanceState.TotalPrice.ToString("C")</strong>
+                    <button class="btn btn-primary w-100 mt-3" @onclick='() => navigation.NavigateTo("/maintenance/createmaintenance")'>Continuar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private string? nombreFilter;
+    private string? tipoFilter;
+    private ICollection<AppForSEII2526.MantenimientoDTO>? maintenances;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Suscribirse para actualizar la UI cuando cambie el estado
+        maintenanceState.OnChange += StateHasChanged;
+        await Search();
+    }
+
+    public void Dispose()
+    {
+        // Desuscribirse al destruir el componente
+        maintenanceState.OnChange -= StateHasChanged;
+    }
+
+    private async Task Search()
+    {
+        // Solución: convertir explícitamente cada elemento al tipo correcto
+        var apiMaintenances = await apiclient.GetMaintenancesAsync(nombreFilter, tipoFilter);
+        maintenances = apiMaintenances
+            .Select(m => new AppForSEII2526.MantenimientoDTO(m.Id, m.Nombre, m.Tipo, m.Precio, m.NumeroDias))
+            .ToList();
+    }
+
+    private void AddMaintenanceToCart(AppForSEII2526.MantenimientoDTO maintenance)
+    {
+        maintenanceState.AddMaintenanceToCreate(maintenance);
+    }
+
+    private void RemoveMaintenanceItem(AppForSEII2526.ReservaItemDTO item)
+    {
+        maintenanceState.RemoveMaintenanceItem(item);
+    }
+}
