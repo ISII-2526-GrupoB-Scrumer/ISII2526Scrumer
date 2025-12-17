@@ -1,7 +1,8 @@
-﻿using AppForSEII2526.API.DTOs.MaintenanceDTO;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
+using AppForSEII2526; // Namespace donde están tus DTOs
+using AppForSEII2526.API.Models; // Namespace donde están tus modelos
 
 namespace AppForSEII2526.API.Controllers
 {
@@ -18,156 +19,128 @@ namespace AppForSEII2526.API.Controllers
             _logger = logger;
         }
 
-        // ===========================================================
-        // GET Booking (Paso 7 del caso de uso)
-        // Muestra el detalle de una contratación de mantenimiento
-        // ===========================================================
         [HttpGet]
         [Route("[action]")]
         [ProducesResponseType(typeof(MaintenanceDetailDTO), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public async Task<ActionResult> GetBooking(int id)
         {
-            if (id < 0)
-            {
-                return NotFound();
-            }
-            if (_context.Booking == null)
-            {
-                _logger.LogError("Error: Booking table does not exist");
-                return NotFound();
-            }
+            if (id < 0) return NotFound();
 
-            
-            var bookingEntity = await _context.Booking
+            // Usamos una proyección para evitar el error de columna errónea en BookingItem
+            var bookingData = await _context.Booking
                 .Where(b => b.Id == id)
-                .Include(b => b.Items)
-                    .ThenInclude(bi => bi.Maintenance)
-                        .ThenInclude(m => m.MaintenanceTypes)
-                .Include(b => b.Client)
+                .Select(b => new
+                {
+                    b.Id,
+                    b.Date,
+                    b.PaymentMethod,
+                    User = b.Client.UserName,
+                    Address = b.Client.ClientAddress,
+                    Items = b.Items.Select(bi => new
+                    {
+                        bi.MaintenanceID,
+                        MaintName = bi.Maintenance.Name,
+                        MaintPrice = bi.Maintenance.Price,
+                        MaintDays = bi.Maintenance.NumberOfDays,
+                        bi.Comment
+                    }).ToList()
+                })
                 .FirstOrDefaultAsync();
 
-            if (bookingEntity == null)
-            {
-                _logger.LogError($"Error: Booking with id {id} does not exist");
-                return NotFound();
-            }
+            if (bookingData == null) return NotFound();
 
-            
-            var totalPrice = bookingEntity.Items.Sum(bi => bi.Maintenance.Price);
+            var reservaItems = bookingData.Items.Select(i => new ReservaItemDTO(
+                i.MaintenanceID,
+                i.MaintName,
+                (double)i.MaintPrice,
+                i.MaintDays,
+                i.Comment
+            )).ToList();
 
-            
-            var bookingDTO = new MaintenanceDetailDTO(
-                bookingEntity.Id,
-                bookingEntity.Client.Id,
-                bookingEntity.PaymentMethod,
-                bookingEntity.Date,
-                totalPrice,
-                bookingEntity.Items.Select(bi => new MaintenanceItemDTO(
-                    bi.Maintenance.Id,
-                    bi.Maintenance.Name ?? "Desconocido",
-                    bi.Maintenance.MaintenanceTypes != null ?
-                        string.Join(", ", bi.Maintenance.MaintenanceTypes.Select(mt => mt.Type)) :
-                        "Desconocido",
-                    bi.Maintenance.Price,
-                    bi.Maintenance.NumberOfDays,
-                    bi.Comment
-                )).ToList()
-            );
-
-            return Ok(bookingDTO);
+            return Ok(new MaintenanceDetailDTO(
+                bookingData.Id,
+                bookingData.User,
+                bookingData.Address,
+                bookingData.PaymentMethod,
+                bookingData.Date,
+                reservaItems
+            ));
         }
 
-
-        // ===========================================================
-        // POST Booking (Paso 5 del caso de uso)
-        // Crea una contratación de mantenimiento
-        // ===========================================================
         [HttpPost]
         [Route("[action]")]
         [ProducesResponseType(typeof(MaintenanceDetailDTO), (int)HttpStatusCode.Created)]
         [ProducesResponseType(typeof(ValidationProblemDetails), (int)HttpStatusCode.BadRequest)]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.Conflict)]
-        public async Task<ActionResult> CreateBooking(MaintenanceCreateDTO bookingCreate)
+        public async Task<ActionResult> CreateBooking(MaintenanceForCreateDTO bookingCreate)
         {
-            // Validaciones iniciales básicas
-            if (bookingCreate.MaintenanceItems == null || bookingCreate.MaintenanceItems.Count == 0)
-                ModelState.AddModelError("MaintenanceItems", "Debe seleccionar al menos un mantenimiento.");
+            if (bookingCreate.ReservaItems == null || !bookingCreate.ReservaItems.Any())
+            {
+                ModelState.AddModelError("ReservaItems", "Debe seleccionar al menos un mantenimiento.");
+                return BadRequest(new ValidationProblemDetails(ModelState));
+            }
 
+            // 1. Buscamos al usuario 'carlitos_l' en la base de datos
             var user = await _context.ApplicationUsers
-                .FirstOrDefaultAsync(u => u.UserName == bookingCreate.ClientId);
+                .FirstOrDefaultAsync(u => u.UserName == bookingCreate.ApplicationUser);
 
             if (user == null)
-                ModelState.AddModelError("Client", "El usuario indicado no existe.");
+            {
+                return BadRequest("El usuario indicado no existe en la base de datos.");
+            }
 
-            if (ModelState.ErrorCount > 0)
-                return BadRequest(new ValidationProblemDetails(ModelState));
-
-            
+            // 2. Creamos la entidad vinculándola al objeto 'user'
             var booking = new Booking
             {
-                Date = DateTime.Now,
+                Date = bookingCreate.Date,
                 PaymentMethod = bookingCreate.PaymentMethod,
-                Client = user!,
-                ClientId = user!.Id,
+                Client = user, // ESTO EVITA EL ERROR 409
                 Items = new List<BookingItem>()
             };
 
-            decimal total = 0;
-
-            foreach (var item in bookingCreate.MaintenanceItems)
+            foreach (var itemDto in bookingCreate.ReservaItems)
             {
-                var maintenance = await _context.Maintenance.FindAsync(item.MaintenanceId);
+                // El campo 'reservaId' del JSON es el ID del mantenimiento
+                var maintenance = await _context.Maintenance.FindAsync(itemDto.ReservaId);
+                if (maintenance == null) continue;
 
-                if (maintenance == null)
+                // Validación de comentario obligatorio 
+                if (string.IsNullOrWhiteSpace(itemDto.Comentarios) || itemDto.Comentarios == "null")
                 {
-                    ModelState.AddModelError("MaintenanceItems", $"El mantenimiento con ID {item.MaintenanceId} no existe.");
+                    ModelState.AddModelError("Comentarios", $"El comentario para {maintenance.Name} es obligatorio.");
                     continue;
                 }
 
                 booking.Items.Add(new BookingItem
                 {
                     MaintenanceID = maintenance.Id,
-                    Comment = item.Comment,
+                    Comment = itemDto.Comentarios
                 });
-
-                total += maintenance.Price;
             }
 
-            if (ModelState.ErrorCount > 0)
-                return BadRequest(new ValidationProblemDetails(ModelState));
+            if (!ModelState.IsValid) return BadRequest(new ValidationProblemDetails(ModelState));
 
             try
             {
                 _context.Booking.Add(booking);
                 await _context.SaveChangesAsync();
+
+                // Retornamos el DTO de detalle con el ID generado automáticamente
+                var detail = new MaintenanceDetailDTO(
+                    booking.Id,
+                    user.UserName,
+                    user.ClientAddress,
+                    booking.PaymentMethod,
+                    booking.Date,
+                    bookingCreate.ReservaItems
+                );
+
+                return CreatedAtAction(nameof(GetBooking), new { id = booking.Id }, detail);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error guardando la reserva de mantenimiento.");
-                return Conflict("Error al guardar la reserva. Inténtalo más tarde.");
+                _logger.LogError(ex, "Error de integridad SQL");
+                return Conflict("Error al procesar la reserva: comprueba que el usuario y los mantenimientos son válidos.");
             }
-
-            
-            var detailDTO = new MaintenanceDetailDTO(
-                booking.Id,
-                booking.Client.UserName,
-                booking.PaymentMethod,
-                booking.Date,
-                booking.Items.Sum(bi => bi.Maintenance.Price),
-                booking.Items.Select(bi => new MaintenanceItemDTO(
-                    bi.Maintenance.Id,
-                    bi.Maintenance.Name ?? "Desconocido",
-                    bi.Maintenance.MaintenanceTypes != null ?
-                        string.Join(", ", bi.Maintenance.MaintenanceTypes.Select(mt => mt.Type)) :
-                        "Desconocido",
-                    bi.Maintenance.Price,
-                    bi.Maintenance.NumberOfDays,
-                    bi.Comment
-                )).ToList()
-            );
-
-            return CreatedAtAction(nameof(GetBooking), new { id = booking.Id }, detailDTO);
         }
     }
 }

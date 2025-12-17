@@ -1,0 +1,73 @@
+﻿@page "/maintenance/select"
+@inject HttpClient Http
+@inject MaintenanceStateContainer State
+@inject NavigationManager Nav
+
+<h3>Seleccionar Mantenimientos</h3>
+
+<div class="row mb-3">
+    <div class="col">
+        <input @bind="filtroNombre" class="form-control" placeholder="Filtrar por nombre..." />
+    </div>
+    <div class="col">
+        <input @bind="filtroTipo" class="form-control" placeholder="Filtrar por tipo..." />
+    </div>
+    <div class="col">
+        <button class="btn btn-primary" @onclick="CargarMantenimientos">Buscar</button>
+    </div>
+</div>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Tipo</th>
+            <th>Precio</th>
+            <th>Días</th>
+            <th>Acción</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var m in mantenimientos)
+        {
+            <tr>
+                <td>@m.Nombre</td>
+                <td>@m.Tipo</td>
+                <td>@m.Precio.ToString("C")</td>
+                <td>@m.NumeroDias</td>
+                <td>
+                    <button class="btn btn-success" @onclick="() => Seleccionar(m)">Añadir</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div class="mt-4">
+    <h4>Carrito: @State.CurrentBooking.ReservaItems.Count servicios</h4>
+    <p>Precio Total: @State.CurrentBooking.TotalPrice.ToString("C")</p>
+    <button class="btn btn-info" disabled="@(!State.CurrentBooking.ReservaItems.Any())"
+            @onclick='() => Nav.NavigateTo("/mantenimiento/crear")'>
+        Reservar mantenimiento
+    </button>
+</div>
+
+@code {
+    private List<MantenimientoDTO> mantenimientos = new();
+    private string filtroNombre;
+    private string filtroTipo;
+
+    protected override async Task OnInitializedAsync() => await CargarMantenimientos();
+
+    private async Task CargarMantenimientos()
+    {
+        mantenimientos = await Http.GetFromJsonAsync<List<MantenimientoDTO>>(
+            $"api/Maintenance/GetMaintenances?nombre={filtroNombre}&tipo={filtroTipo}");
+    }
+
+    private void Seleccionar(MantenimientoDTO m)
+    {
+        State.AddMaintenance(m);
+        StateHasChanged();
+    }
+}
