@@ -106,8 +106,8 @@ namespace AppForSEII2526
                 120 + 90,
                 new List<MaintenanceItemDTO>
                 {
-                    new MaintenanceItemDTO(1,"Cambio aceite","Motor",120,1,"Todo correcto"),
-                    new MaintenanceItemDTO(2,"Cambio pastillas","Frenos",90,1,"Revisar desgaste")
+            new MaintenanceItemDTO(1,"Cambio aceite","Motor",120,1,"Todo correcto"),
+            new MaintenanceItemDTO(2,"Cambio pastillas","Frenos",90,1,"Revisar desgaste")
                 }
             );
 
@@ -116,28 +116,12 @@ namespace AppForSEII2526
             var okResult = Assert.IsType<OkObjectResult>(result);
             var dto = Assert.IsType<MaintenanceDetailDTO>(okResult.Value);
 
-            // Comprobaciones principales
-            Assert.Equal(expected.Id, dto.Id);
-            Assert.Equal(expected.ClientId, dto.ClientId);
-            Assert.Equal(expected.PaymentMethod, dto.PaymentMethod);
-            Assert.Equal(expected.TotalPrice, dto.TotalPrice);
-
-            // Items
-            Assert.Equal(2, dto.Maintenances.Count);
-
-            for (int i = 0; i < dto.Maintenances.Count; i++)
-            {
-                Assert.Equal(expected.Maintenances[i].MaintenanceId, dto.Maintenances[i].MaintenanceId);
-                Assert.Equal(expected.Maintenances[i].MaintenanceName, dto.Maintenances[i].MaintenanceName);
-                Assert.Equal(expected.Maintenances[i].Type, dto.Maintenances[i].Type);
-                Assert.Equal(expected.Maintenances[i].Price, dto.Maintenances[i].Price);
-            }
+            // Comprobaciones principales con un solo Assert
+            Assert.Equal(expected, dto); // Compara el DTO completo (expected vs actual)
         }
 
 
-        // =======================================================
-        // TEST 2 - Booking no encontrado
-        // =======================================================
+
         [Fact]
         [Trait("Database", "WithoutFixture")]
         [Trait("LevelTesting", "Unit Testing")]
@@ -148,7 +132,13 @@ namespace AppForSEII2526
 
             var result = await controller.GetBooking(-1);
 
-            Assert.IsType<NotFoundResult>(result);
+            // Expected y actual para el tipo de respuesta
+            var expected = typeof(NotFoundResult); // El tipo que esperamos
+            var actual = result.GetType(); // El tipo que obtenemos
+
+            // Assert con los parámetros expected y actual
+            Assert.Equal(expected, actual); // Compara el tipo esperado con el tipo real
         }
+
     }
 }

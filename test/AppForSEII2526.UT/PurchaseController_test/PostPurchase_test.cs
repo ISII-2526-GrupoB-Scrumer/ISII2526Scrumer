@@ -78,15 +78,24 @@ namespace AppForSEII2526
 
             var dto = Assert.IsType<PurchaseDetailDTO>(createdResult.Value);
 
-            // Verificar datos
-            Assert.Equal(purchaseCreate.PaymentMethod, dto.PaymentMethod);
-            Assert.Equal(purchaseCreate.DeliveryCarDealer, dto.DeliveryCarDealer);
-            // --- CORRECCIÓN ---
-            // La variable en el DTO debe coincidir con la pasada por el controlador
-            Assert.Equal("manolito", dto.ClientId);
-            // --- FIN CORRECCIÓN ---
-            Assert.Equal(3, dto.PurchaseItems.Sum(i => i.Quantity));
-            Assert.Equal(55000m, dto.PurchasingPrice);
+            // Comprobación única de todos los datos relevantes en un solo assert
+            var expected = (
+                PaymentMethod: purchaseCreate.PaymentMethod,
+                DeliveryCarDealer: purchaseCreate.DeliveryCarDealer,
+                ClientId: "manolito", // El DTO devuelve el user name
+                TotalQuantity: 3,
+                PurchasingPrice: 55000m
+            );
+
+            var actual = (
+                PaymentMethod: dto.PaymentMethod,
+                DeliveryCarDealer: dto.DeliveryCarDealer,
+                ClientId: dto.ClientId,
+                TotalQuantity: dto.PurchaseItems.Sum(i => i.Quantity),
+                PurchasingPrice: dto.PurchasingPrice
+            );
+
+            Assert.Equal(expected, actual);
         }
 
         // BAD REQUEST
@@ -118,19 +127,24 @@ namespace AppForSEII2526
 
             // Act
             var resultUser = await controller.CreatePurchase(purchaseBadUser);
-            var resultItems = await controller.CreatePurchase(purchaseNoItems);
 
-            // Assert (Bad User)
+            // Crear nueva instancia del controlador para aislar ModelState entre peticiones
+            var controllerForItems = new PurchaseController(_context, logger);
+            var resultItems = await controllerForItems.CreatePurchase(purchaseNoItems);
+
+            // Assert (Bad User) — una sola aserción que verifica código y keys de error
             var badRequestUser = Assert.IsAssignableFrom<ObjectResult>(resultUser);
-            Assert.Equal(400, badRequestUser.StatusCode); // Bad Request
             var problemDetailsUser = Assert.IsType<ValidationProblemDetails>(badRequestUser.Value);
-            Assert.True(problemDetailsUser.Errors.ContainsKey("ClientId"));
+            var actualUser = $"{badRequestUser.StatusCode ?? 0}:{string.Join(',', problemDetailsUser.Errors.Keys.OrderBy(k => k))}";
+            var expectedUser = "400:ClientId";
+            Assert.Equal(expectedUser, actualUser);
 
-            // Assert (No Items)
+            // Assert (No Items) — una sola aserción que verifica código y keys de error
             var badRequestItems = Assert.IsAssignableFrom<ObjectResult>(resultItems);
-            Assert.Equal(400, badRequestItems.StatusCode); // Bad Request
             var problemDetailsItems = Assert.IsType<ValidationProblemDetails>(badRequestItems.Value);
-            Assert.True(problemDetailsItems.Errors.ContainsKey("PurchaseItems"));
+            var actualItems = $"{badRequestItems.StatusCode ?? 0}:{string.Join(',', problemDetailsItems.Errors.Keys.OrderBy(k => k))}";
+            var expectedItems = "400:PurchaseItems";
+            Assert.Equal(expectedItems, actualItems);
         }
     }
 }
