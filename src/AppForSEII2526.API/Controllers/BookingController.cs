@@ -112,6 +112,7 @@ namespace AppForSEII2526.API.Controllers
 
                 booking.Items.Add(new BookingItem
                 {
+                    BookingId = booking.Id,
                     MaintenanceID = maintenance.Id,
                     Comment = itemDto.Comentarios
                 });

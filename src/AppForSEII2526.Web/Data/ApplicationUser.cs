@@ -6,4 +6,3 @@ namespace AppForSEII2526.Web.Data;
 public class ApplicationUser : IdentityUser
 {
 }
-

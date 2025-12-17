@@ -71,7 +71,7 @@ namespace AppForSEII2526
             var controller = new PurchaseController(_context, logger);
 
             // Act
-            var result = await controller.GetPurchase(999); // ID inexistente
+            var result = await controller.GetPurchase(-1); // ID inexistente
 
             // Assert
             Assert.IsType<NotFoundResult>(result);

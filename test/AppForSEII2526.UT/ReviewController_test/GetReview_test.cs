@@ -135,8 +135,8 @@ namespace AppForSEII2526
             ILogger<ReviewController> logger = mock.Object;
             var controller = new ReviewController(_context, logger);
 
-            // Intentamos obtener una review con un ID que NO existe
-            var result = await controller.GetReview(999);
+            // Intentamos obtener una review con un ID que es MENOR DE 0
+            var result = await controller.GetReview(-1);
 
             // La API debe devolver un NotFound
             Assert.IsType<NotFoundResult>(result);

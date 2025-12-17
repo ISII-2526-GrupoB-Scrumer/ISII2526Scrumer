@@ -11,13 +11,19 @@ namespace AppForSEII2526
 
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
+
+        [Required(ErrorMessage = "El metodo de pago es obligatorio.")]
         public string PaymentMethod { get; set; } = string.Empty;
         public decimal TotalPrice { get; set; }
 
+        [Required(ErrorMessage = "El ID del cliente es obligatorio.")]
         public string ClientId { get; set; } = string.Empty;
 
+        [Required(ErrorMessage = "El nombre es obligatorio.")]
         public string Name { get; set; } = string.Empty;
+        [Required(ErrorMessage = "El apellido es obligatorio.")]
         public string Surname { get; set; } = string.Empty;
+        [Required(ErrorMessage = "La dirección es obligatoria.")]
         public string Address { get; set; } = string.Empty;
 
 
