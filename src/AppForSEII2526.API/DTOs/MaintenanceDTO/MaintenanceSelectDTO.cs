@@ -17,17 +17,6 @@
             Price = price;
             NumberOfDays = numberOfDays;
         }
-        public override bool Equals(object? obj)
-        {
-            if (obj is not MaintenanceSelectDTO other)
-                return false;
-
-            return Id == other.Id &&
-                   Name == other.Name &&
-                   Type == other.Type &&
-                   Price == other.Price &&
-                   NumberOfDays == other.NumberOfDays;
-        }
 
     }
 }

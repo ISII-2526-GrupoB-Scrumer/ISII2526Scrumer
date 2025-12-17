@@ -20,17 +20,5 @@
             TotalPrice = totalPrice;
             Maintenances = maintenances;
         }
-        public override bool Equals(object obj)
-        {
-            if (obj is MaintenanceDetailDTO other)
-            {
-                return this.Id == other.Id &&
-                       this.ClientId == other.ClientId &&
-                       this.PaymentMethod == other.PaymentMethod &&
-                       this.TotalPrice == other.TotalPrice &&
-                       this.Maintenances.SequenceEqual(other.Maintenances);
-            }
-            return false;
-        }
     }
 }
