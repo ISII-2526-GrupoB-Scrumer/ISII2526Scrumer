@@ -76,7 +76,9 @@
             <hr />
 
             <h5>Total: @purchaseState.TotalPrice €</h5>
-
+            <button class="btn btn-outline-primary" type="submit" @onclick="ModifyPurchaseItems" id="ModifyCars">
+                Modificar coches
+            </button>
             <button class="btn btn-success mt-3 w-100"
                     @onclick="ConfirmPurchase">
                 Confirm Purchase
@@ -93,7 +95,10 @@
     private string Errors = "";
     private bool HideErrors => string.IsNullOrEmpty(Errors);
 
-
+    private void ModifyPurchaseItems()
+    {
+        navigation.NavigateTo("/purchase/selectcarsforpurchase");
+    }
     // -----------------------------
     // CONFIRM PURCHASE
     // -----------------------------

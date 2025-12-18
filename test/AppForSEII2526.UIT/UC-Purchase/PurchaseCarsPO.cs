@@ -1,11 +1,14 @@
-﻿using OpenQA.Selenium;
+﻿using AppForSEII2526.UIT.Shared;
+using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 using SeleniumExtras.WaitHelpers;
 using Xunit.Abstractions;
 using System;
 
-namespace AppForSEII2526.UIT.PageObjects.Purchase
+
+namespace AppForSEII2526
 {
+
     public class PurchaseCarsPO
     {
         protected IWebDriver _driver;
@@ -76,5 +79,11 @@ namespace AppForSEII2526.UIT.PageObjects.Purchase
                 }
             });
         }
+        public void RemoveCarFromCart(int id)
+        {
+           
+            _driver.FindElement(By.Id("removeCar_" + id)).Click();
+        }
+
     }
 }

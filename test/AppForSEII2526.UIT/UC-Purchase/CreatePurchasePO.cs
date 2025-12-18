@@ -1,4 +1,5 @@
-﻿using OpenQA.Selenium;
+﻿using AppForSEII2526.UIT.Shared;
+using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 using SeleniumExtras.WaitHelpers;
 using Xunit.Abstractions;
@@ -8,6 +9,7 @@ namespace AppForSEII2526.UIT.PageObjects.Purchase
 {
     public class CreatePurchasePO
     {
+        private By modifyButton = By.Id("ModifyCars");
         protected IWebDriver _driver;
         protected WebDriverWait _wait;
         protected ITestOutputHelper _output;
@@ -52,6 +54,11 @@ namespace AppForSEII2526.UIT.PageObjects.Purchase
                 )
             );
             confirmButton.Click();
+        }
+        public void ModifyCars()
+        {
+           
+            _driver.FindElement(modifyButton).Click();
         }
     }
 }

@@ -270,6 +270,55 @@ namespace AppForSEII2526.UIT.UC_Purchase
 
 
         [Fact]
+        public void UC_FilterByColor_carritomodelocarritoeliminaelprimeroyterminalacompraDisplaysOnlyRojoCars()
+        {
+            Initial_step_opening_the_web_page();
+            _driver.Navigate().GoToUrl(_URI + "purchase/selectcarsforpurchase");
+
+            var colorInput = _wait.Until(ExpectedConditions.ElementIsVisible(
+                By.CssSelector("input[placeholder='Color']") // Suponiendo que el campo de color es un input
+            ));
+            colorInput.SendKeys("Blanco");
+
+            _driver.FindElement(By.XPath("//button[contains(text(),'Search')]")).Click();
+
+            var table = _wait.Until(ExpectedConditions.ElementExists(By.CssSelector("table")));
+            var purchaseCars = new PurchaseCarsPO(_driver, _output);
+            purchaseCars.AddFirstCar();
+            var modelInput = _wait.Until(ExpectedConditions.ElementIsVisible(
+                By.CssSelector("input[placeholder='Model name']")
+            ));
+            modelInput.SendKeys("Tucson");
+            _driver.FindElement(By.XPath("//button[contains(text(),'Search')]")).Click();
+            var purchaseCars2 = new PurchaseCarsPO(_driver, _output);
+            purchaseCars.AddFirstCar();
+            purchaseCars.Continue();
+            Thread.Sleep(1000);
+            _driver.FindElement(By.XPath("//button[contains(text(),'Modificar coches')]")).Click();
+            purchaseCars.RemoveCarFromCart(5);
+            purchaseCars.Continue();
+
+            // Completar el formulario y confirmar (FillPurchaseForm ya hace el Click)
+            FillPurchaseForm(
+                delivery: "Madrid Center",
+                payment: "Bank Transfer",
+                driver: "Experienced",
+                country: "Spain",
+                date: DateTime.Now.AddDays(1)
+            );
+           
+            // Esperar a la redirección a la página de detalles de compra
+            var wait = new WebDriverWait(_driver, TimeSpan.FromSeconds(15));
+            wait.Until(ExpectedConditions.UrlContains("/purchase/details/"));
+
+            // Verificar que la URL contenga "purchase/details/"
+            Assert.Contains("/purchase/details/", _driver.Url);
+
+            
+        }
+
+
+        [Fact]
         public void UC_FilterByModel_Ferrari_DisplaysNoResults()
         {
             Initial_step_opening_the_web_page();
