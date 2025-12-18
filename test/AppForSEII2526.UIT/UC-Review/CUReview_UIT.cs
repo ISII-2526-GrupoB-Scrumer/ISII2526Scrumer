@@ -435,7 +435,7 @@ namespace AppForSEII2526.UIT.UC_Review
             var detailPO = new DetailReviewPO(_driver, _output);
 
             // Act: seleccionar coche inicial
-            selectPO.AddCarToReview(7); 
+            selectPO.AddCarToReview(7);
             selectPO.Continue();
 
             // Act: comprobar que al volver los datos no desaparecen
@@ -457,14 +457,61 @@ namespace AppForSEII2526.UIT.UC_Review
 
             // Assert: verificar que el coche que aparece en los detalles es el Honda Civic (carId 6)
             Assert.True(
-                detailPO.CheckCarModelInDetail(carId), 
+                detailPO.CheckCarModelInDetail(carId),
                 "El coche reseñado debe ser el Honda Civic"
             );
         }
 
 
+        [Fact]
+        [Trait("LevelTesting", "Functional Testing")]
+        public void UC4_16() // EXAMEN SPRINT 3 CU-REVIEW
+        {
+            // Arrange
+            Initial_step_opening_the_web_page();
+            _driver.Navigate().GoToUrl(_URI + "review/selectcarsforreview");
+
+            var selectPO = new SelectCarsForReviewPO(_driver, _output);
+            var createPO = new CreateReviewPO(_driver, _output);
+            var detailPO = new DetailReviewPO(_driver, _output);
 
 
+            selectPO.SearchCars("Ford", ""); // 1)
+            System.Threading.Thread.Sleep(1000); ;
+            selectPO.AddCarToReview(7); // 2)
+            System.Threading.Thread.Sleep(1000); ;
+            selectPO.SearchCars("", "");
 
+            System.Threading.Thread.Sleep(1000); ;
+            selectPO.SearchCars("", "Gasolina"); // 3)
+
+            System.Threading.Thread.Sleep(1000); ;
+            selectPO.AddCarToReview(carId); // 4)
+
+            System.Threading.Thread.Sleep(1000); ;
+            selectPO.Continue();
+            System.Threading.Thread.Sleep(1000); ;
+            createPO.GoBackToSelectCars();
+
+            System.Threading.Thread.Sleep(1000); ;
+            selectPO.RemoveCarFromReview(7); // 5)
+            selectPO.Continue();
+
+            // Act: crear reseña
+            createPO.FillReviewerData("Carlos", "carlitos_l", "España", "Experto");
+            createPO.FillReviewItemByCarId(carId, "5", "Muy buen coche");
+
+            createPO.SubmitReview();
+            createPO.ConfirmDialog();
+
+            // Esperar un momento para asegurar
+            System.Threading.Thread.Sleep(1000); ;
+
+            // Assert: verificar que el coche que aparece en los detalles es el Honda Civic (carId 6)
+            Assert.True(
+                detailPO.CheckCarModelInDetail(carId),
+                "El coche reseñado debe ser el Honda Civic"
+            );
+        }
     }
 }
