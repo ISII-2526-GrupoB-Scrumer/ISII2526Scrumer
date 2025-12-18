@@ -19,7 +19,7 @@ public class BookingItem
     [ForeignKey("BookingId")]
     public Booking Booking { get; set; }
 
-    [ForeignKey("MaintenanceId")]
+    [ForeignKey("MantId")]
     public Maintenance Maintenance { get; set; }
 
     // Constructor por defecto
