@@ -106,9 +106,12 @@
             @foreach (var item in purchaseState.Purchase.PurchaseItems)
             {
                 <div class="row mb-2">
-                    <button class="btn btn-light"
+                    <button class="btn btn-light w-100 text-start"
+                            id="removeCar_@item.CarId"
                             @onclick="@(() => RemoveItem(item))">
-                        x @item.CarModel (@item.Quantity) - @item.PurchasingPrice €
+                        x @item.CarModel
+                        (Cantidad: @item.Quantity)
+                        – @item.PurchasingPrice
                     </button>
                 </div>
             }
