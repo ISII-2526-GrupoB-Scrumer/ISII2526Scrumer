@@ -1,7 +1,6 @@
 ﻿@page "/maintenance/selectcarsformaintenance"
 
 @using Microsoft.AspNetCore.Authorization
-@using AppForSEII2526
 @using AppForSEII2526.Web.API
 @inject AppForSEII2526APIClient apiclient
 @inject ILogger<SelectCarsForMaintenance> logger
@@ -94,21 +93,23 @@
             </div>
         </div>
 
+        <!-- CARRITO -->
         <div class="col-4" hidden="@hideCart">
             <div class="card shadow-sm">
                 <div class="card-header bg-success text-white">
                     <h5 class="mb-0">Servicios a Contratar</h5>
                 </div>
                 <div class="card-body">
-                    @foreach (var item in booking.MaintenanceItems)
+
+                    @foreach (var item in booking.ReservaItems)
                     {
                         <div class="d-flex justify-content-between align-items-center border-bottom py-2">
                             <div>
-                                <strong>@item.MaintenanceName</strong><br />
+                                <strong>@item.Name</strong><br />
                                 <small>@item.Price.ToString("C") x @item.NumberOfDays día(s)</small>
                             </div>
                             <button class="btn btn-sm btn-outline-danger"
-                                    id="remove_@item.MaintenanceId"
+                                    id="remove_@item.ReservaId"
                                     @onclick="@(() => RemoveItem(item))">
                                 &times;
                             </button>
@@ -132,26 +133,21 @@
 </div>
 
 @code {
-    // Variables para filtros (UC3 Paso 2.1)
     private string? nombreFilter;
     private string? tipoFilter;
 
-    // Lista cargada desde la API
     private ICollection<MaintenanceSelectDTO>? maintenances;
 
-    // Gestión de errores
     private string errors = "";
     private bool hideErrors => string.IsNullOrEmpty(errors);
 
-    // Acceso al estado global definido en MaintenanceStateContainer.cs
-    private MaintenanceCreateDTO booking => maintenanceState.Maintenance;
+    // 🔴 DTO CORRECTO
+    private MaintenanceForCreateDTO booking => maintenanceState.Maintenance;
 
-    // Lógica para mostrar/ocultar el carrito
-    private bool hideCart => booking.MaintenanceItems == null || booking.MaintenanceItems.Count == 0;
+    private bool hideCart => booking.ReservaItems == null || booking.ReservaItems.Count == 0;
 
     protected override async Task OnInitializedAsync()
     {
-        // Al iniciar, cargamos los datos por defecto (UC3 Paso 2)
         if (booking.Date == default)
             booking.Date = DateTime.Today.AddDays(1);
 
@@ -162,7 +158,6 @@
     {
         try
         {
-            // Llamamos al controlador de mantenimiento con los filtros de nombre y tipo
             maintenances = await apiclient.GetMaintenancesAsync(nombreFilter, tipoFilter);
             errors = "";
         }
@@ -176,21 +171,18 @@
 
     private void AddMaintenance(MaintenanceSelectDTO m)
     {
-        // Utilizamos el método específico de tu MaintenanceStateContainer.cs
         maintenanceState.AddMaintenanceToCreate(m);
         StateHasChanged();
     }
 
-    private void RemoveItem(MaintenanceItemDTO item)
+    private void RemoveItem(ReservaItemDTO item)
     {
-        // Permite modificar el carrito (Flujo Alternativo 2)
         maintenanceState.RemoveMaintenanceItem(item);
         StateHasChanged();
     }
 
     private void Continue()
     {
-        // Paso 4: Avanza al formulario de contratación
         navigation.NavigateTo("/maintenance/createbooking");
     }
 }

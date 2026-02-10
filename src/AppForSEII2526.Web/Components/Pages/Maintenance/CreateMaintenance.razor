@@ -1,0 +1,123 @@
+﻿@page "/maintenance/createbooking"
+
+@using AppForSEII2526.Web.API
+@inject AppForSEII2526APIClient apiclient
+@inject MaintenanceStateContainer maintenanceState
+@inject NavigationManager navigation
+
+<h3>Confirmar contratación de mantenimientos</h3>
+
+@if (!string.IsNullOrEmpty(error))
+{
+    <div class="alert alert-danger">@error</div>
+}
+
+<h5>Mantenimientos seleccionados</h5>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Precio</th>
+            <th>Días</th>
+            <th>Comentario (obligatorio)</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in booking.ReservaItems)
+        {
+            <tr>
+                <td>@item.Name</td>
+                <td>@item.Price.ToString("C")</td>
+                <td>@item.NumberOfDays</td>
+                <td>
+                    <input class="form-control"
+                           @bind="item.Comentarios" />
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div class="text-end mb-3">
+    <h5>Total: @maintenanceState.TotalPrice.ToString("C")</h5>
+</div>
+
+<hr />
+
+<h5>Datos del cliente</h5>
+
+<div class="row mb-2">
+    <div class="col">
+        <label>Nombre *</label>
+        <input class="form-control"
+               @bind="booking.ApplicationUser" />
+    </div>
+
+    <div class="col">
+        <label>Dirección *</label>
+        <input class="form-control"
+               @bind="booking.ClientAddress" />
+    </div>
+</div>
+
+<div class="row mb-2">
+    <div class="col">
+        <label>Método de pago *</label>
+        <input class="form-control"
+               @bind="booking.PaymentMethod" />
+    </div>
+
+    <div class="col">
+        <label>Teléfono (opcional)</label>
+        <input class="form-control"
+               @bind="booking.PhoneNumber" />
+    </div>
+</div>
+
+<button class="btn btn-success w-100"
+        @onclick="CreateBooking">
+    Contratar mantenimientos
+</button>
+
+@code {
+
+    private string error = "";
+
+    private MaintenanceForCreateDTO booking => maintenanceState.Maintenance;
+
+    protected override void OnInitialized()
+    {
+        // asegurar fecha válida
+        if (booking.Date == default)
+            booking.Date = DateTime.Today;
+    }
+
+    private async Task CreateBooking()
+    {
+        error = "";
+
+        // Validar comentarios obligatorios
+        foreach (var item in booking.ReservaItems)
+        {
+            if (string.IsNullOrWhiteSpace(item.Comentarios))
+            {
+                error = "Todos los mantenimientos necesitan comentario.";
+                return;
+            }
+        }
+
+        try
+        {
+            var result = await apiclient.CreateBookingAsync(booking);
+
+            maintenanceState.MaintenanceProcessed();
+
+            navigation.NavigateTo($"/maintenance/detailbooking?id={result.Id}");
+        }
+        catch (ApiException ex)
+        {
+            error = ex.Response; // muestra error real del backend
+        }
+    }
+}
