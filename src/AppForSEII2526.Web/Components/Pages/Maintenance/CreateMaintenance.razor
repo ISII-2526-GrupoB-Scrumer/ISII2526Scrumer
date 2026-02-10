@@ -62,10 +62,20 @@
 </div>
 
 <div class="row mb-2">
-    <div class="col">
-        <label>Método de pago *</label>
-        <input class="form-control"
-               @bind="booking.PaymentMethod" />
+    <div class="col-md">
+        <div class="form-floating">
+            @*a dropdown for selecting the payment method*@
+            <InputSelect class="form-select" @bind-Value="booking.PaymentMethod" id="PaymentMethod">
+                <option value=""></option>
+                <option value="Visa">Visa</option>
+                <option value="Google Pay">Google Pay</option>
+                <option value="Paypal">Paypal</option>
+            </InputSelect>
+
+            <label for="PaymentMethod">Metodo de pago</label>
+        </div>
+
+
     </div>
 
     <div class="col">
