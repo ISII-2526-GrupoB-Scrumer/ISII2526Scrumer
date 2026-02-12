@@ -141,7 +141,7 @@
     private string errors = "";
     private bool hideErrors => string.IsNullOrEmpty(errors);
 
-    // 🔴 DTO CORRECTO
+    
     private MaintenanceForCreateDTO booking => maintenanceState.Maintenance;
 
     private bool hideCart => booking.ReservaItems == null || booking.ReservaItems.Count == 0;

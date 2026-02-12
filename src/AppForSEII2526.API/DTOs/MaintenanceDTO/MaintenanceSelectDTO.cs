@@ -39,7 +39,7 @@
         }
     }
 
-    // Mantener la clase antigua para compatibilidad hacia atrás si es necesario
+    
     public class MantenimientoDTO
     {
         public int Id { get; set; }
