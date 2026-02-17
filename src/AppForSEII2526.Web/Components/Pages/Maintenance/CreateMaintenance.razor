@@ -32,7 +32,7 @@
                 <td>@item.NumberOfDays</td>
                 <td>
                     <input class="form-control"
-                           @bind="item.Comentarios" />
+                           @bind="item.Comentarios" id="comentario" />
                 </td>
             </tr>
         }
@@ -51,13 +51,13 @@
     <div class="col">
         <label>Nombre *</label>
         <input class="form-control"
-               @bind="booking.ApplicationUser" />
+               @bind="booking.ApplicationUser" id="nombre"/>
     </div>
 
     <div class="col">
         <label>Dirección *</label>
         <input class="form-control"
-               @bind="booking.ClientAddress" />
+               @bind="booking.ClientAddress" id="direccion"/>
     </div>
 </div>
 
@@ -65,7 +65,7 @@
     <div class="col-md">
         <div class="form-floating">
             @*a dropdown for selecting the payment method*@
-            <InputSelect class="form-select" @bind-Value="booking.PaymentMethod" id="PaymentMethod">
+            <InputSelect class="form-select" @bind-Value="booking.PaymentMethod" id="metodopago">
                 <option value=""></option>
                 <option value="Visa">Visa</option>
                 <option value="Google Pay">Google Pay</option>
@@ -81,13 +81,18 @@
     <div class="col">
         <label>Teléfono (opcional)</label>
         <input class="form-control"
-               @bind="booking.PhoneNumber" />
+               @bind="booking.PhoneNumber" id="telefono"/>
     </div>
 </div>
 
 <button class="btn btn-success w-100"
-        @onclick="CreateBooking">
+        @onclick="CreateBooking" id="contratar">
     Contratar mantenimientos
+</button>
+
+<button class="btn btn-primary w-100 mt-2"
+        @onclick="volver" id="volver">
+    Volver a mantenimientos
 </button>
 
 @code {
@@ -95,6 +100,11 @@
     private string error = "";
 
     private MaintenanceForCreateDTO booking => maintenanceState.Maintenance;
+
+    private void volver()
+    {
+        navigation.NavigateTo("/maintenance/selectcarsformaintenance");
+    }
 
     protected override void OnInitialized()
     {
