@@ -4,9 +4,10 @@
     {
         [Required(AllowEmptyStrings = false, ErrorMessage = "Por favor, introduzca un nombre de usuario.")]
         public string ApplicationUser { get; set; }
-        [Required(AllowEmptyStrings = true, ErrorMessage = "Por favor, introduzca una dirección.")]
+        [Required(AllowEmptyStrings = false, ErrorMessage = "Por favor, introduzca una dirección.")]
         public string ClientAddress { get; set; }
-        [Required]
+        
+        [Required(AllowEmptyStrings = false, ErrorMessage = "Por favor, introduzca una dirección.")]
         public string PaymentMethod { get; set; }
         [Required]
         public DateTime Date { get; set; }

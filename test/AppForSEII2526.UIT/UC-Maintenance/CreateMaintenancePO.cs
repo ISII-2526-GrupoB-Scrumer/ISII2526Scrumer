@@ -1,14 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using AppForSEII2526.UIT.Shared;
+using OpenQA.Selenium;
+using OpenQA.Selenium.Support.UI;
+using Xunit.Abstractions;
 
 namespace AppForSEII2526
 {
-    internal class CreateMaintenancePO : PageObject
+    public class CreateMaintenancePO : PageObject
     {
-
         private By inputNombre = By.Id("nombre");
         private By inputDireccion = By.Id("direccion");
         private By inputTelefono = By.Id("telefono");
@@ -18,22 +16,23 @@ namespace AppForSEII2526
 
         public CreateMaintenancePO(IWebDriver driver, ITestOutputHelper output) : base(driver, output)
         {
-
         }
 
         public void FillForm(string nombre, string direccion, string telefono, string pago, string comentario)
         {
-            
             WaitForBeingVisible(inputNombre);
 
+            _driver.FindElement(inputNombre).Clear();
             _driver.FindElement(inputNombre).SendKeys(nombre);
+
+            _driver.FindElement(inputDireccion).Clear();
             _driver.FindElement(inputDireccion).SendKeys(direccion);
+
+            _driver.FindElement(inputTelefono).Clear();
             _driver.FindElement(inputTelefono).SendKeys(telefono);
 
-            
             new SelectElement(_driver.FindElement(selectPago)).SelectByText(pago);
 
-            // Rellenar comentarios (si hay varios, Selenium los encuentra por el mismo ID)
             var comentarios = _driver.FindElements(inputComentario);
             foreach (var campo in comentarios)
             {
@@ -48,10 +47,36 @@ namespace AppForSEII2526
             _driver.FindElement(btnContratar).Click();
         }
 
+        // Método actualizado para detectar errores
+        // CreateMaintenancePO.cs
         public bool ErrorVisible()
         {
-            
-            return _driver.FindElements(By.CssSelector(".alert-danger")).Count > 0;
+            try
+            {
+                // 1. Busca el error manual (ErrorsShown) definido en el Razor
+                bool manualError = _driver.FindElements(By.Id("ErrorsShown")).Any(e => e.Displayed);
+
+                // 2. Busca los mensajes de validación automáticos de Blazor
+                bool summaryError = _driver.FindElements(By.ClassName("validation-message")).Any(e => e.Displayed);
+
+                return manualError || summaryError;
+            }
+            catch (NoSuchElementException)
+            {
+                return false;
+            }
+        }
+
+        public void FillComments(string comentario)
+        {
+       
+            var camposComentario = _driver.FindElements(inputComentario);
+
+            foreach (var campo in camposComentario)
+            {
+                campo.Clear();
+                campo.SendKeys(comentario);
+            }
         }
     }
 }

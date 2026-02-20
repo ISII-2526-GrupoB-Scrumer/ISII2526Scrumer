@@ -1168,6 +1168,7 @@
             "type": "string"
           },
           "clientAddress": {
+            "minLength": 1,
             "type": "string"
           },
           "paymentMethod": {
@@ -1215,6 +1216,7 @@
             "type": "string"
           },
           "clientAddress": {
+            "minLength": 1,
             "type": "string"
           },
           "paymentMethod": {
@@ -1828,6 +1830,9 @@
         "additionalProperties": false
       },
       "ReservaItemDTO": {
+        "required": [
+          "comentarios"
+        ],
         "type": "object",
         "properties": {
           "reservaId": {
@@ -1843,8 +1848,7 @@
             "format": "int32"
           },
           "comentarios": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "name": {
             "type": "string",

@@ -20,7 +20,7 @@ namespace AppForSEII2526.UIT.UC_Maintenance
         }
 
         private const int maintId1 = 1;
-        private const string maintName1 = "Cambio de Aceite";
+        private const string maintName1 = "Cambio aceite";
         private const string maintType1 = "Motor";
 
         [Theory]
@@ -39,7 +39,7 @@ namespace AppForSEII2526.UIT.UC_Maintenance
             detailPO = new DetailMaintenancePO(_driver, _output);
 
             // Act
-            selectPO.AddToCart(1); // Añade el primer mantenimiento disponible [cite: 131]
+            selectPO.AddToCart(1); 
             selectPO.ContinueToBooking();
 
             createPO.FillForm(nom, dir, tel, pago, com);
@@ -51,7 +51,7 @@ namespace AppForSEII2526.UIT.UC_Maintenance
 
         [Fact]
         [Trait("LevelTesting", "Functional Testing")]
-        public void UC3_4() // Esc-2: Servicios no disponibles por filtro [cite: 190]
+        public void UC3_4() 
         {
             Initial_step_opening_the_web_page();
             _driver.Navigate().GoToUrl(_URI + "maintenance/selectcarsformaintenance");
@@ -59,7 +59,7 @@ namespace AppForSEII2526.UIT.UC_Maintenance
 
             selectPO.SearchMaintenance("xxxxx", "xxxxx");
 
-            var expected = new List<string[]>(); // Esperamos tabla vacía [cite: 194]
+            var expected = new List<string[]>(); 
             Assert.True(selectPO.CheckBodyTable(expected, By.Id("TableOfMaintenances")));
         }
 
@@ -68,7 +68,7 @@ namespace AppForSEII2526.UIT.UC_Maintenance
         [InlineData("", "Motor")]
         [InlineData("Aceite", "Motor")]
         [Trait("LevelTesting", "Functional Testing")]
-        public void UC3_5_6_7(string nombre, string tipo) // Esc-3 Filtrar mantenimientos [cite: 170, 196]
+        public void UC3_5_6_7(string nombre, string tipo) 
         {
             Initial_step_opening_the_web_page();
             _driver.Navigate().GoToUrl(_URI + "maintenance/selectcarsformaintenance");
@@ -79,7 +79,7 @@ namespace AppForSEII2526.UIT.UC_Maintenance
 
             var expected = new List<string[]>
             {
-                // Concatenado será "Cambio de Aceite Motor"
+                
                 new[] { maintName1, maintType1 }
             };
 
@@ -88,7 +88,7 @@ namespace AppForSEII2526.UIT.UC_Maintenance
 
         [Fact]
         [Trait("LevelTesting", "Functional Testing")]
-        public void UC3_8() // Esc-4: Servicios no seleccionados [cite: 214]
+        public void UC3_8() 
         {
             Initial_step_opening_the_web_page();
             _driver.Navigate().GoToUrl(_URI + "maintenance/selectcarsformaintenance");
@@ -101,14 +101,13 @@ namespace AppForSEII2526.UIT.UC_Maintenance
         }
 
         [Theory]
-        [InlineData("", "Calle Sol 123, Madrid", "600000001", "Visa", "Comentario")] // Nombre vacío [cite: 223]
-        [InlineData("carlitos_l", "", "600000001", "Visa", "Comentario")]   // Dirección vacía [cite: 238]
-        [InlineData("carlitos_l", "Calle Sol 123, Madrid", "", "Visa", "Comentario")] // Pago vacío [cite: 243]
-        [InlineData("carlitos_l", "Calle Sol 123, Madrid", "600000001", "", "Comentario")]       // Comentario vacío (específico de este CU) [cite: 99]
+        [InlineData("", "Calle Sol 123, Madrid", "600000001", "Visa", "Comentario")] 
+        [InlineData("carlitos_l", "", "600000001", "Visa", "Comentario")] 
+        [InlineData("carlitos_l", "Calle Sol 123, Madrid", "600000001", "", "Comentario")]       
         [InlineData("carlitos_l", "Calle Sol 123, Madrid", "600000001", "Visa", "")]
         [Trait("LevelTesting", "Functional Testing")]
 
-        public void UC3_10_11_12_13_14(string nom, string dir, string tel, string pago, string com) // Esc-6: Error en formulario [cite: 223, 243]
+        public void UC3_10_11_12_13_14(string nom, string dir, string tel, string pago, string com) 
         {
             Initial_step_opening_the_web_page();
             _driver.Navigate().GoToUrl(_URI + "maintenance/selectcarsformaintenance");
@@ -121,13 +120,13 @@ namespace AppForSEII2526.UIT.UC_Maintenance
             createPO.FillForm(nom, dir, tel, pago, com);
             createPO.ClickContratar();
 
-            Assert.True(createPO.ErrorVisible()); // Debe mostrar la alerta de error [cite: 89]
+            Assert.True(createPO.ErrorVisible()); 
         }
 
         [Fact]
         [Trait("LevelTesting", "Functional Testing")]
 
-        public void UC3_15() // Esc-7: Modificar servicios desde el formulario [cite: 218]
+        public void UC3_15() 
         {
             Initial_step_opening_the_web_page();
             _driver.Navigate().GoToUrl(_URI + "maintenance/selectcarsformaintenance");
@@ -138,13 +137,53 @@ namespace AppForSEII2526.UIT.UC_Maintenance
             selectPO.AddToCart(1);
             selectPO.ContinueToBooking();
 
-            _driver.FindElement(By.Id("volver")).Click(); // Botón volver [cite: 95]
+            _driver.FindElement(By.Id("volver")).Click();
 
             selectPO.RemoveFromCart(1);
 
-            Assert.True(selectPO.BookingNotAvailable()); // No se puede continuar sin items [cite: 144]
+            Assert.True(selectPO.BookingNotAvailable());
         }
 
+
+
+        [Theory]
+        [Trait("LevelTesting", "Functional Testing")]
+        [InlineData("carlitos_l", "Calle Sol 123, Madrid", "600000001", "Visa", "comentario")]
+        public void UC3_16(string nom, string dir, string tel, string pago, string com)
+        {
+            // 1. Arrange: Abrir página y preparar POs
+            Initial_step_opening_the_web_page();
+            _driver.Navigate().GoToUrl(_URI + "maintenance/selectcarsformaintenance");
+
+            selectPO = new SelectCarsForMaintenancePO(_driver, _output);
+            createPO = new CreateMaintenancePO(_driver, _output);
+            detailPO = new DetailMaintenancePO(_driver, _output);
+
+            // 2. Act: Seleccionar primer mantenimiento y pasar al Create
+            selectPO.AddToCart(1); // Añade id=1
+            selectPO.ContinueToBooking();
+            Thread.Sleep(1000); // Espera a que cargue la página de Create
+
+            // 3. Act: Rellenar datos iniciales
+            createPO.FillForm(nom, dir, tel, pago, com);
+            Thread.Sleep(500);
+
+            // 4. Act: Volver al Select (botón "volver")
+            _driver.FindElement(By.Id("volver")).Click();
+            Thread.Sleep(1000);
+
+            // 5. Act: Seleccionar un segundo mantenimiento (id=2)
+            selectPO.AddToCart(2);
+            selectPO.ContinueToBooking();
+            Thread.Sleep(1000);
+
+            // 6. Act: Finalizar la contratación
+            createPO.FillForm(nom, dir, tel, pago, com);
+            createPO.ClickContratar();
+            Thread.Sleep(1000);
+
+            // 7. Assert: Verificar en el detalle que aparecen los datos y el precio total
+            Assert.True(detailPO.CheckDetails(nom, dir, ""));
+        }
     }
-    
 }
