@@ -112,8 +112,9 @@ namespace AppForSEII2526.API.Controllers
 
                 booking.Items.Add(new BookingItem
                 {
-                    BookingId = booking.Id,
+                    // BookingId no hace falta asignarlo: EF lo rellena al guardar por la relación booking.Items
                     MaintenanceID = maintenance.Id,
+                    Maintenance = maintenance,          // ✅ ESTO hace que EF rellene MantId correctamente
                     Comment = itemDto.Comentarios
                 });
             }

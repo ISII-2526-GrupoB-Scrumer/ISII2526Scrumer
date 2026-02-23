@@ -1,0 +1,188 @@
+﻿@page "/maintenance/selectcarsformaintenance"
+
+@using Microsoft.AspNetCore.Authorization
+@using AppForSEII2526.Web.API
+@inject AppForSEII2526APIClient apiclient
+@inject ILogger<SelectCarsForMaintenance> logger
+@inject MaintenanceStateContainer maintenanceState
+@inject NavigationManager navigation
+
+<h3>Reserva de Mantenimientos</h3>
+
+<div class="container-fluid">
+
+    <div class="row alert alert-danger" role="alert" hidden="@hideErrors">
+        <p>@errors</p>
+    </div>
+
+    <div class="row">
+
+        <div class="col-8">
+
+            <div class="row mb-3">
+                <div class="col">
+                    <div class="input-group">
+                        <span class="input-group-text">Nombre</span>
+                        <input type="text"
+                               id="inputNombre"
+                               class="form-control"
+                               placeholder="Nombre del servicio"
+                               @bind="nombreFilter" />
+                    </div>
+                </div>
+
+                <div class="col">
+                    <div class="input-group">
+                        <span class="input-group-text">Tipo</span>
+                        <input type="text"
+                               id="inputTipo"
+                               class="form-control"
+                               placeholder="Tipo de mantenimiento"
+                               @bind="tipoFilter" />
+                    </div>
+                </div>
+
+                <div class="col">
+                    <button class="btn btn-primary w-100"
+                            id="buttonBuscar"
+                            @onclick="SearchMaintenances">
+                        Buscar
+                    </button>
+                </div>
+            </div>
+
+            <div class="row">
+                @if (maintenances == null)
+                {
+                    <p>Cargando lista de mantenimientos...</p>
+                }
+                else
+                {
+                    <div class="table-responsive mh-100">
+                        <table class="table table-hover table-condensed" id="TableOfMaintenances">
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Tipo</th>
+                                    <th>Precio</th>
+                                    <th>Días necesarios</th>
+                                    <th>Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var m in maintenances)
+                                {
+                                    <tr>
+                                        <td>@m.Name</td>
+                                        <td>@m.Type</td>
+                                        <td>@m.Price.ToString("C")</td>
+                                        <td>@m.NumberOfDays</td>
+                                        <td>
+                                            <button class="btn btn-outline-success"
+                                                    id="maint_@m.Id"
+                                                    @onclick="@(() => AddMaintenance(m))">
+                                                Añadir
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- CARRITO -->
+        <div class="col-4" hidden="@hideCart">
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">Servicios a Contratar</h5>
+                </div>
+                <div class="card-body">
+
+                    @foreach (var item in booking.ReservaItems)
+                    {
+                        <div class="d-flex justify-content-between align-items-center border-bottom py-2">
+                            <div>
+                                <strong>@item.Name</strong><br />
+                                <small>@item.Price.ToString("C") x @item.NumberOfDays día(s)</small>
+                            </div>
+                            <button class="btn btn-sm btn-outline-danger"
+                                    id="remove_@item.ReservaId"
+                                    @onclick="@(() => RemoveItem(item))">
+                                &times;
+                            </button>
+                        </div>
+                    }
+
+                    <div class="mt-3 text-end">
+                        <h5 id="totalPriceDisplay">Total: @maintenanceState.TotalPrice.ToString("C")</h5>
+                    </div>
+
+                    <button class="btn btn-primary w-100 mt-2"
+                            id="buttonReservar"
+                            @onclick="Continue">
+                        Reservar mantenimiento
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+@code {
+    private string? nombreFilter;
+    private string? tipoFilter;
+
+    private ICollection<MaintenanceSelectDTO>? maintenances;
+
+    private string errors = "";
+    private bool hideErrors => string.IsNullOrEmpty(errors);
+
+    
+    private MaintenanceForCreateDTO booking => maintenanceState.Maintenance;
+
+    private bool hideCart => booking.ReservaItems == null || booking.ReservaItems.Count == 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (booking.Date == default)
+            booking.Date = DateTime.Today.AddDays(1);
+
+        await SearchMaintenances();
+    }
+
+    private async Task SearchMaintenances()
+    {
+        try
+        {
+            maintenances = await apiclient.GetMaintenancesAsync(nombreFilter, tipoFilter);
+            errors = "";
+        }
+        catch (ApiException ex)
+        {
+            logger.LogError($"{DateTime.Now} ERROR: {ex}");
+            errors = "Error al conectar con el sistema de mantenimientos.";
+        }
+        StateHasChanged();
+    }
+
+    private void AddMaintenance(MaintenanceSelectDTO m)
+    {
+        maintenanceState.AddMaintenanceToCreate(m);
+        StateHasChanged();
+    }
+
+    private void RemoveItem(ReservaItemDTO item)
+    {
+        maintenanceState.RemoveMaintenanceItem(item);
+        StateHasChanged();
+    }
+
+    private void Continue()
+    {
+        navigation.NavigateTo("/maintenance/createbooking");
+    }
+}

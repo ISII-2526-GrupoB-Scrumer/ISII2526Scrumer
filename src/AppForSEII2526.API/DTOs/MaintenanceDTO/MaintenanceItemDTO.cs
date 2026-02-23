@@ -5,6 +5,7 @@
         public int ReservaId { get; set; }
         public double Price { get; set; }
         public int NumberOfDays { get; set; }
+        [Required(AllowEmptyStrings = true, ErrorMessage = "Por favor, introduzca una comentario.")]
         public string Comentarios { get; set; }
         public string Name { get; set; }
 

@@ -1,0 +1,90 @@
+﻿@page "/maintenance/detailbooking"
+
+@using AppForSEII2526.Web.API
+@inject AppForSEII2526APIClient apiclient
+@inject NavigationManager navigation
+
+<h3>Detalle de la reserva de mantenimiento</h3>
+
+@if (maintenance == null)
+{
+    <p>Cargando reserva...</p>
+}
+else
+{
+    <div class="card shadow-sm">
+        <div class="card-body">
+
+            <h5>Datos del cliente</h5>
+
+            <p id="ClientName">
+                <strong>Nombre:</strong> @maintenance.ApplicationUser
+            </p>
+
+            <p id="ClientAddress">
+                <strong>Dirección:</strong> @maintenance.ClientAddress
+            </p>
+
+            <p id="PaymentMethod">
+                <strong>Método de pago:</strong> @maintenance.PaymentMethod
+            </p>
+
+            <p id="BookingDate">
+                <strong>Fecha:</strong> @maintenance.Date.Date.ToShortDateString()
+            </p>
+
+            <hr />
+
+            <h5>Mantenimientos contratados</h5>
+
+            <table class="table table-striped" id="DetailItems">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Precio</th>
+                        <th>Días</th>
+                        <th>Comentario</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in maintenance.ReservaItems)
+                    {
+                        <tr id="Item_@item.ReservaId">
+                            <td>@item.Name</td>
+                            <td>@item.Price.ToString("C")</td>
+                            <td>@item.NumberOfDays</td>
+                            <td>@item.Comentarios</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            <hr />
+
+            <h5 class="text-end" id="TotalPrice">
+                Precio total: @maintenance.TotalPrice.ToString("C")
+            </h5>
+
+            <h5 class="text-end" id="TotalDays">
+                Días totales: @maintenance.ReservaItems.Sum(i => i.NumberOfDays)
+            </h5>
+
+        </div>
+    </div>
+}
+
+@code {
+
+    private MaintenanceDetailDTO? maintenance;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var uri = navigation.ToAbsoluteUri(navigation.Uri);
+        var query = System.Web.HttpUtility.ParseQueryString(uri.Query);
+
+        if (int.TryParse(query["id"], out int id))
+        {
+            maintenance = await apiclient.GetBookingAsync(id);
+        }
+    }
+}

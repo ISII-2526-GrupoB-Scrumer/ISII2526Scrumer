@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AppForSEII2526;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
-using AppForSEII2526; // Namespace de tus nuevos DTOs
 
 namespace AppForSEII2526.API.Controllers
 {
@@ -19,7 +21,7 @@ namespace AppForSEII2526.API.Controllers
         // Paso 2: Listar mantenimientos con filtros
         [HttpGet]
         [Route("[action]")]
-        [ProducesResponseType(typeof(IList<MantenimientoDTO>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(IList<MaintenanceSelectDTO>), (int)HttpStatusCode.OK)]
         public async Task<ActionResult> GetMaintenances(string? nombre, string? tipo)
         {
             var query = _context.Maintenance.AsQueryable();
@@ -43,14 +45,14 @@ namespace AppForSEII2526.API.Controllers
                 .ToListAsync();
 
             // Mapeo al DTO final (MaintenanceSelectDTO.cs)
-            var result = data.Select(d => new MantenimientoDTO(
+            var result = data.Select(d => new MaintenanceSelectDTO(
                 d.Id,
                 d.Name,
                 d.TipoPrincipal,
                 (double)d.Price,
                 d.NumberOfDays
             ))
-            .OrderBy(m => m.Nombre)
+            .OrderBy(m => m.Name)
             .ToList();
 
             return Ok(result);

@@ -46,6 +46,7 @@ builder.Services.AddScoped<AppForSEII2526APIClient>(sp => new AppForSEII2526APIC
 builder.Services.AddScoped<ReviewStateContainer>();
 builder.Services.AddScoped<RentalStateContainer>();
 builder.Services.AddScoped<PurchaseStateContainer>();
+builder.Services.AddScoped<MaintenanceStateContainer>();
 
 var app = builder.Build();
 

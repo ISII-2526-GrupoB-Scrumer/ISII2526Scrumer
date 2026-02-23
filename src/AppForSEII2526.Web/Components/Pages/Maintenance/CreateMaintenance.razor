@@ -1,0 +1,152 @@
+﻿@page "/maintenance/createbooking"
+
+@using AppForSEII2526.Web.API
+@inject AppForSEII2526APIClient apiclient
+@inject MaintenanceStateContainer maintenanceState
+@inject NavigationManager navigation
+
+<h3>Confirmar contratación de mantenimientos</h3>
+
+@* Envolvemos el formulario en un EditForm vinculado al modelo de reserva *@
+<EditForm Model="booking" OnValidSubmit="CreateBooking">
+    <DataAnnotationsValidator />
+
+    @* Sumario de errores automático para los campos del DTO (Nombre, Dirección, Pago) *@
+    <div class="row">
+        <ValidationSummary class="alert alert-danger" />
+    </div>
+
+    @* Errores manuales de lógica de negocio o de la API *@
+    @if (!string.IsNullOrEmpty(error))
+    {
+        <div class="alert alert-danger" id="ErrorsShown">@error</div>
+    }
+
+    <h5>Mantenimientos seleccionados</h5>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Precio</th>
+                <th>Días</th>
+                <th>Comentario (obligatorio)</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in booking.ReservaItems)
+            {
+                <tr>
+                    <td>@item.Name</td>
+                    <td>@item.Price.ToString("C")</td>
+                    <td>@item.NumberOfDays</td>
+                    <td>
+                        @* Usamos InputText para que se vincule con el sistema de validación *@
+                        <InputText class="form-control" @bind-Value="item.Comentarios" id="comentario" />
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <div class="text-end mb-3">
+        <h5>Total: @maintenanceState.TotalPrice.ToString("C")</h5>
+    </div>
+
+    <hr />
+
+    <h5>Datos del cliente</h5>
+
+    <div class="row mb-2">
+        <div class="col">
+            <label>Nombre *</label>
+            <InputText class="form-control" @bind-Value="booking.ApplicationUser" id="nombre" />
+        </div>
+
+        <div class="col">
+            <label>Dirección *</label>
+            <InputText class="form-control" @bind-Value="booking.ClientAddress" id="direccion" />
+        </div>
+    </div>
+
+    <div class="row mb-2">
+        <div class="col-md">
+            <div class="form-floating">
+                @* Selector de método de pago *@
+                <InputSelect class="form-select" @bind-Value="booking.PaymentMethod" id="metodopago">
+                    <option value=""></option>
+                    <option value="Visa">Visa</option>
+                    <option value="Google Pay">Google Pay</option>
+                    <option value="Paypal">Paypal</option>
+                </InputSelect>
+
+                <label for="metodopago">Metodo de pago</label>
+            </div>
+        </div>
+
+        <div class="col">
+            <label>Teléfono (opcional)</label>
+            <InputText class="form-control" @bind-Value="booking.PhoneNumber" id="telefono" />
+        </div>
+    </div>
+
+    @* Importante: type="submit" para que el EditForm ejecute OnValidSubmit *@
+    <button class="btn btn-success w-100" type="submit" id="contratar">
+        Contratar mantenimientos
+    </button>
+
+    @* Botón de volver con type="button" para no disparar la validación *@
+    <button class="btn btn-primary w-100 mt-2" type="button" @onclick="volver" id="volver">
+        Volver a mantenimientos
+    </button>
+</EditForm>
+
+@code {
+
+    private string error = "";
+
+    private MaintenanceForCreateDTO booking => maintenanceState.Maintenance;
+
+    private void volver()
+    {
+        navigation.NavigateTo("/maintenance/selectcarsformaintenance");
+    }
+
+    protected override void OnInitialized()
+    {
+        // Asegurar fecha válida por defecto
+        if (booking.Date == default)
+            booking.Date = DateTime.Today;
+    }
+
+    private async Task CreateBooking()
+    {
+        error = "";
+
+        foreach (var item in booking.ReservaItems)
+        {
+            if (string.IsNullOrWhiteSpace(item.Comentarios))
+            {
+                error = "Todos los mantenimientos necesitan comentario.";
+                return;
+            }
+        }
+
+        try
+        {
+            var result = await apiclient.CreateBookingAsync(booking);
+
+            maintenanceState.MaintenanceProcessed();
+
+            navigation.NavigateTo($"/maintenance/detailbooking?id={result.Id}");
+        }
+        catch (ApiException ex)
+        {
+            error = ex.Response;
+        }
+        catch (Exception)
+        {
+            error = "Ocurrió un error inesperado. Por favor, revise los datos e inténtelo de nuevo.";
+        }
+    }
+}
