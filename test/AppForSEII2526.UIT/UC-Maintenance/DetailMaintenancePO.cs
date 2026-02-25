@@ -12,16 +12,35 @@ namespace AppForSEII2526.UIT.UC_Maintenance
         {
         }
 
+        // En DetailMaintenancePO.cs
         public bool CheckDetails(string nombre, string direccion, string precioTotal)
         {
             WaitForBeingVisible(By.Id("TotalPrice"));
 
             bool check = true;
-            check &= _driver.FindElement(By.Id("ClientName")).Text.Contains(nombre); // [cite: 103]
-            check &= _driver.FindElement(By.Id("ClientAddress")).Text.Contains(direccion); // [cite: 104]
-            check &= _driver.FindElement(By.Id("TotalPrice")).Text.Contains(precioTotal); // [cite: 110]
+            check &= _driver.FindElement(By.Id("ClientName")).Text.Contains(nombre);
+            check &= _driver.FindElement(By.Id("ClientAddress")).Text.Contains(direccion);
+
+            // Nueva validación del precio total
+            if (!string.IsNullOrEmpty(precioTotal))
+            {
+                check &= _driver.FindElement(By.Id("TotalPrice")).Text.Contains(precioTotal);
+            }
 
             return check;
+        }
+
+        // Nuevo método para verificar que un item específico existe en la tabla de detalles
+        public bool IsServiceInTable(int reservaId)
+        {
+            try
+            {
+                return _driver.FindElement(By.Id($"Item_{reservaId}")).Displayed;
+            }
+            catch
+            {
+                return false;
+            }
         }
     }
 }
