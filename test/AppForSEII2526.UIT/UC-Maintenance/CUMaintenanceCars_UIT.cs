@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace AppForSEII2526.UIT.UC_Maintenance
 {
@@ -186,6 +187,36 @@ namespace AppForSEII2526.UIT.UC_Maintenance
             // 7. Assert: Verificar en el detalle que aparecen los datos y el precio total
             Assert.True(detailPO.CheckDetails(nom, dir, precioEsperado), "Los datos generales o el precio no coinciden.");
             Assert.True(_driver.PageSource.Contains("Cambio aceite"), "El servicio 'Cambio aceite' no aparece en el detalle.");
+        }
+
+        [Theory]
+        [Trait("LevelTesting", "Functional Testing")]
+        [InlineData("carlitos_l", "Calle Sol 123, Madrid", "600000001", "Visa", "comentario", "250")]
+        public void UC3_15(string nom, string dir, string tel, string pago, string com, string precioEsperado)
+        {
+            Initial_step_opening_the_web_page();
+            _driver.Navigate().GoToUrl(_URI + "maintenance/selectcarsformaintenance");
+            selectPO = new SelectCarsForMaintenancePO(_driver, _output);
+            createPO = new CreateMaintenancePO(_driver, _output);
+            detailPO = new DetailMaintenancePO(_driver, _output);
+
+            selectPO.SearchMaintenance("", "Motor");
+            selectPO.AddToCart(1);
+            Thread.Sleep(1000);
+            selectPO.SearchMaintenance("Revision completa", "");
+            selectPO.AddToCart(6);
+            Thread.Sleep(1000);
+
+            //borro id 2
+            selectPO.RemoveFromCart(1);
+            Thread.Sleep(1000);
+
+            selectPO.ContinueToBooking();
+            createPO.FillForm(nom, dir, tel, pago, com);
+            createPO.ClickContratar();
+
+            Assert.True(detailPO.CheckDetails(nom, dir, precioEsperado), "Los datos generales o el precio no coinciden.");
+            Assert.True(_driver.PageSource.Contains("Revision completa"), "El servicio 'Revision completa' no aparece en el detalle. Es urgente");
         }
     }
 }
